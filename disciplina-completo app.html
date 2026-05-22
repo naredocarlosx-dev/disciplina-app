@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Disciplina — Construye tu mejor versión</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"><\/script>
+<style>
+:root{--bg:#F7F6F2;--surface:#FFF;--surface2:#F0EEE8;--border:rgba(0,0,0,.08);--border-md:rgba(0,0,0,.13);--text:#1A1A18;--text2:#6B6B66;--text3:#A8A89F;--green:#1D9E75;--green-light:#E1F5EE;--green-dark:#0F6E56;--amber:#BA7517;--amber-light:#FAEEDA;--blue:#185FA5;--blue-light:#E6F1FB;--red:#C93030;--red-light:#FCEBEB;--orange:#D85A30;--purple:#534AB7;--purple-light:#EEEDFE;--radius:12px;--radius-sm:8px;--radius-xs:6px;--shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);--shadow-md:0 4px 16px rgba(0,0,0,.09);--shadow-lg:0 8px 32px rgba(0,0,0,.12)}
+*{box-sizing:border-box;margin:0;padding:0}html{font-size:15px;scroll-behavior:smooth}body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.screen{display:none;min-height:100vh}.screen.active{display:block}#screen-app{display:none}#screen-app.active{display:flex}#screen-admin{display:none}#screen-admin.active{display:flex}
+
+/* NAV */
+.land-nav{position:sticky;top:0;z-index:100;background:rgba(247,246,242,.93);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:0 6vw;height:64px;display:flex;align-items:center;justify-content:space-between}
+.land-logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--text)}
+.land-logo-mark{width:34px;height:34px;background:var(--text);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center}
+.land-logo-mark i{color:#fff;font-size:18px}
+.land-logo-name{font-size:17px;font-weight:600;letter-spacing:-.3px}
+.land-nav-links{display:flex;align-items:center;gap:6px}
+.land-nav-links a{padding:7px 14px;font-size:14px;color:var(--text2);text-decoration:none;border-radius:var(--radius-sm);transition:all .15s}
+.land-nav-links a:hover{background:var(--surface2);color:var(--text)}
+.btn-cta{background:var(--text)!important;color:#fff!important;font-weight:500!important}
+.btn-cta:hover{background:#333!important}
+
+/* HERO */
+.hero{padding:80px 6vw 60px;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;max-width:1200px;margin:0 auto}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--green-dark);background:var(--green-light);padding:4px 12px;border-radius:99px;margin-bottom:18px}
+.hero-title{font-family:'DM Serif Display',serif;font-size:clamp(32px,4vw,52px);line-height:1.15;letter-spacing:-.5px;margin-bottom:18px}
+.hero-title em{color:var(--green);font-style:italic}
+.hero-sub{font-size:16px;color:var(--text2);line-height:1.7;margin-bottom:28px;max-width:440px}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap}
+.btn-hero-primary{display:inline-flex;align-items:center;gap:8px;background:var(--text);color:#fff;padding:13px 24px;border-radius:var(--radius-sm);font-size:15px;font-weight:500;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .15s;text-decoration:none}
+.btn-hero-primary:hover{background:#333;transform:translateY(-1px)}
+.btn-hero-secondary{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--text);padding:13px 24px;border-radius:var(--radius-sm);font-size:15px;cursor:pointer;border:1px solid var(--border-md);font-family:'DM Sans',sans-serif;transition:all .15s;text-decoration:none}
+.btn-hero-secondary:hover{background:var(--surface2)}
+.hero-stats{display:flex;gap:24px;margin-top:28px;padding-top:24px;border-top:1px solid var(--border)}
+.hero-stat-val{font-size:22px;font-weight:700;font-family:'DM Mono',monospace}
+.hero-stat-label{font-size:12px;color:var(--text3);margin-top:2px}
+.hero-visual{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow-lg)}
+.hero-mockup-bar{display:flex;gap:5px;margin-bottom:14px}
+.hero-mockup-dot{width:10px;height:10px;border-radius:50%}
+.mock-greeting{font-size:13px;font-weight:600;margin-bottom:4px}
+.mock-date{font-size:11px;color:var(--text3);margin-bottom:12px}
+.mock-quote{background:var(--green-light);border-left:3px solid var(--green);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:10px 12px;margin-bottom:12px;font-size:11px;font-style:italic;color:var(--green-dark);line-height:1.5}
+.mock-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px}
+.mock-metric{background:var(--surface2);border-radius:var(--radius-xs);padding:8px;text-align:center}
+.mock-metric-val{font-size:16px;font-weight:700;font-family:'DM Mono',monospace}
+.mock-metric-label{font-size:9px;color:var(--text3);margin-top:2px}
+.mock-habit{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)}
+.mock-check{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--border-md);flex-shrink:0}
+.mock-check.done{background:var(--green);border-color:var(--green)}
+.mock-habit-name{font-size:11px;font-weight:500}
+.mock-streak{font-size:10px;font-weight:600;background:var(--amber-light);color:var(--amber);padding:1px 6px;border-radius:99px;margin-left:auto}
+
+/* SECTIONS */
+.section{padding:72px 6vw;max-width:1200px;margin:0 auto}
+.section-full{padding:72px 6vw;background:var(--surface)}
+.section-full .section-inner{max-width:1200px;margin:0 auto}
+.section-label{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
+.section-title{font-family:'DM Serif Display',serif;font-size:clamp(24px,3vw,38px);letter-spacing:-.3px;line-height:1.2;margin-bottom:14px}
+.section-sub{font-size:15px;color:var(--text2);line-height:1.7;max-width:520px}
+
+/* FEATURES */
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:40px}
+.feat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 20px;box-shadow:var(--shadow);transition:box-shadow .2s,transform .2s}
+.feat-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.feat-icon{width:42px;height:42px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px}
+.feat-title{font-size:15px;font-weight:600;margin-bottom:6px}
+.feat-sub{font-size:13px;color:var(--text2);line-height:1.6}
+.feat-green{background:var(--green-light);color:var(--green-dark)}
+.feat-amber{background:var(--amber-light);color:var(--amber)}
+.feat-blue{background:var(--blue-light);color:var(--blue)}
+.feat-purple{background:var(--purple-light);color:var(--purple)}
+.feat-red{background:var(--red-light);color:var(--red)}
+.feat-surface{background:var(--surface2);color:var(--text2)}
+
+/* ABOUT */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;margin-top:36px}
+.about-text p{font-size:15px;color:var(--text2);line-height:1.75;margin-bottom:14px}
+.about-values{display:flex;flex-direction:column;gap:12px;margin-top:20px}
+.about-value{display:flex;align-items:flex-start;gap:12px}
+.about-value-icon{width:32px;height:32px;border-radius:var(--radius-xs);background:var(--green-light);color:var(--green-dark);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;margin-top:1px}
+.about-value-title{font-size:14px;font-weight:600;margin-bottom:2px}
+.about-value-sub{font-size:13px;color:var(--text2)}
+.about-card{background:var(--text);color:#fff;border-radius:var(--radius);padding:30px 28px}
+.about-card-title{font-family:'DM Serif Display',serif;font-size:24px;line-height:1.3;margin-bottom:14px}
+.about-card-sub{font-size:14px;line-height:1.7;opacity:.75;margin-bottom:20px}
+.about-pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;background:rgba(255,255,255,.12);color:#fff;padding:5px 12px;border-radius:99px;margin:3px}
+
+/* FAQ */
+.faq-list{margin-top:36px;max-width:720px}
+.faq-item{border-bottom:1px solid var(--border);padding:18px 0;cursor:pointer}
+.faq-q{display:flex;justify-content:space-between;align-items:center;font-size:15px;font-weight:500}
+.faq-q i{font-size:18px;color:var(--text3);transition:transform .2s;flex-shrink:0}
+.faq-item.open .faq-q i{transform:rotate(45deg);color:var(--green)}
+.faq-a{font-size:14px;color:var(--text2);line-height:1.7;margin-top:0;max-height:0;overflow:hidden;transition:max-height .3s ease,margin-top .2s}
+.faq-item.open .faq-a{max-height:200px;margin-top:10px}
+
+/* FOOTER */
+.land-footer{background:var(--text);color:#fff;padding:48px 6vw 28px}
+.footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:40px;margin-bottom:36px;max-width:1200px;margin-left:auto;margin-right:auto}
+.footer-brand{font-size:16px;font-weight:600;margin-bottom:10px}
+.footer-desc{font-size:13px;opacity:.6;line-height:1.6}
+.footer-col-title{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;opacity:.5;margin-bottom:12px}
+.footer-link{display:block;font-size:13px;opacity:.7;text-decoration:none;color:#fff;margin-bottom:7px;transition:opacity .15s}
+.footer-link:hover{opacity:1}
+.footer-bottom{max-width:1200px;margin:0 auto;border-top:1px solid rgba(255,255,255,.1);padding-top:20px;display:flex;justify-content:space-between;align-items:center;font-size:12px;opacity:.5}
+
+/* AUTH */
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--bg)}
+.auth-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:36px 32px;width:100%;max-width:400px;box-shadow:var(--shadow-lg)}
+.auth-logo{display:flex;align-items:center;gap:8px;margin-bottom:28px;justify-content:center}
+.auth-logo-mark{width:36px;height:36px;background:var(--text);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center}
+.auth-logo-mark i{color:#fff;font-size:18px}
+.auth-tabs{display:flex;background:var(--surface2);border-radius:var(--radius-sm);padding:3px;gap:3px;margin-bottom:22px}
+.auth-tab{flex:1;padding:7px;border-radius:var(--radius-xs);text-align:center;cursor:pointer;font-size:13px;font-weight:500;color:var(--text2);border:none;background:transparent;font-family:'DM Sans',sans-serif;transition:all .15s}
+.auth-tab.active{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+.auth-form{display:none}.auth-form.active{display:block}
+.form-row-m{margin-bottom:14px}
+.form-label-m{font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px}
+.form-input{width:100%;padding:10px 12px;border:1px solid var(--border-md);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border .15s}
+.form-input:focus{border-color:var(--green)}
+.auth-error{font-size:12px;color:var(--red);background:var(--red-light);border:1px solid #F09595;border-radius:var(--radius-xs);padding:8px 12px;margin-bottom:12px;display:none}
+.auth-back{display:block;text-align:center;font-size:13px;color:var(--text3);margin-top:16px;cursor:pointer}
+.auth-back:hover{color:var(--text)}
+.btn-auth{width:100%;padding:11px;border:none;border-radius:var(--radius-sm);background:var(--text);color:#fff;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-auth:hover{background:#333}
+.demo-hint{font-size:11px;color:var(--text3);text-align:center;margin-top:12px;line-height:1.5}
+.demo-hint strong{color:var(--text2)}
+
+/* APP SIDEBAR */
+.sidebar{width:220px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:28px 16px 20px;position:fixed;top:0;left:0;bottom:0;z-index:10}
+.logo{display:flex;align-items:center;gap:10px;padding:0 8px;margin-bottom:28px}
+.logo-mark{width:34px;height:34px;background:var(--text);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center}
+.logo-mark i{color:#fff;font-size:18px}
+.logo-name{font-size:17px;font-weight:600;letter-spacing:-.3px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--radius-sm);cursor:pointer;font-size:14px;font-weight:400;color:var(--text2);transition:all .15s;border:none;background:transparent;width:100%;text-align:left;font-family:'DM Sans',sans-serif}
+.nav-item i{font-size:18px;flex-shrink:0}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:var(--text);color:#fff;font-weight:500}
+.nav-item .badge{margin-left:auto;font-size:10px;font-weight:600;background:var(--red);color:#fff;padding:1px 6px;border-radius:99px}
+.nav-item.active .badge{background:rgba(255,255,255,.25)}
+.nav-divider{height:1px;background:var(--border);margin:10px 0}
+.sidebar-user{display:flex;align-items:center;gap:8px;padding:10px;border-radius:var(--radius-sm);margin-top:auto;background:var(--surface2)}
+.sidebar-avatar{width:30px;height:30px;border-radius:50%;background:var(--green-light);border:1.5px solid #9FE1CB;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--green-dark);flex-shrink:0}
+.sidebar-user-name{font-size:12px;font-weight:500;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sidebar-user-role{font-size:10px;color:var(--text3)}
+
+/* APP MAIN */
+.app-main{margin-left:220px;flex:1;min-height:100vh;padding:32px 36px;max-width:calc(100vw - 220px)}
+.app-page{display:none}.app-page.active{display:block}
+
+/* SHARED */
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.topbar-greeting{font-size:22px;font-weight:600;letter-spacing:-.4px}
+.topbar-date{font-size:13px;color:var(--text3);margin-top:3px}
+.today-pill{background:var(--text);color:#fff;font-size:12px;font-weight:500;padding:6px 16px;border-radius:99px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;margin-bottom:16px;box-shadow:var(--shadow)}
+.card-title{font-size:12px;font-weight:600;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:7px}
+.card-title i{font-size:15px}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px}
+.metric-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow)}
+.metric-card.accent-green{border-top:3px solid var(--green)}.metric-card.accent-amber{border-top:3px solid var(--amber)}.metric-card.accent-blue{border-top:3px solid var(--blue)}.metric-card.accent-red{border-top:3px solid var(--red)}.metric-card.accent-purple{border-top:3px solid var(--purple)}
+.metric-label{font-size:11px;color:var(--text3);font-weight:500;letter-spacing:.03em;margin-bottom:6px}
+.metric-val{font-size:26px;font-weight:600;letter-spacing:-.5px;font-family:'DM Mono',monospace}
+.metric-val.c-green{color:var(--green-dark)}.metric-val.c-amber{color:var(--amber)}.metric-val.c-blue{color:var(--blue)}.metric-val.c-red{color:var(--red)}.metric-val.c-purple{color:var(--purple)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;border:none}
+.btn-dark{background:var(--text);color:#fff}.btn-dark:hover{background:#333}
+.btn-outline{background:transparent;color:var(--text2);border:1px solid var(--border-md)}.btn-outline:hover{background:var(--surface2);color:var(--text)}
+.btn-green{background:var(--green);color:#fff}.btn-green:hover{background:var(--green-dark)}
+.btn-red{background:var(--red);color:#fff}.btn-red:hover{background:#a82424}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn-icon{width:32px;height:32px;border-radius:var(--radius-xs);display:flex;align-items:center;justify-content:center;background:transparent;border:none;cursor:pointer;color:var(--text3);font-size:17px;transition:all .15s}
+.btn-icon:hover{background:var(--surface2);color:var(--text)}
+.page-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px}
+.page-title{font-size:24px;font-weight:600;letter-spacing:-.4px}
+.page-sub{font-size:13px;color:var(--text2);margin-top:3px}
+.section-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.section-title{font-size:15px;font-weight:600;letter-spacing:-.2px}
+.empty{text-align:center;padding:24px;color:var(--text3);font-size:13px}
+.habit-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)}
+.habit-row:last-child{border-bottom:none}
+.check-box{width:24px;height:24px;border-radius:7px;border:1.5px solid var(--border-md);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.check-box.done{background:var(--green);border-color:var(--green);color:#fff}
+.check-box i{font-size:14px}
+.habit-name{font-size:14px;font-weight:500}
+.habit-meta{font-size:12px;color:var(--text3);margin-top:2px}
+.streak-pill{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;background:var(--amber-light);color:var(--amber);padding:2px 8px;border-radius:99px}
+.pb-wrap{height:6px;border-radius:99px;background:var(--surface2);overflow:hidden;margin-top:6px}
+.pb-fill{height:100%;border-radius:99px;transition:width .5s}
+.pb-green{background:var(--green)}.pb-amber{background:var(--amber)}.pb-red{background:var(--red)}.pb-orange{background:var(--orange)}.pb-blue{background:var(--blue)}.pb-purple{background:var(--purple)}
+.tag{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px}
+.tag-green{background:var(--green-light);color:var(--green-dark)}.tag-amber{background:var(--amber-light);color:var(--amber)}.tag-blue{background:var(--blue-light);color:var(--blue)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;backdrop-filter:blur(2px)}
+.modal{background:var(--surface);border-radius:var(--radius);padding:24px;width:100%;max-width:420px;box-shadow:var(--shadow-lg);border:1px solid var(--border);max-height:90vh;overflow-y:auto}
+.modal-title{font-size:17px;font-weight:600;margin-bottom:18px;letter-spacing:-.3px}
+.modal-footer{display:flex;gap:8px;margin-top:18px;justify-content:flex-end}
+input[type=text],input[type=number],input[type=date],input[type=time],input[type=email],input[type=password],select,textarea{width:100%;padding:9px 12px;border:1px solid var(--border-md);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;transition:border .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--green)}
+textarea{resize:none;min-height:70px;line-height:1.5}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.alert-banner{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-radius:var(--radius-sm);margin-bottom:12px;border:1px solid;animation:slideDown .25s ease}
+@keyframes slideDown{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.alert-empty{background:var(--red-light);border-color:#F09595;color:#791F1F}
+.alert-low{background:var(--amber-light);border-color:#FAC775;color:#633806}
+.alert-banner i{font-size:18px;flex-shrink:0;margin-top:1px}
+.alert-body{flex:1}.alert-title{font-size:13px;font-weight:600}.alert-sub{font-size:12px;margin-top:3px;opacity:.85;line-height:1.4}
+.inv-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.inv-row:last-child{border-bottom:none}
+.inv-icon{width:40px;height:40px;border-radius:var(--radius-sm);background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--text2);flex-shrink:0}
+.inv-info{flex:1;min-width:0}.inv-name{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.inv-meta{font-size:12px;color:var(--text3);margin-top:2px}
+.inv-pct{font-size:15px;font-weight:700;font-family:'DM Mono',monospace;min-width:46px;text-align:right}
+.critical-badge{font-size:10px;font-weight:600;padding:1px 7px;border-radius:99px}
+.cb-empty{background:var(--red-light);color:var(--red)}.cb-low{background:var(--amber-light);color:var(--amber)}
+.saving-card{border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:10px;background:var(--surface);transition:box-shadow .15s}
+.saving-card:hover{box-shadow:var(--shadow-md)}
+.meal-slot-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--radius-sm);background:var(--surface2);margin-bottom:6px;border:1px solid var(--border)}
+.meal-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.meal-slot-label{font-size:11px;font-weight:600;color:var(--text3);width:78px;flex-shrink:0}
+.meal-slot-food{font-size:13px;color:var(--text);flex:1}
+.meal-slot-time{font-size:11px;color:var(--text3)}
+.day-tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.day-tab{padding:7px 14px;border-radius:var(--radius-sm);font-size:13px;cursor:pointer;border:1px solid var(--border-md);background:transparent;color:var(--text2);font-family:'DM Sans',sans-serif;transition:all .15s}
+.day-tab.active{background:var(--text);color:#fff;border-color:var(--text);font-weight:500}
+.day-tab:hover:not(.active){background:var(--surface2)}
+.workout-row{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:var(--radius-sm);background:var(--surface2);margin-bottom:8px;border:1px solid var(--border)}
+.w-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.week-cell{border-radius:var(--radius-sm);padding:10px 8px;background:var(--surface2);border:1px solid var(--border);min-height:70px}
+.week-cell.today{border:2px solid var(--green)}
+.week-cell-day{font-size:10px;font-weight:600;color:var(--text3);text-align:center;margin-bottom:6px}
+.week-pill{font-size:9px;font-weight:600;padding:2px 5px;border-radius:4px;margin-bottom:3px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.filter-btn{font-size:12px;padding:5px 12px;border-radius:99px;cursor:pointer;border:1px solid var(--border-md);background:transparent;color:var(--text2);font-family:'DM Sans',sans-serif;transition:all .15s}
+.filter-btn.active{background:var(--text);color:#fff;border-color:var(--text);font-weight:500}
+.filter-btn:hover:not(.active){background:var(--surface2)}
+.move-type-btn{flex:1;padding:9px 12px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;font-weight:500;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s;border:1px solid var(--border-md)}
+.move-type-btn.active-use{background:var(--red-light);color:var(--red);border-color:#F09595}
+.move-type-btn.active-buy{background:var(--green-light);color:var(--green-dark);border-color:#9FE1CB}
+.move-type-btn:not(.active-use):not(.active-buy){background:transparent;color:var(--text2)}
+.chart-wrap{position:relative;width:100%;height:180px}
+.log-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.log-row:last-child{border-bottom:none}
+.log-icon{width:30px;height:30px;border-radius:var(--radius-xs);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.log-icon.buy{background:var(--green-light);color:var(--green-dark)}.log-icon.use{background:var(--amber-light);color:var(--amber)}
+.log-name{font-size:13px;font-weight:500}.log-detail{font-size:12px;color:var(--text3);margin-top:1px}
+.cat-badge{font-size:10px;font-weight:600;padding:2px 7px;border-radius:99px}
+.cat-lacteos{background:var(--blue-light);color:var(--blue)}.cat-verduras{background:#EAF3DE;color:#27500A}.cat-carnes{background:#FAECE7;color:#712B13}.cat-granos{background:var(--amber-light);color:var(--amber)}.cat-bebidas{background:var(--purple-light);color:var(--purple)}.cat-otros{background:var(--surface2);color:var(--text2)}
+.quote-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px 20px 28px;margin-bottom:20px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.quote-accent{position:absolute;top:0;left:0;width:4px;height:100%;background:var(--green);border-radius:4px 0 0 4px}
+.quote-mark{font-size:64px;line-height:1;color:rgba(0,0,0,.07);font-family:Georgia,serif;position:absolute;top:8px;right:16px;user-select:none;font-style:italic}
+.quote-text{font-size:15px;line-height:1.7;color:var(--text);font-style:italic;margin-bottom:14px;padding-right:40px;font-family:Georgia,serif}
+.quote-footer{display:flex;align-items:center;gap:10px}
+.quote-avatar{width:34px;height:34px;border-radius:50%;background:var(--green-light);border:1.5px solid #9FE1CB;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--green-dark);flex-shrink:0}
+.quote-name{font-size:13px;font-weight:600}.quote-role{font-size:11px;color:var(--text3);margin-top:1px}
+.quote-date-pill{margin-left:auto;font-size:11px;font-weight:500;color:var(--green-dark);background:var(--green-light);padding:3px 10px;border-radius:99px;display:flex;align-items:center;gap:4px}
+.dash-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}
+.dash-col{display:flex;flex-direction:column;gap:16px}
+
+/* ADMIN */
+.admin-table{width:100%;border-collapse:collapse;font-size:13px}
+.admin-table th{text-align:left;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--text3);padding:8px 12px;border-bottom:2px solid var(--border)}
+.admin-table td{padding:11px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+.admin-table tr:hover td{background:var(--surface2)}
+.role-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px}
+.role-admin{background:#EEEDFE;color:#3C3489}.role-user{background:var(--green-light);color:var(--green-dark)}
+.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}
+.status-active{background:var(--green)}.status-inactive{background:var(--text3)}
+.search-input{padding:8px 12px;border:1px solid var(--border-md);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:13px;background:var(--surface);color:var(--text);outline:none;width:220px}
+.search-input:focus{border-color:var(--green)}
+
+@media(max-width:1100px){.dash-grid{grid-template-columns:1fr}.hero{grid-template-columns:1fr;padding:48px 6vw}.hero-visual{display:none}.about-grid{grid-template-columns:1fr}.footer-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:780px){.sidebar{width:60px;padding:16px 8px}.logo-name,.nav-item span,.sidebar-user-name,.sidebar-user-role{display:none}.app-main{margin-left:60px;padding:20px 18px;max-width:calc(100vw - 60px)}.nav-item{justify-content:center;padding:10px}.logo{justify-content:center;padding:0}.metric-grid{grid-template-columns:repeat(2,1fr)}.land-nav-links a:not(.btn-cta){display:none}.footer-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- LANDING -->
+<div id="screen-landing" class="screen active">
+<nav class="land-nav">
+  <a href="#" class="land-logo"><div class="land-logo-mark"><i class="ti ti-bolt"></i></div><span class="land-logo-name">Disciplina</span></a>
+  <div class="land-nav-links">
+    <a href="#features">Características</a><a href="#about">Quiénes somos</a><a href="#faq">FAQ</a>
+    <a href="#" onclick="showScreen('screen-auth');return false" class="btn-cta">Iniciar sesión</a>
+  </div>
+</nav>
+<div class="hero">
+  <div>
+    <div class="hero-eyebrow"><i class="ti ti-bolt" style="font-size:13px"></i>Hábitos que transforman</div>
+    <h1 class="hero-title">Construye tu <em>mejor versión</em> cada día</h1>
+    <p class="hero-sub">Disciplina es la app todo-en-uno para rastrear hábitos, controlar tu alimentación, alcanzar metas de ahorro y mantenerte activo. Simple, rápida y sin distracciones.</p>
+    <div class="hero-actions">
+      <a href="#" class="btn-hero-primary" onclick="showScreen('screen-auth');return false"><i class="ti ti-arrow-right" style="font-size:16px"></i>Comenzar gratis</a>
+      <a href="#features" class="btn-hero-secondary"><i class="ti ti-eye" style="font-size:16px"></i>Ver características</a>
+    </div>
+    <div class="hero-stats">
+      <div><div class="hero-stat-val">6</div><div class="hero-stat-label">módulos integrados</div></div>
+      <div><div class="hero-stat-val">30</div><div class="hero-stat-label">frases de Brian Tracy</div></div>
+      <div><div class="hero-stat-val">100%</div><div class="hero-stat-label">tuyo, sin anuncios</div></div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-mockup-bar"><div class="hero-mockup-dot" style="background:#FF5F57"></div><div class="hero-mockup-dot" style="background:#FFBD2E"></div><div class="hero-mockup-dot" style="background:#28C840"></div></div>
+    <div class="mock-greeting">Buenos días 👋</div><div class="mock-date">Miércoles, 21 de mayo de 2025</div>
+    <div class="mock-quote">"Successful people are simply those with successful habits." — Brian Tracy</div>
+    <div class="mock-metrics">
+      <div class="mock-metric"><div class="mock-metric-val" style="color:#1D9E75">2/3</div><div class="mock-metric-label">Completados</div></div>
+      <div class="mock-metric"><div class="mock-metric-val" style="color:#BA7517">5🔥</div><div class="mock-metric-label">Racha máx.</div></div>
+      <div class="mock-metric"><div class="mock-metric-val" style="color:#185FA5">67%</div><div class="mock-metric-label">% del día</div></div>
+    </div>
+    <div class="mock-habit"><div class="mock-check done"></div><div class="mock-habit-name" style="text-decoration:line-through;color:#A8A89F">Ahorrar hoy</div><span class="mock-streak">🔥 3</span></div>
+    <div class="mock-habit"><div class="mock-check done"></div><div class="mock-habit-name" style="text-decoration:line-through;color:#A8A89F">Seguir mi dieta</div><span class="mock-streak">🔥 5</span></div>
+    <div class="mock-habit"><div class="mock-check"></div><div class="mock-habit-name">Entrenar</div><span class="mock-streak">🔥 2</span></div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<div id="features" class="section-full">
+  <div class="section-inner">
+    <div class="section-label">Características</div>
+    <h2 class="section-title">Todo lo que necesitas en un solo lugar</h2>
+    <p class="section-sub">Diseñado para ser rápido, claro e intuitivo. En segundos sabes qué tienes que hacer hoy.</p>
+    <div class="features-grid">
+      <div class="feat-card"><div class="feat-icon feat-green"><i class="ti ti-check"></i></div><div class="feat-title">Seguimiento de hábitos</div><div class="feat-sub">Check diario, racha de días consecutivos y gráfica semanal para mantenerte motivado día tras día.</div></div>
+      <div class="feat-card"><div class="feat-icon feat-amber"><i class="ti ti-piggy-bank"></i></div><div class="feat-title">Metas de ahorro</div><div class="feat-sub">Define objetivos financieros, registra aportaciones y visualiza tu avance con barra de progreso en tiempo real.</div></div>
+      <div class="feat-card"><div class="feat-icon feat-blue"><i class="ti ti-salad"></i></div><div class="feat-title">Planificador de comidas</div><div class="feat-sub">5 tiempos de comida con horario por día. Vista semanal completa y plan de dieta personalizado.</div></div>
+      <div class="feat-card"><div class="feat-icon feat-purple"><i class="ti ti-barbell"></i></div><div class="feat-title">Rutinas de fitness</div><div class="feat-sub">Crea rutinas, asígnalas a días de la semana y márcalas completadas desde el dashboard.</div></div>
+      <div class="feat-card"><div class="feat-icon feat-red"><i class="ti ti-package"></i></div><div class="feat-title">Inventario de cocina</div><div class="feat-sub">Registra compras y consumo. Alertas automáticas al 3% de stock para nunca quedarte sin nada.</div></div>
+      <div class="feat-card"><div class="feat-icon feat-surface"><i class="ti ti-quote"></i></div><div class="feat-title">Frase diaria</div><div class="feat-sub">Una frase de Brian Tracy diferente cada día. 30 frases curadas para inspirar tu jornada.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div id="about" class="section">
+  <div class="section-label">Quiénes somos</div>
+  <h2 class="section-title">Una app hecha por personas que buscan mejorar</h2>
+  <div class="about-grid">
+    <div class="about-text">
+      <p>Disciplina nació de una pregunta simple: ¿por qué es tan difícil mantener buenos hábitos si todo el mundo sabe lo que necesita hacer?</p>
+      <p>La respuesta no es falta de voluntad, sino falta de sistema. Disciplina es ese sistema: visual, sin fricción y enfocado en lo que más importa para tu salud, finanzas y bienestar.</p>
+      <p>No somos una gran corporación. Somos un equipo pequeño obsesionado con el diseño limpio y la efectividad real. Cada función fue incluida porque la usamos nosotros mismos.</p>
+      <div class="about-values">
+        <div class="about-value"><div class="about-value-icon"><i class="ti ti-target"></i></div><div><div class="about-value-title">Claridad sobre complejidad</div><div class="about-value-sub">Menos ruido, más acción. Cada pantalla tiene un propósito claro.</div></div></div>
+        <div class="about-value"><div class="about-value-icon"><i class="ti ti-heart"></i></div><div><div class="about-value-title">Diseñado para el largo plazo</div><div class="about-value-sub">No para el día 1. Para el día 90, el día 180 y más allá.</div></div></div>
+        <div class="about-value"><div class="about-value-icon"><i class="ti ti-lock"></i></div><div><div class="about-value-title">Sin anuncios, sin rastreo</div><div class="about-value-sub">Tu información es tuya. Sin vender datos, sin interrupciones.</div></div></div>
+      </div>
+    </div>
+    <div class="about-card">
+      <div class="about-card-title">Nuestra misión</div>
+      <div class="about-card-sub">Hacer que la disciplina sea el camino de menor resistencia. Cuando rastrear un hábito tarda menos de 3 segundos, lo haces todos los días.</div>
+      <div style="margin-bottom:12px">
+        <span class="about-pill"><i class="ti ti-check" style="font-size:13px"></i>Hábitos</span>
+        <span class="about-pill"><i class="ti ti-piggy-bank" style="font-size:13px"></i>Ahorro</span>
+        <span class="about-pill"><i class="ti ti-salad" style="font-size:13px"></i>Nutrición</span>
+        <span class="about-pill"><i class="ti ti-barbell" style="font-size:13px"></i>Fitness</span>
+        <span class="about-pill"><i class="ti ti-package" style="font-size:13px"></i>Inventario</span>
+        <span class="about-pill"><i class="ti ti-chart-line" style="font-size:13px"></i>Progreso</span>
+      </div>
+      <div style="font-size:13px;opacity:.6;line-height:1.5">Versión 1.0 · Hecho con dedicación · 100% navegador local</div>
+    </div>
+  </div>
+</div>
+
+<!-- FAQ -->
+<div id="faq" class="section-full">
+  <div class="section-inner">
+    <div class="section-label">Preguntas frecuentes</div>
+    <h2 class="section-title">Resolvemos tus dudas</h2>
+    <div class="faq-list">
+      <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q"><span>¿Disciplina es gratuita?</span><i class="ti ti-plus"></i></div><div class="faq-a">Sí, completamente gratuita. No hay planes de pago, suscripciones ni funciones ocultas. Toda la app está disponible desde el primer día sin costo alguno.</div></div>
+      <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q"><span>¿Mis datos están seguros? ¿Se guardan en la nube?</span><i class="ti ti-plus"></i></div><div class="faq-a">Todo se guarda localmente en tu navegador durante la sesión. No enviamos información a ningún servidor. Tus hábitos, comidas y metas son completamente privados.</div></div>
+      <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q"><span>¿Puedo usar Disciplina en mi teléfono?</span><i class="ti ti-plus"></i></div><div class="faq-a">Sí. La app está diseñada con diseño responsivo y funciona correctamente en dispositivos móviles. Solo abre el archivo HTML en tu navegador favorito.</div></div>
+      <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q"><span>¿Qué pasa si cierro el navegador? ¿Se pierden mis datos?</span><i class="ti ti-plus"></i></div><div class="faq-a">Los datos se mantienen en la sesión actual. Para conservarlos entre sesiones, guarda el archivo HTML localmente en tu computadora y úsalo desde ahí.</div></div>
+      <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q"><span>¿Hay un panel de administrador?</span><i class="ti ti-plus"></i></div><div class="faq-a">Sí. El administrador tiene acceso a un panel especial donde puede ver todos los usuarios registrados, activar o desactivar cuentas y cambiar roles. El acceso demo es con correo admin@disciplina.com y contraseña admin123.</div></div>
+      <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q"><span>¿Por qué frases de Brian Tracy específicamente?</span><i class="ti ti-plus"></i></div><div class="faq-a">Brian Tracy es uno de los autores de desarrollo personal más reconocidos del mundo, especializado en hábitos, productividad y metas. Sus frases son prácticas, directas y motivadoras para empezar el día con enfoque.</div></div>
+      <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q"><span>¿Puedo crear varios usuarios?</span><i class="ti ti-plus"></i></div><div class="faq-a">Sí. Cualquier persona puede registrarse con nombre, correo y contraseña. Cada usuario tiene su propio acceso. El administrador gestiona todas las cuentas desde el panel de administración.</div></div>
+      <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q"><span>¿Cómo funcionan las alertas de inventario?</span><i class="ti ti-plus"></i></div><div class="faq-a">Cada producto tiene una cantidad máxima de referencia. Cuando el stock baja al 3% o menos, aparece una alerta crítica en el dashboard y en la sección de cocina. Si llega a cero se marca como "agotado" con alerta roja.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="land-footer">
+  <div class="footer-grid">
+    <div><div class="footer-brand">⚡ Disciplina</div><div class="footer-desc">La app para construir hábitos que duran. Simple, rápida y sin distracciones. Hecha para personas que quieren mejorar de verdad.</div></div>
+    <div>
+      <div class="footer-col-title">Navegación</div>
+      <a href="#features" class="footer-link">Características</a>
+      <a href="#about" class="footer-link">Quiénes somos</a>
+      <a href="#faq" class="footer-link">Preguntas frecuentes</a>
+      <a href="#" onclick="showScreen('screen-auth');return false" class="footer-link">Iniciar sesión</a>
+    </div>
+    <div>
+      <div class="footer-col-title">La app incluye</div>
+      <a href="#" class="footer-link">Seguimiento de hábitos</a>
+      <a href="#" class="footer-link">Planificador de comidas</a>
+      <a href="#" class="footer-link">Metas de ahorro</a>
+      <a href="#" class="footer-link">Rutinas de fitness</a>
+      <a href="#" class="footer-link">Inventario de cocina</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 Disciplina · Todos los derechos reservados</span>
+    <span>Hecho con dedicación · Sin anuncios · Sin rastreo</span>
+  </div>
+</footer>
+</div>
+
+<!-- AUTH -->
+<div id="screen-auth" class="screen">
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-logo"><div class="auth-logo-mark"><i class="ti ti-bolt"></i></div><span style="font-size:17px;font-weight:600;letter-spacing:-.3px">Disciplina</span></div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuthTab('login',this)">Iniciar sesión</button>
+      <button class="auth-tab" onclick="switchAuthTab('register',this)">Crear cuenta</button>
+    </div>
+    <div id="auth-login" class="auth-form active">
+      <div class="auth-error" id="login-error"></div>
+      <div class="form-row-m"><label class="form-label-m">Correo electrónico</label><input type="email" id="login-email" class="form-input" placeholder="tu@correo.com" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="form-row-m"><label class="form-label-m">Contraseña</label><input type="password" id="login-pass" class="form-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <button class="btn-auth" onclick="doLogin()"><i class="ti ti-login" style="font-size:16px"></i>Entrar</button>
+      <div class="demo-hint">Demo usuario: <strong>usuario@demo.com</strong> / <strong>demo123</strong><br>Demo admin: <strong>admin@disciplina.com</strong> / <strong>admin123</strong></div>
+    </div>
+    <div id="auth-register" class="auth-form">
+      <div class="auth-error" id="reg-error"></div>
+      <div class="form-row-m"><label class="form-label-m">Nombre completo</label><input type="text" id="reg-name" class="form-input" placeholder="Tu nombre"></div>
+      <div class="form-row-m"><label class="form-label-m">Correo electrónico</label><input type="email" id="reg-email" class="form-input" placeholder="tu@correo.com"></div>
+      <div class="form-row-m"><label class="form-label-m">Contraseña</label><input type="password" id="reg-pass" class="form-input" placeholder="Mínimo 6 caracteres"></div>
+      <div class="form-row-m"><label class="form-label-m">Confirmar contraseña</label><input type="password" id="reg-pass2" class="form-input" placeholder="Repite tu contraseña"></div>
+      <button class="btn-auth" onclick="doRegister()"><i class="ti ti-user-plus" style="font-size:16px"></i>Crear cuenta</button>
+    </div>
+    <a class="auth-back" onclick="showScreen('screen-landing')"><i class="ti ti-arrow-left" style="font-size:13px;vertical-align:-1px"></i> Volver al inicio</a>
+  </div>
+</div>
+</div>
+
+<!-- APP -->
+<div id="screen-app" class="screen">
+  <aside class="sidebar">
+    <div class="logo"><div class="logo-mark"><i class="ti ti-bolt"></i></div><span class="logo-name">Disciplina</span></div>
+    <button class="nav-item active" onclick="showAppPage('dashboard',this)"><i class="ti ti-home"></i><span>Inicio</span></button>
+    <button class="nav-item" onclick="showAppPage('habitos',this)"><i class="ti ti-check"></i><span>Hábitos</span></button>
+    <button class="nav-item" onclick="showAppPage('ahorro',this)"><i class="ti ti-piggy-bank"></i><span>Ahorro</span></button>
+    <button class="nav-item" onclick="showAppPage('comidas',this)"><i class="ti ti-salad"></i><span>Comidas</span></button>
+    <button class="nav-item" onclick="showAppPage('fitness',this)"><i class="ti ti-barbell"></i><span>Fitness</span></button>
+    <button class="nav-item" onclick="showAppPage('inventario',this)"><i class="ti ti-package"></i><span>Cocina</span><span class="badge" id="nav-badge" style="display:none">0</span></button>
+    <div class="nav-divider"></div>
+    <button class="nav-item" onclick="doLogout()"><i class="ti ti-logout"></i><span>Salir</span></button>
+    <div class="sidebar-user" style="margin-top:12px">
+      <div class="sidebar-avatar" id="sb-avatar">U</div>
+      <div><div class="sidebar-user-name" id="sb-username">Usuario</div><div class="sidebar-user-role" id="sb-role">usuario</div></div>
+    </div>
+  </aside>
+  <main class="app-main">
+    <!-- DASHBOARD -->
+    <div id="app-page-dashboard" class="app-page active">
+      <div class="topbar"><div><div class="topbar-greeting" id="greeting">Buenos días 👋</div><div class="topbar-date" id="topbar-date"></div></div><div class="today-pill">Hoy</div></div>
+      <div class="quote-card"><div class="quote-accent"></div><div class="quote-mark" aria-hidden="true">"</div><p class="quote-text" id="bt-quote"></p><div class="quote-footer"><div class="quote-avatar">BT</div><div><div class="quote-name">Brian Tracy</div><div class="quote-role">Author &amp; motivational speaker</div></div><div class="quote-date-pill"><i class="ti ti-calendar" style="font-size:12px"></i><span id="bt-date"></span></div></div></div>
+      <div id="dash-alerts"></div>
+      <div class="metric-grid">
+        <div class="metric-card accent-green"><div class="metric-label">Completados hoy</div><div class="metric-val c-green" id="dash-done">0/0</div></div>
+        <div class="metric-card accent-amber"><div class="metric-label">Racha máxima</div><div class="metric-val c-amber" id="dash-streak">0 🔥</div></div>
+        <div class="metric-card accent-blue"><div class="metric-label">Progreso del día</div><div class="metric-val c-blue" id="dash-pct">0%</div></div>
+        <div class="metric-card accent-red"><div class="metric-label">Alertas cocina</div><div class="metric-val c-red" id="dash-alerts-count">0</div></div>
+      </div>
+      <div class="dash-grid">
+        <div class="dash-col">
+          <div class="card"><div class="card-title"><i class="ti ti-chart-bar"></i>Progreso semanal</div><div class="chart-wrap"><canvas id="progressChart" role="img" aria-label="Progreso de hábitos">Sin datos.</canvas></div></div>
+          <div class="card"><div class="section-row"><div class="section-title">Hábitos de hoy</div></div><div id="dash-habits-list"></div></div>
+        </div>
+        <div class="dash-col">
+          <div class="card"><div class="card-title"><i class="ti ti-salad"></i>Comidas de hoy</div><div id="dash-meals"></div></div>
+          <div class="card"><div class="card-title"><i class="ti ti-barbell"></i>Entrenamiento de hoy</div><div id="dash-workout"></div></div>
+          <div class="card"><div class="card-title"><i class="ti ti-alert-triangle"></i>Stock crítico</div><div id="dash-inv-alerts"></div></div>
+        </div>
+      </div>
+    </div>
+    <!-- HABITOS -->
+    <div id="app-page-habitos" class="app-page">
+      <div class="page-header"><div><div class="page-title">Hábitos</div><div class="page-sub">Construye consistencia día a día</div></div><button class="btn btn-dark" onclick="openModal('modal-habit')"><i class="ti ti-plus"></i>Nuevo hábito</button></div>
+      <div class="card"><div class="section-row"><div class="section-title">Mis hábitos</div></div><div id="habits-list"></div></div>
+      <div class="card"><div class="card-title"><i class="ti ti-flame"></i>Rachas activas</div><div id="streaks-list"></div></div>
+    </div>
+    <!-- AHORRO -->
+    <div id="app-page-ahorro" class="app-page">
+      <div class="page-header"><div><div class="page-title">Ahorro</div><div class="page-sub">Tus metas financieras</div></div><button class="btn btn-dark" onclick="openModal('modal-saving')"><i class="ti ti-plus"></i>Nueva meta</button></div>
+      <div id="savings-list"></div>
+    </div>
+    <!-- COMIDAS -->
+    <div id="app-page-comidas" class="app-page">
+      <div class="page-header"><div><div class="page-title">Planificador de comidas</div><div class="page-sub">Tu alimentación semanal</div></div></div>
+      <div class="card"><div class="section-row"><div class="section-title" id="selected-day-label">Hoy</div><button class="btn btn-outline btn-sm" onclick="openMealEditor()"><i class="ti ti-edit"></i>Editar día</button></div><div class="day-tabs" id="week-tabs"></div><div id="day-meals"></div></div>
+      <div class="card"><div class="section-row"><div class="section-title">Plan de dieta</div><button class="btn btn-outline btn-sm" onclick="openModal('modal-diet')"><i class="ti ti-settings"></i>Configurar</button></div><div id="diet-plan-display"></div></div>
+    </div>
+    <!-- FITNESS -->
+    <div id="app-page-fitness" class="app-page">
+      <div class="page-header"><div><div class="page-title">Fitness</div><div class="page-sub">Tus rutinas de entrenamiento</div></div><button class="btn btn-dark" onclick="openModal('modal-workout')"><i class="ti ti-plus"></i>Nueva rutina</button></div>
+      <div class="card"><div class="section-row"><div class="section-title">Rutinas</div></div><div id="workouts-list"></div></div>
+      <div class="card"><div class="card-title"><i class="ti ti-calendar-week"></i>Vista semanal</div><div id="workout-week"></div></div>
+    </div>
+    <!-- INVENTARIO -->
+    <div id="app-page-inventario" class="app-page">
+      <div class="page-header"><div><div class="page-title">Inventario de cocina</div><div class="page-sub">Controla tu despensa en tiempo real</div></div><button class="btn btn-dark" onclick="openInvAdd()"><i class="ti ti-plus"></i>Agregar producto</button></div>
+      <div id="inv-alerts-section"></div>
+      <div class="metric-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="metric-card accent-blue"><div class="metric-label">Total productos</div><div class="metric-val c-blue" id="inv-total">0</div></div>
+        <div class="metric-card accent-amber"><div class="metric-label">Stock bajo</div><div class="metric-val c-amber" id="inv-low">0</div></div>
+        <div class="metric-card accent-red"><div class="metric-label">Agotados</div><div class="metric-val c-red" id="inv-empty">0</div></div>
+      </div>
+      <div class="card"><div class="section-row"><div class="section-title">Productos</div></div><div class="filter-bar" id="cat-filters"></div><div id="inv-list"></div></div>
+      <div class="card"><div class="card-title"><i class="ti ti-history"></i>Últimos movimientos</div><div id="inv-log"></div></div>
+    </div>
+  </main>
+</div>
+
+<!-- ADMIN -->
+<div id="screen-admin" class="screen">
+  <aside class="sidebar">
+    <div class="logo"><div class="logo-mark" style="background:var(--purple)"><i class="ti ti-shield"></i></div><span class="logo-name">Admin</span></div>
+    <button class="nav-item active" onclick="showAdminPage('users',this)"><i class="ti ti-users"></i><span>Usuarios</span></button>
+    <button class="nav-item" onclick="showAdminPage('stats',this)"><i class="ti ti-chart-bar"></i><span>Estadísticas</span></button>
+    <button class="nav-item" onclick="showAdminPage('settings',this)"><i class="ti ti-settings"></i><span>Configuración</span></button>
+    <div class="nav-divider"></div>
+    <button class="nav-item" onclick="doLogout()"><i class="ti ti-logout"></i><span>Salir</span></button>
+    <div class="sidebar-user" style="margin-top:12px">
+      <div class="sidebar-avatar" style="background:#EEEDFE;border-color:#AFA9EC;color:#3C3489">AD</div>
+      <div><div class="sidebar-user-name" id="admin-sb-name">Administrador</div><div class="sidebar-user-role" style="color:var(--purple);font-size:10px">administrador</div></div>
+    </div>
+  </aside>
+  <main class="app-main">
+    <!-- USUARIOS -->
+    <div id="admin-page-users" class="app-page active">
+      <div class="page-header"><div><div class="page-title">Gestión de usuarios</div><div class="page-sub">Administra las cuentas de la plataforma</div></div><button class="btn btn-dark" onclick="openModal('modal-add-user')"><i class="ti ti-user-plus"></i>Agregar usuario</button></div>
+      <div class="metric-grid" style="grid-template-columns:repeat(4,1fr)">
+        <div class="metric-card accent-blue"><div class="metric-label">Total usuarios</div><div class="metric-val c-blue" id="admin-total">0</div></div>
+        <div class="metric-card accent-green"><div class="metric-label">Activos</div><div class="metric-val c-green" id="admin-active">0</div></div>
+        <div class="metric-card accent-purple"><div class="metric-label">Administradores</div><div class="metric-val c-purple" id="admin-admins">0</div></div>
+        <div class="metric-card accent-amber"><div class="metric-label">Inactivos</div><div class="metric-val c-amber" id="admin-inactive">0</div></div>
+      </div>
+      <div class="card">
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
+          <input type="text" class="search-input" id="user-search" placeholder="Buscar usuario..." oninput="renderAdminUsers()">
+          <span style="font-size:13px;color:var(--text3);margin-left:auto" id="user-count-label"></span>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="admin-table">
+            <thead><tr><th>Usuario</th><th>Correo</th><th>Rol</th><th>Estado</th><th>Registro</th><th>Acciones</th></tr></thead>
+            <tbody id="admin-users-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <!-- STATS -->
+    <div id="admin-page-stats" class="app-page">
+      <div class="page-header"><div><div class="page-title">Estadísticas</div><div class="page-sub">Resumen general de la plataforma</div></div></div>
+      <div class="metric-grid">
+        <div class="metric-card accent-green"><div class="metric-label">Registrados</div><div class="metric-val c-green" id="stat-users">0</div></div>
+        <div class="metric-card accent-blue"><div class="metric-label">Activos</div><div class="metric-val c-blue" id="stat-active">0</div></div>
+        <div class="metric-card accent-purple"><div class="metric-label">Admins</div><div class="metric-val c-purple" id="stat-admins">0</div></div>
+        <div class="metric-card accent-amber"><div class="metric-label">Registros hoy</div><div class="metric-val c-amber" id="stat-today">0</div></div>
+      </div>
+      <div class="card"><div class="card-title"><i class="ti ti-users"></i>Distribución de roles</div><div id="role-dist"></div></div>
+      <div class="card"><div class="card-title"><i class="ti ti-calendar"></i>Usuarios recientes</div><div id="recent-users-list"></div></div>
+    </div>
+    <!-- SETTINGS -->
+    <div id="admin-page-settings" class="app-page">
+      <div class="page-header"><div><div class="page-title">Configuración</div><div class="page-sub">Ajustes generales de la plataforma</div></div></div>
+      <div class="card">
+        <div class="section-title" style="margin-bottom:16px">Cambiar contraseña de administrador</div>
+        <div class="form-row-m"><label class="form-label-m">Nueva contraseña</label><input type="password" id="new-admin-pass" placeholder="Mínimo 6 caracteres" style="max-width:320px"></div>
+        <div class="form-row-m"><label class="form-label-m">Confirmar contraseña</label><input type="password" id="new-admin-pass2" placeholder="Repite la contraseña" style="max-width:320px"></div>
+        <button class="btn btn-dark btn-sm" onclick="changeAdminPass()"><i class="ti ti-lock"></i>Cambiar contraseña</button>
+        <div id="settings-msg" style="font-size:13px;margin-top:10px;display:none"></div>
+      </div>
+      <div class="card">
+        <div class="section-title" style="margin-bottom:16px">Información de la plataforma</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.8">
+          <div><strong>Nombre:</strong> Disciplina v1.0</div>
+          <div><strong>Tipo:</strong> Aplicación HTML local (sin servidor)</div>
+          <div><strong>Almacenamiento:</strong> Memoria de sesión del navegador</div>
+          <div><strong>Tecnologías:</strong> HTML5, CSS3, JavaScript, Chart.js</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-title" style="margin-bottom:12px">Zona de peligro</div>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:12px">Elimina todos los usuarios no administradores de la sesión.</p>
+        <button class="btn btn-red btn-sm" onclick="clearNonAdmins()"><i class="ti ti-trash"></i>Eliminar usuarios no admin</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- MODALS -->
+<div id="modal-habit" class="modal-overlay" style="display:none" onclick="closeModalBg(event,'modal-habit')"><div class="modal"><div class="modal-title">Nuevo hábito</div><div class="form-row-m"><label class="form-label-m">Nombre</label><input type="text" id="h-name" placeholder="Ej: Beber 2L de agua"></div><div class="form-row-m"><label class="form-label-m">Categoría</label><select id="h-cat"><option value="salud">Salud</option><option value="ahorro">Ahorro</option><option value="fitness">Fitness</option><option value="otro">Otro</option></select></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-habit')">Cancelar</button><button class="btn btn-dark" onclick="addHabit()">Guardar</button></div></div></div>
+<div id="modal-saving" class="modal-overlay" style="display:none" onclick="closeModalBg(event,'modal-saving')"><div class="modal"><div class="modal-title">Nueva meta de ahorro</div><div class="form-row-m"><label class="form-label-m">Nombre</label><input type="text" id="s-name" placeholder="Ej: Vacaciones"></div><div class="form-grid"><div class="form-row-m"><label class="form-label-m">Meta ($)</label><input type="number" id="s-goal" placeholder="10000"></div><div class="form-row-m"><label class="form-label-m">Fecha límite</label><input type="date" id="s-date"></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-saving')">Cancelar</button><button class="btn btn-dark" onclick="addSaving()">Guardar</button></div></div></div>
+<div id="modal-contribute" class="modal-overlay" style="display:none" onclick="closeModalBg(event,'modal-contribute')"><div class="modal"><div class="modal-title">Registrar aportación</div><div class="form-row-m"><label class="form-label-m">Monto ($)</label><input type="number" id="c-amount" placeholder="500"></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-contribute')">Cancelar</button><button class="btn btn-dark" onclick="addContribution()">Guardar</button></div></div></div>
+<div id="modal-workout" class="modal-overlay" style="display:none" onclick="closeModalBg(event,'modal-workout')"><div class="modal"><div class="modal-title">Nueva rutina</div><div class="form-row-m"><label class="form-label-m">Nombre</label><input type="text" id="w-name" placeholder="Ej: Pecho y tríceps"></div><div class="form-row-m"><label class="form-label-m">Días</label><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px" id="w-days-picker"><label style="font-size:13px;display:flex;align-items:center;gap:5px"><input type="checkbox" value="L"> Lun</label><label style="font-size:13px;display:flex;align-items:center;gap:5px"><input type="checkbox" value="M"> Mar</label><label style="font-size:13px;display:flex;align-items:center;gap:5px"><input type="checkbox" value="X"> Mié</label><label style="font-size:13px;display:flex;align-items:center;gap:5px"><input type="checkbox" value="J"> Jue</label><label style="font-size:13px;display:flex;align-items:center;gap:5px"><input type="checkbox" value="V"> Vie</label><label style="font-size:13px;display:flex;align-items:center;gap:5px"><input type="checkbox" value="S"> Sáb</label><label style="font-size:13px;display:flex;align-items:center;gap:5px"><input type="checkbox" value="D"> Dom</label></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-workout')">Cancelar</button><button class="btn btn-dark" onclick="addWorkout()">Guardar</button></div></div></div>
+<div id="modal-meal-editor" class="modal-overlay" style="display:none" onclick="closeModalBg(event,'modal-meal-editor')"><div class="modal" style="max-width:500px"><div class="modal-title" id="meal-editor-title">Editar comidas</div><div id="meal-editor-slots"></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-meal-editor')">Cancelar</button><button class="btn btn-dark" onclick="saveMeals()">Guardar</button></div></div></div>
+<div id="modal-diet" class="modal-overlay" style="display:none" onclick="closeModalBg(event,'modal-diet')"><div class="modal"><div class="modal-title">Plan de dieta</div><div class="form-row-m"><label class="form-label-m">Nombre del plan</label><input type="text" id="dp-name" placeholder="Ej: Déficit calórico 1800 kcal"></div><div class="form-row-m"><label class="form-label-m">Notas</label><textarea id="dp-desc" placeholder="Ej: Alta en proteína, baja en carbohidratos..."></textarea></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-diet')">Cancelar</button><button class="btn btn-dark" onclick="saveDietPlan()">Guardar</button></div></div></div>
+<div id="modal-inv-add" class="modal-overlay" style="display:none" onclick="closeModalBg(event,'modal-inv-add')"><div class="modal"><div class="modal-title" id="inv-modal-title">Agregar producto</div><div class="form-row-m"><label class="form-label-m">Nombre</label><input type="text" id="inv-name" placeholder="Ej: Leche entera"></div><div class="form-grid"><div class="form-row-m"><label class="form-label-m">Categoría</label><select id="inv-cat"><option value="lacteos">Lácteos</option><option value="verduras">Verduras y frutas</option><option value="carnes">Carnes y proteína</option><option value="granos">Granos y cereales</option><option value="bebidas">Bebidas</option><option value="otros">Otros</option></select></div><div class="form-row-m"><label class="form-label-m">Unidad</label><select id="inv-unit"><option value="g">Gramos (g)</option><option value="kg">Kilogramos (kg)</option><option value="ml">Mililitros (ml)</option><option value="L">Litros (L)</option><option value="pzs">Piezas (pzs)</option><option value="porciones">Porciones</option></select></div></div><div class="form-grid"><div class="form-row-m"><label class="form-label-m">Cantidad actual</label><input type="number" id="inv-qty" placeholder="0" min="0" step="0.01"></div><div class="form-row-m"><label class="form-label-m">Cantidad máxima</label><input type="number" id="inv-max" placeholder="1000" min="1" step="0.01"></div></div><div style="font-size:12px;color:var(--text3);padding:8px 10px;background:var(--surface2);border-radius:var(--radius-xs);margin-bottom:4px"><i class="ti ti-info-circle" style="font-size:13px;vertical-align:-1px"></i> Alerta crítica al llegar al <strong>3%</strong> del máximo.</div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-inv-add')">Cancelar</button><button class="btn btn-dark" id="inv-save-btn" onclick="saveInvProduct()">Agregar</button></div></div></div>
+<div id="modal-inv-move" class="modal-overlay" style="display:none" onclick="closeModalBg(event,'modal-inv-move')"><div class="modal"><div class="modal-title">Registrar movimiento</div><div style="background:var(--surface2);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:16px;border:1px solid var(--border)"><div style="font-size:14px;font-weight:600" id="inv-move-name"></div><div style="font-size:13px;color:var(--text2);margin-top:4px">Stock: <strong id="inv-move-current"></strong> <span id="inv-move-unit2"></span></div></div><div style="display:flex;gap:8px;margin-bottom:16px"><button id="mv-type-use" class="move-type-btn" onclick="setMvType('use')"><i class="ti ti-minus" style="font-size:16px"></i>Consumir</button><button id="mv-type-buy" class="move-type-btn" onclick="setMvType('buy')"><i class="ti ti-plus" style="font-size:16px"></i>Compra del súper</button></div><div class="form-row-m"><label class="form-label-m" id="mv-qty-label">Cantidad a descontar</label><input type="number" id="mv-qty" placeholder="0" min="0.01" step="0.01"></div><div class="form-row-m"><label class="form-label-m">Nota (opcional)</label><input type="text" id="mv-note" placeholder="Ej: desayuno, compra semanal..."></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-inv-move')">Cancelar</button><button class="btn btn-dark" onclick="saveInvMove()">Registrar</button></div></div></div>
+<div id="modal-add-user" class="modal-overlay" style="display:none" onclick="closeModalBg(event,'modal-add-user')"><div class="modal"><div class="modal-title">Agregar usuario</div><div class="form-row-m"><label class="form-label-m">Nombre</label><input type="text" id="au-name" placeholder="Nombre completo"></div><div class="form-row-m"><label class="form-label-m">Correo</label><input type="email" id="au-email" placeholder="correo@ejemplo.com"></div><div class="form-grid"><div class="form-row-m"><label class="form-label-m">Contraseña</label><input type="password" id="au-pass" placeholder="Contraseña"></div><div class="form-row-m"><label class="form-label-m">Rol</label><select id="au-role"><option value="user">Usuario</option><option value="admin">Administrador</option></select></div></div><div class="auth-error" id="au-error" style="margin-top:8px"></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-add-user')">Cancelar</button><button class="btn btn-dark" onclick="adminAddUser()">Agregar</button></div></div></div>
+<div id="modal-edit-user" class="modal-overlay" style="display:none" onclick="closeModalBg(event,'modal-edit-user')"><div class="modal"><div class="modal-title">Editar usuario</div><input type="hidden" id="eu-id"><div class="form-row-m"><label class="form-label-m">Nombre</label><input type="text" id="eu-name"></div><div class="form-row-m"><label class="form-label-m">Correo</label><input type="email" id="eu-email"></div><div class="form-grid"><div class="form-row-m"><label class="form-label-m">Rol</label><select id="eu-role"><option value="user">Usuario</option><option value="admin">Administrador</option></select></div><div class="form-row-m"><label class="form-label-m">Estado</label><select id="eu-status"><option value="active">Activo</option><option value="inactive">Inactivo</option></select></div></div><div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modal-edit-user')">Cancelar</button><button class="btn btn-dark" onclick="adminSaveUser()">Guardar</button></div></div></div>
+
+<script>
+const DAYS=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+const MEAL_SLOTS=[{key:'desayuno',label:'Desayuno',color:'#185FA5'},{key:'intermedio',label:'Intermedio',color:'#1D9E75'},{key:'comida',label:'Comida',color:'#BA7517'},{key:'post_entreno',label:'Post entreno',color:'#D85A30'},{key:'cena',label:'Cena',color:'#534AB7'}];
+const CAT_LABELS={lacteos:'Lácteos',verduras:'Verduras y frutas',carnes:'Carnes y proteína',granos:'Granos y cereales',bebidas:'Bebidas',otros:'Otros'};
+const CAT_ICONS={lacteos:'droplet',verduras:'leaf',carnes:'meat',granos:'wheat',bebidas:'bottle',otros:'box'};
+const ALERT_PCT=3;
+const today=new Date();
+const todayKey=today.toISOString().split('T')[0];
+const BT_QUOTES=["Move out of your comfort zone. You can only grow if you are willing to feel awkward and uncomfortable when you try something new.","Successful people are simply those with successful habits.","You have within you right now, everything you need to deal with whatever the world can throw at you.","The key to success is to focus our conscious mind on things we desire, not things we fear.","All successful people are big dreamers. They imagine what their future could be and then work every day toward that vision.","It doesn't matter where you are coming from. All that matters is where you are going.","Your life only gets better when you get better.","I've found that luck is quite predictable. If you want more luck, take more chances. Be more active. Show up more often.","Develop an attitude of gratitude, and give thanks for everything that happens to you, knowing every step forward is progress.","Imagine no limitations; decide what's right and desirable before you decide what's possible.","The act of taking the first step is what separates the winners from the losers.","You are fully responsible for everything you are, everything you have, and everything you become.","Invest three percent of your income in yourself in order to guarantee your future.","Whatever you believe with feeling becomes your reality.","Set peace of mind as your highest goal and organize your life around it.","The starting point of great success has always been the same — dream big dreams.","Every minute you spend in planning saves ten minutes in execution.","Disciplining yourself to do what you know is right, although difficult, is the highroad to pride, self-esteem, and personal satisfaction.","Excellence is not a destination; it is a continuous journey that never ends.","The biggest mistake we could ever make is to think we work for anybody but ourselves.","Clarity is the most important concept in personal productivity.","The more you seek opportunity, the more likely it is that you will achieve the security that you desire.","Goal-setting is the most important practice for moving confidently toward your dreams.","Your greatest asset is your earning ability. Your greatest resource is your time.","Think about what you want very clearly, then take the actions that move you most rapidly toward it.","The more credit you give away, the more will come back to you. The more you help others, the more they want to help you.","Winners make a habit of manufacturing their own positive expectations in advance of the event.","Teamwork is so important that it is virtually impossible to reach your potential without becoming very good at it.","The price of success must be paid in full, in advance. There are no shortcuts.","You have to put in many tiny efforts that nobody sees or appreciates before you achieve anything worthwhile."];
+
+let authState={currentUser:null,users:[{id:1,name:'Administrador',email:'admin@disciplina.com',pass:'admin123',role:'admin',status:'active',created:todayKey},{id:2,name:'Demo Usuario',email:'usuario@demo.com',pass:'demo123',role:'user',status:'active',created:todayKey}],nextUserId:3};
+let state={habits:[{id:1,name:'Ahorrar hoy',cat:'ahorro',doneToday:false,streak:3,history:{}},{id:2,name:'Seguir mi dieta',cat:'salud',doneToday:false,streak:5,history:{}},{id:3,name:'Entrenar',cat:'fitness',doneToday:false,streak:2,history:{}}],savings:[{id:1,name:'Fondo de emergencia',goal:20000,current:8500,deadline:'2025-12-31'},{id:2,name:'Vacaciones',goal:15000,current:3200,deadline:'2025-07-01'}],meals:{},workouts:[{id:1,name:'Pecho y tríceps',days:['L','X'],done:[],color:'#185FA5'},{id:2,name:'Espalda y bíceps',days:['M','J'],done:[],color:'#1D9E75'},{id:3,name:'Piernas',days:['V'],done:[],color:'#D85A30'}],dietPlan:null,selectedDay:today.getDay(),activeSavingId:null,progressHistory:{},inventory:[{id:1,name:'Leche entera',cat:'lacteos',unit:'L',qty:2.5,max:4},{id:2,name:'Arroz',cat:'granos',unit:'kg',qty:1.8,max:5},{id:3,name:'Pechuga de pollo',cat:'carnes',unit:'g',qty:150,max:2000},{id:4,name:'Espinacas',cat:'verduras',unit:'g',qty:80,max:500},{id:5,name:'Huevos',cat:'otros',unit:'pzs',qty:4,max:30},{id:6,name:'Avena',cat:'granos',unit:'g',qty:25,max:1000}],invLog:[],invFilter:'todos',moveInvId:null,editInvId:null,mvType:'use',nextIds:{h:4,s:3,w:4,inv:7},progressChart:null};
+
+function fq(q){return q===Math.floor(q)?String(q):parseFloat(q.toFixed(2)).toString();}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.display='none';});const el=document.getElementById(id);el.style.display=(id==='screen-app'||id==='screen-admin')?'flex':'block';el.classList.add('active');window.scrollTo(0,0);}
+function switchAuthTab(tab,btn){document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.auth-form').forEach(f=>f.classList.remove('active'));btn.classList.add('active');document.getElementById('auth-'+tab).classList.add('active');}
+function doLogin(){const email=document.getElementById('login-email').value.trim().toLowerCase();const pass=document.getElementById('login-pass').value;const err=document.getElementById('login-error');const user=authState.users.find(u=>u.email.toLowerCase()===email&&u.pass===pass);if(!user){err.textContent='Correo o contraseña incorrectos.';err.style.display='block';return;}if(user.status==='inactive'){err.textContent='Esta cuenta está desactivada. Contacta al administrador.';err.style.display='block';return;}err.style.display='none';authState.currentUser=user;if(user.role==='admin'){document.getElementById('admin-sb-name').textContent=user.name;showScreen('screen-admin');renderAdminAll();}else{document.getElementById('sb-username').textContent=user.name;document.getElementById('sb-role').textContent=user.role;document.getElementById('sb-avatar').textContent=user.name.charAt(0).toUpperCase();showScreen('screen-app');initApp();}}
+function doRegister(){const name=document.getElementById('reg-name').value.trim();const email=document.getElementById('reg-email').value.trim().toLowerCase();const pass=document.getElementById('reg-pass').value;const pass2=document.getElementById('reg-pass2').value;const err=document.getElementById('reg-error');if(!name||!email||!pass){err.textContent='Por favor completa todos los campos.';err.style.display='block';return;}if(pass.length<6){err.textContent='La contraseña debe tener al menos 6 caracteres.';err.style.display='block';return;}if(pass!==pass2){err.textContent='Las contraseñas no coinciden.';err.style.display='block';return;}if(authState.users.find(u=>u.email.toLowerCase()===email)){err.textContent='Ya existe una cuenta con ese correo.';err.style.display='block';return;}err.style.display='none';const newUser={id:authState.nextUserId++,name,email,pass,role:'user',status:'active',created:todayKey};authState.users.push(newUser);authState.currentUser=newUser;document.getElementById('sb-username').textContent=newUser.name;document.getElementById('sb-role').textContent='usuario';document.getElementById('sb-avatar').textContent=newUser.name.charAt(0).toUpperCase();showScreen('screen-app');initApp();}
+function doLogout(){authState.currentUser=null;showScreen('screen-auth');document.getElementById('login-email').value='';document.getElementById('login-pass').value='';document.getElementById('login-error').style.display='none';}
+function initApp(){const h=today.getHours();document.getElementById('greeting').textContent=(h<12?'Buenos días':h<18?'Buenas tardes':'Buenas noches')+' 👋';const ds=today.toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long',year:'numeric'});document.getElementById('topbar-date').textContent=ds.charAt(0).toUpperCase()+ds.slice(1);const dy=Math.floor((today-new Date(today.getFullYear(),0,0))/86400000);document.getElementById('bt-quote').textContent=BT_QUOTES[dy%BT_QUOTES.length];document.getElementById('bt-date').textContent=today.toLocaleDateString('en-US',{month:'short',day:'numeric'});document.querySelectorAll('#screen-app .nav-item').forEach(b=>b.classList.remove('active'));document.querySelector('#screen-app .nav-item').classList.add('active');document.querySelectorAll('#screen-app .app-page').forEach(p=>p.classList.remove('active'));document.getElementById('app-page-dashboard').classList.add('active');renderAll();}
+function showAppPage(id,btn){document.querySelectorAll('#screen-app .app-page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('#screen-app .sidebar .nav-item').forEach(b=>b.classList.remove('active'));document.getElementById('app-page-'+id).classList.add('active');btn.classList.add('active');}
+function openModal(id){document.getElementById(id).style.display='flex';}function closeModal(id){document.getElementById(id).style.display='none';}function closeModalBg(e,id){if(e.target.classList.contains('modal-overlay'))closeModal(id);}
+function renderAll(){renderDashboard();renderHabits();renderSavings();renderMeals();renderFitness();renderInventario();}
+function getAlerts(){const empty=state.inventory.filter(p=>p.qty<=0);const low=state.inventory.filter(p=>p.qty>0&&(p.qty/p.max*100)<=ALERT_PCT);return{empty,low};}
+function renderAlerts(){const{empty,low}=getAlerts();const total=empty.length+low.length;const b=document.getElementById('nav-badge');b.textContent=total;b.style.display=total?'inline':'none';document.getElementById('dash-alerts-count').textContent=total;let html='';if(empty.length)html+=`<div class="alert-banner alert-empty"><i class="ti ti-alert-circle"></i><div class="alert-body"><div class="alert-title">Productos agotados (${empty.length})</div><div class="alert-sub">${empty.map(p=>p.name).join(', ')}</div></div></div>`;if(low.length)html+=`<div class="alert-banner alert-low"><i class="ti ti-alert-triangle"></i><div class="alert-body"><div class="alert-title">Stock crítico — menos del 3% (${low.length})</div><div class="alert-sub">${low.map(p=>`${p.name}: ${fq(p.qty)} ${p.unit}`).join(' · ')}</div></div></div>`;document.getElementById('dash-alerts').innerHTML=html;document.getElementById('inv-alerts-section').innerHTML=html;const di=document.getElementById('dash-inv-alerts');if(!total){di.innerHTML='<div class="empty" style="padding:12px">Todo en orden ✓</div>';return;}let rows='';[...empty,...low].forEach(p=>{const pct=Math.round(p.qty/p.max*100);rows+=`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)"><i class="ti ti-${CAT_ICONS[p.cat]||'package'}" style="font-size:16px;color:var(--text3)"></i><div style="flex:1;font-size:13px;font-weight:500">${p.name}</div><span class="critical-badge ${p.qty<=0?'cb-empty':'cb-low'}">${p.qty<=0?'Agotado':pct+'%'}</span></div>`;});di.innerHTML=rows;}
+function renderDashboard(){const done=state.habits.filter(h=>h.doneToday).length;const total=state.habits.length;const pct=total?Math.round(done/total*100):0;const maxS=state.habits.reduce((m,h)=>Math.max(m,h.streak),0);document.getElementById('dash-done').textContent=done+'/'+total;document.getElementById('dash-streak').textContent=maxS+' 🔥';document.getElementById('dash-pct').textContent=pct+'%';document.getElementById('dash-habits-list').innerHTML=state.habits.map(h=>`<div class="habit-row"><div class="check-box ${h.doneToday?'done':''}" onclick="toggleHabit(${h.id})">${h.doneToday?'<i class="ti ti-check"></i>':''}</div><div style="flex:1"><div class="habit-name" style="${h.doneToday?'text-decoration:line-through;color:var(--text3)':''}">${h.name}</div></div><span class="streak-pill">🔥 ${h.streak}</span></div>`).join('');const tm=state.meals[today.getDay()]||{};const filled=MEAL_SLOTS.filter(sl=>tm[sl.key]&&tm[sl.key].food);document.getElementById('dash-meals').innerHTML=filled.length?filled.map(sl=>`<div class="meal-slot-row"><div class="meal-dot" style="background:${sl.color}"></div><div class="meal-slot-label">${sl.label}</div><div class="meal-slot-food">${tm[sl.key].food}</div>${tm[sl.key].time?`<span class="meal-slot-time">${tm[sl.key].time}</span>`:''}</div>`).join(''):'<div class="empty" style="padding:10px">Sin comidas planificadas.</div>';const dc=['D','L','M','X','J','V','S'][today.getDay()];const tw=state.workouts.filter(w=>w.days.includes(dc));document.getElementById('dash-workout').innerHTML=tw.length?tw.map(w=>{const d=w.done.includes(todayKey);return`<div class="workout-row" style="border-left:3px solid ${w.color}"><div class="w-dot" style="background:${w.color}"></div><div style="flex:1;font-size:13px;font-weight:500">${w.name}</div><div class="check-box ${d?'done':''}" onclick="toggleWorkoutDone(${w.id})" style="width:26px;height:26px">${d?'<i class="ti ti-check"></i>':''}</div></div>`;}).join(''):'<div class="empty" style="padding:10px">Descanso hoy 🛌</div>';saveProgress();renderProgressChart();renderAlerts();}
+function saveProgress(){const done=state.habits.filter(h=>h.doneToday).length;const total=state.habits.length;state.progressHistory[todayKey]=total?Math.round(done/total*100):0;}
+function renderProgressChart(){const last7=[],labels=[];for(let i=6;i>=0;i--){const d=new Date(today);d.setDate(d.getDate()-i);const k=d.toISOString().split('T')[0];last7.push(state.progressHistory[k]||0);labels.push(DAYS[d.getDay()]);}const canvas=document.getElementById('progressChart');if(state.progressChart)state.progressChart.destroy();state.progressChart=new Chart(canvas,{type:'bar',data:{labels,datasets:[{label:'%',data:last7,backgroundColor:last7.map((_,i)=>i===6?'#1D9E75':'#9FE1CB'),borderRadius:8,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.y+'%'}}},scales:{x:{grid:{display:false},ticks:{font:{family:'DM Mono',size:11},color:'#A8A89F'}},y:{min:0,max:100,grid:{color:'rgba(0,0,0,.05)'},ticks:{font:{family:'DM Mono',size:11},color:'#A8A89F',callback:v=>v+'%'},border:{display:false}}}}});}
+function toggleHabit(id){const h=state.habits.find(x=>x.id===id);if(!h)return;h.doneToday=!h.doneToday;h.history[todayKey]=h.doneToday;if(h.doneToday)h.streak++;else if(h.streak>0)h.streak--;saveProgress();renderHabits();renderDashboard();}
+function addHabit(){const n=document.getElementById('h-name').value.trim();if(!n)return;state.habits.push({id:state.nextIds.h++,name:n,cat:document.getElementById('h-cat').value,doneToday:false,streak:0,history:{}});document.getElementById('h-name').value='';closeModal('modal-habit');renderHabits();renderDashboard();}
+function deleteHabit(id){state.habits=state.habits.filter(h=>h.id!==id);renderHabits();renderDashboard();}
+function renderHabits(){const el=document.getElementById('habits-list');if(!state.habits.length){el.innerHTML='<div class="empty">No hay hábitos. ¡Crea uno!</div>';return;}el.innerHTML=state.habits.map(h=>`<div class="habit-row"><div class="check-box ${h.doneToday?'done':''}" onclick="toggleHabit(${h.id})">${h.doneToday?'<i class="ti ti-check"></i>':''}</div><div style="flex:1"><div class="habit-name" style="${h.doneToday?'text-decoration:line-through;color:var(--text3)':''}">${h.name}</div><div class="habit-meta"><span class="tag tag-${h.cat==='fitness'?'blue':h.cat==='ahorro'?'amber':'green'}">${h.cat}</span></div></div><span class="streak-pill">🔥 ${h.streak} días</span><button class="btn-icon" onclick="deleteHabit(${h.id})" aria-label="Eliminar"><i class="ti ti-trash"></i></button></div>`).join('');const sl=document.getElementById('streaks-list');sl.innerHTML=[...state.habits].sort((a,b)=>b.streak-a.streak).slice(0,5).map(h=>`<div class="habit-row"><div style="font-size:22px">🔥</div><div style="flex:1;font-size:14px;font-weight:500">${h.name}</div><div style="font-size:20px;font-weight:700;font-family:'DM Mono';color:var(--amber)">${h.streak}</div><div style="font-size:12px;color:var(--text3)">días</div></div>`).join('');}
+function addSaving(){const n=document.getElementById('s-name').value.trim(),g=parseFloat(document.getElementById('s-goal').value);if(!n||!g)return;state.savings.push({id:state.nextIds.s++,name:n,goal:g,current:0,deadline:document.getElementById('s-date').value});document.getElementById('s-name').value='';document.getElementById('s-goal').value='';document.getElementById('s-date').value='';closeModal('modal-saving');renderSavings();}
+function openContribute(id){state.activeSavingId=id;document.getElementById('c-amount').value='';openModal('modal-contribute');}
+function addContribution(){const a=parseFloat(document.getElementById('c-amount').value);if(!a)return;const s=state.savings.find(x=>x.id===state.activeSavingId);if(s)s.current=Math.min(s.goal,s.current+a);closeModal('modal-contribute');renderSavings();}
+function deleteSaving(id){state.savings=state.savings.filter(s=>s.id!==id);renderSavings();}
+function renderSavings(){const el=document.getElementById('savings-list');if(!state.savings.length){el.innerHTML='<div class="card"><div class="empty">Sin metas. ¡Crea una!</div></div>';return;}el.innerHTML=state.savings.map(s=>{const pct=Math.min(100,Math.round(s.current/s.goal*100));const bc=pct>=80?'pb-green':pct>=40?'pb-blue':'pb-amber';return`<div class="saving-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px"><div><div style="font-size:15px;font-weight:600">${s.name}</div><div style="font-size:13px;color:var(--text2)">$${s.current.toLocaleString('es-MX')} de $${s.goal.toLocaleString('es-MX')}</div>${s.deadline?`<div style="font-size:11px;color:var(--text3);margin-top:3px">Límite: ${s.deadline}</div>`:''}</div><div style="font-size:28px;font-weight:700;font-family:'DM Mono';color:var(--green)">${pct}%</div></div><div class="pb-wrap" style="height:8px"><div class="pb-fill ${bc}" style="width:${pct}%"></div></div><div style="display:flex;gap:8px;margin-top:12px"><button class="btn btn-green btn-sm" onclick="openContribute(${s.id})"><i class="ti ti-plus" style="font-size:14px"></i>Aportar</button><button class="btn-icon" onclick="deleteSaving(${s.id})" aria-label="Eliminar"><i class="ti ti-trash"></i></button></div></div>`;}).join('');}
+function getWeekDays(){const days=[],d=new Date(today),dow=d.getDay();d.setDate(d.getDate()-dow);for(let i=0;i<7;i++){const dd=new Date(d);dd.setDate(d.getDate()+i);days.push(dd);}return days;}
+const weekDays=getWeekDays();
+function renderMeals(){document.getElementById('week-tabs').innerHTML=weekDays.map(d=>`<button class="day-tab ${d.getDay()===state.selectedDay?'active':''}" onclick="selectDay(${d.getDay()})">${DAYS[d.getDay()]} ${d.getDate()}</button>`).join('');renderDayMeals();renderDietPlan();}
+function selectDay(day){state.selectedDay=day;document.querySelectorAll('.day-tab').forEach((b,i)=>b.classList.toggle('active',weekDays[i].getDay()===day));renderDayMeals();}
+function renderDayMeals(){document.getElementById('selected-day-label').textContent=DAYS[state.selectedDay]+(state.selectedDay===today.getDay()?' — Hoy':'');const dm=state.meals[state.selectedDay]||{};document.getElementById('day-meals').innerHTML=MEAL_SLOTS.map(sl=>{const m=dm[sl.key]||{};return`<div class="meal-slot-row"><div class="meal-dot" style="background:${sl.color}"></div><div class="meal-slot-label">${sl.label}</div><div class="meal-slot-food">${m.food||'<span style="color:var(--text3)">Sin planificar</span>'}</div>${m.time?`<span class="meal-slot-time"><i class="ti ti-clock" style="font-size:12px;vertical-align:-1px"></i> ${m.time}</span>`:''}</div>`;}).join('');}
+function openMealEditor(){const dm=state.meals[state.selectedDay]||{};document.getElementById('meal-editor-title').textContent='Editar comidas — '+DAYS[state.selectedDay];document.getElementById('meal-editor-slots').innerHTML=MEAL_SLOTS.map(sl=>{const m=dm[sl.key]||{};return`<div style="margin-bottom:16px"><div style="font-size:13px;font-weight:600;color:${sl.color};margin-bottom:8px;display:flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:${sl.color};display:inline-block"></span>${sl.label}</div><div class="form-grid"><div><label class="form-label-m">Comida</label><input type="text" id="me-food-${sl.key}" value="${m.food||''}" placeholder="Ej: Avena con fruta"></div><div><label class="form-label-m">Horario</label><input type="time" id="me-time-${sl.key}" value="${m.time||''}"></div></div></div>`;}).join('');openModal('modal-meal-editor');}
+function saveMeals(){if(!state.meals[state.selectedDay])state.meals[state.selectedDay]={};MEAL_SLOTS.forEach(sl=>{state.meals[state.selectedDay][sl.key]={food:document.getElementById('me-food-'+sl.key).value.trim(),time:document.getElementById('me-time-'+sl.key).value};});closeModal('modal-meal-editor');renderDayMeals();renderDashboard();}
+function saveDietPlan(){const n=document.getElementById('dp-name').value.trim();if(!n)return;state.dietPlan={name:n,desc:document.getElementById('dp-desc').value.trim()};closeModal('modal-diet');renderDietPlan();}
+function renderDietPlan(){const el=document.getElementById('diet-plan-display');if(!state.dietPlan){el.innerHTML='<div class="empty">Sin plan configurado.</div>';return;}el.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div style="font-size:15px;font-weight:600">${state.dietPlan.name}</div>${state.dietPlan.desc?`<div style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.6">${state.dietPlan.desc}</div>`:''}</div><button class="btn-icon" onclick="openModal('modal-diet')" aria-label="Editar"><i class="ti ti-edit"></i></button></div>`;}
+function addWorkout(){const n=document.getElementById('w-name').value.trim();if(!n)return;const days=[...document.querySelectorAll('#w-days-picker input:checked')].map(c=>c.value);const cols=['#185FA5','#1D9E75','#D85A30','#BA7517','#534AB7','#D4537E'];state.workouts.push({id:state.nextIds.w++,name:n,days,done:[],color:cols[state.workouts.length%cols.length]});document.getElementById('w-name').value='';document.querySelectorAll('#w-days-picker input').forEach(c=>c.checked=false);closeModal('modal-workout');renderFitness();}
+function toggleWorkoutDone(id){const w=state.workouts.find(x=>x.id===id);if(!w)return;const i=w.done.indexOf(todayKey);i>-1?w.done.splice(i,1):w.done.push(todayKey);renderFitness();renderDashboard();}
+function deleteWorkout(id){state.workouts=state.workouts.filter(w=>w.id!==id);renderFitness();}
+function renderFitness(){const el=document.getElementById('workouts-list');if(!state.workouts.length){el.innerHTML='<div class="empty">Sin rutinas. ¡Crea una!</div>';return;}el.innerHTML=state.workouts.map(w=>{const d=w.done.includes(todayKey);return`<div class="workout-row" style="border-left:3px solid ${w.color}"><div class="w-dot" style="background:${w.color}"></div><div style="flex:1"><div style="font-size:14px;font-weight:500">${w.name}</div><div style="font-size:12px;color:var(--text3);margin-top:2px">${w.days.join(' · ')}</div></div><div class="check-box ${d?'done':''}" onclick="toggleWorkoutDone(${w.id})" style="width:28px;height:28px">${d?'<i class="ti ti-check"></i>':''}</div><button class="btn-icon" onclick="deleteWorkout(${w.id})" aria-label="Eliminar"><i class="ti ti-trash"></i></button></div>`;}).join('');const dm={L:1,M:2,X:3,J:4,V:5,S:6,D:0};const dn=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];document.getElementById('workout-week').innerHTML=`<div class="week-grid">${Array.from({length:7},(_,i)=>{const di=[1,2,3,4,5,6,0][i];const ws=state.workouts.filter(w=>w.days.some(d=>dm[d]===di));const isT=di===today.getDay();return`<div class="week-cell ${isT?'today':''}"><div class="week-cell-day">${dn[di]}</div>${ws.map(w=>`<div class="week-pill" style="background:${w.color}22;color:${w.color}">${w.name}</div>`).join('')||`<div style="font-size:10px;color:var(--text3);text-align:center">—</div>`}</div>`;}).join('')}</div>`;}
+function openInvAdd(){state.editInvId=null;document.getElementById('inv-modal-title').textContent='Agregar producto';document.getElementById('inv-save-btn').textContent='Agregar';['inv-name','inv-qty','inv-max'].forEach(id=>document.getElementById(id).value='');openModal('modal-inv-add');}
+function openEditInv(id){const p=state.inventory.find(x=>x.id===id);if(!p)return;state.editInvId=id;document.getElementById('inv-modal-title').textContent='Editar: '+p.name;document.getElementById('inv-save-btn').textContent='Actualizar';document.getElementById('inv-name').value=p.name;document.getElementById('inv-cat').value=p.cat;document.getElementById('inv-unit').value=p.unit;document.getElementById('inv-qty').value=p.qty;document.getElementById('inv-max').value=p.max;openModal('modal-inv-add');}
+function saveInvProduct(){const name=document.getElementById('inv-name').value.trim();if(!name)return;const cat=document.getElementById('inv-cat').value,unit=document.getElementById('inv-unit').value;const qty=parseFloat(document.getElementById('inv-qty').value)||0;const max=parseFloat(document.getElementById('inv-max').value)||100;if(state.editInvId){const p=state.inventory.find(x=>x.id===state.editInvId);if(p)Object.assign(p,{name,cat,unit,qty,max});state.editInvId=null;}else{state.inventory.push({id:state.nextIds.inv++,name,cat,unit,qty,max});}document.getElementById('inv-save-btn').textContent='Agregar';document.getElementById('inv-modal-title').textContent='Agregar producto';closeModal('modal-inv-add');renderInventario();renderAlerts();}
+function deleteInvItem(id){state.inventory=state.inventory.filter(p=>p.id!==id);renderInventario();renderAlerts();}
+function openInvMove(id){const p=state.inventory.find(x=>x.id===id);if(!p)return;state.moveInvId=id;state.mvType='use';document.getElementById('inv-move-name').textContent=p.name;document.getElementById('inv-move-current').textContent=fq(p.qty);document.getElementById('inv-move-unit2').textContent=p.unit;document.getElementById('mv-qty').value='';document.getElementById('mv-note').value='';updateMvUI();openModal('modal-inv-move');}
+function setMvType(t){state.mvType=t;updateMvUI();}
+function updateMvUI(){document.getElementById('mv-type-use').className='move-type-btn'+(state.mvType==='use'?' active-use':'');document.getElementById('mv-type-buy').className='move-type-btn'+(state.mvType==='buy'?' active-buy':'');document.getElementById('mv-qty-label').textContent=state.mvType==='use'?'Cantidad a descontar':'Cantidad a agregar (compra del súper)';}
+function saveInvMove(){const qty=parseFloat(document.getElementById('mv-qty').value);if(!qty||qty<=0)return;const note=document.getElementById('mv-note').value.trim();const p=state.inventory.find(x=>x.id===state.moveInvId);if(!p)return;if(state.mvType==='use')p.qty=Math.max(0,parseFloat((p.qty-qty).toFixed(4)));else p.qty=Math.min(p.max,parseFloat((p.qty+qty).toFixed(4)));const now=new Date();state.invLog.push({id:Date.now(),name:p.name,type:state.mvType,qty,unit:p.unit,note,date:now.toLocaleDateString('es-MX',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})});closeModal('modal-inv-move');renderInventario();renderAlerts();}
+function setInvFilter(c){state.invFilter=c;renderInventario();}
+function renderInventario(){document.getElementById('inv-total').textContent=state.inventory.length;const low=state.inventory.filter(p=>p.qty>0&&(p.qty/p.max*100)<=20).length;const empty=state.inventory.filter(p=>p.qty<=0).length;document.getElementById('inv-low').textContent=low;document.getElementById('inv-empty').textContent=empty;const cats=['todos',...[...new Set(state.inventory.map(p=>p.cat))]];document.getElementById('cat-filters').innerHTML=cats.map(c=>`<button class="filter-btn ${state.invFilter===c?'active':''}" onclick="setInvFilter('${c}')">${c==='todos'?'Todos':CAT_LABELS[c]||c}</button>`).join('');const filtered=state.invFilter==='todos'?state.inventory:state.inventory.filter(p=>p.cat===state.invFilter);const sorted=[...filtered].sort((a,b)=>(a.qty/a.max)-(b.qty/b.max));const el=document.getElementById('inv-list');if(!sorted.length){el.innerHTML='<div class="empty">Sin productos en esta categoría.</div>';return;}el.innerHTML=sorted.map(p=>{const pct=Math.min(100,Math.round(p.qty/p.max*100));const isEmpty=p.qty<=0,isCrit=!isEmpty&&pct<=ALERT_PCT,isLow=!isEmpty&&!isCrit&&pct<=20;const barC=isEmpty?'pb-red':isCrit?'pb-orange':isLow?'pb-amber':pct<=50?'pb-blue':'pb-green';const pctC=isEmpty?'var(--red)':isCrit?'var(--orange)':isLow?'var(--amber)':'var(--green)';return`<div class="inv-row"><div class="inv-icon"><i class="ti ti-${CAT_ICONS[p.cat]||'package'}"></i></div><div class="inv-info"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span class="inv-name">${p.name}</span>${isEmpty?'<span class="critical-badge cb-empty">Agotado</span>':isCrit?'<span class="critical-badge cb-low">Crítico &lt;3%</span>':''}<span class="cat-badge cat-${p.cat}">${CAT_LABELS[p.cat]}</span></div><div class="inv-meta">${fq(p.qty)} / ${fq(p.max)} ${p.unit}</div><div class="pb-wrap" style="height:5px;margin-top:6px"><div class="pb-fill ${barC}" style="width:${pct}%"></div></div></div><div style="text-align:right;flex-shrink:0"><div class="inv-pct" style="color:${pctC}">${pct}%</div><div style="display:flex;gap:4px;margin-top:6px;justify-content:flex-end"><button class="btn-icon" onclick="openInvMove(${p.id})" aria-label="Movimiento"><i class="ti ti-transfer"></i></button><button class="btn-icon" onclick="openEditInv(${p.id})" aria-label="Editar"><i class="ti ti-edit"></i></button><button class="btn-icon" onclick="deleteInvItem(${p.id})" aria-label="Eliminar"><i class="ti ti-trash"></i></button></div></div></div>`;}).join('');const recent=[...state.invLog].reverse().slice(0,8);const log=document.getElementById('inv-log');if(!recent.length){log.innerHTML='<div class="empty">Sin movimientos aún.</div>';return;}log.innerHTML=recent.map(l=>`<div class="log-row"><div class="log-icon ${l.type==='buy'?'buy':'use'}"><i class="ti ti-${l.type==='buy'?'arrow-down':'arrow-up'}"></i></div><div style="flex:1"><div class="log-name">${l.name} <span style="color:${l.type==='buy'?'var(--green)':'var(--amber)'}">${l.type==='buy'?'+':'-'}${fq(l.qty)} ${l.unit}</span></div>${l.note?`<div class="log-detail">${l.note}</div>`:''}</div><div style="font-size:11px;color:var(--text3);flex-shrink:0">${l.date}</div></div>`).join('');}
+function showAdminPage(id,btn){document.querySelectorAll('#screen-admin .app-page').forEach(p=>p.classList.remove('active'));document.querySelectorAll('#screen-admin .sidebar .nav-item').forEach(b=>b.classList.remove('active'));document.getElementById('admin-page-'+id).classList.add('active');btn.classList.add('active');if(id==='stats')renderAdminStats();}
+function renderAdminAll(){renderAdminUsers();renderAdminStats();}
+function renderAdminUsers(){const q=(document.getElementById('user-search')||{}).value||'';const filtered=authState.users.filter(u=>u.name.toLowerCase().includes(q.toLowerCase())||u.email.toLowerCase().includes(q.toLowerCase()));const total=authState.users.length;const active=authState.users.filter(u=>u.status==='active').length;const admins=authState.users.filter(u=>u.role==='admin').length;document.getElementById('admin-total').textContent=total;document.getElementById('admin-active').textContent=active;document.getElementById('admin-admins').textContent=admins;document.getElementById('admin-inactive').textContent=total-active;document.getElementById('user-count-label').textContent=`${filtered.length} de ${total} usuarios`;const tbody=document.getElementById('admin-users-tbody');tbody.innerHTML=filtered.map(u=>`<tr><td><div style="display:flex;align-items:center;gap:8px"><div style="width:30px;height:30px;border-radius:50%;background:${u.role==='admin'?'#EEEDFE':'var(--green-light)'};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:${u.role==='admin'?'#3C3489':'var(--green-dark)'};">${u.name.charAt(0).toUpperCase()}</div><span style="font-weight:500">${u.name}</span></div></td><td style="color:var(--text2)">${u.email}</td><td><span class="role-badge ${u.role==='admin'?'role-admin':'role-user'}">${u.role==='admin'?'Administrador':'Usuario'}</span></td><td><span class="status-dot ${u.status==='active'?'status-active':'status-inactive'}"></span>${u.status==='active'?'Activo':'Inactivo'}</td><td style="color:var(--text3)">${u.created}</td><td><div style="display:flex;gap:4px"><button class="btn-icon" onclick="openEditUser(${u.id})" aria-label="Editar"><i class="ti ti-edit"></i></button><button class="btn-icon" onclick="toggleUserStatus(${u.id})" aria-label="Estado" title="${u.status==='active'?'Desactivar':'Activar'}"><i class="ti ti-${u.status==='active'?'eye-off':'eye'}"></i></button>${u.role!=='admin'?`<button class="btn-icon" onclick="deleteUser(${u.id})" aria-label="Eliminar" style="color:var(--red)"><i class="ti ti-trash"></i></button>`:''}</div></td></tr>`).join('');}
+function renderAdminStats(){const total=authState.users.length;const active=authState.users.filter(u=>u.status==='active').length;const admins=authState.users.filter(u=>u.role==='admin').length;const todayReg=authState.users.filter(u=>u.created===todayKey).length;document.getElementById('stat-users').textContent=total;document.getElementById('stat-active').textContent=active;document.getElementById('stat-admins').textContent=admins;document.getElementById('stat-today').textContent=todayReg;const rd=document.getElementById('role-dist');const userPct=total?Math.round((total-admins)/total*100):0;const adminPct=total?Math.round(admins/total*100):0;rd.innerHTML=`<div style="display:flex;gap:16px;margin-bottom:10px"><div style="flex:1"><div style="font-size:12px;color:var(--text3);margin-bottom:4px">Usuarios (${total-admins})</div><div class="pb-wrap" style="height:10px"><div class="pb-fill pb-green" style="width:${userPct}%"></div></div></div><div style="flex:1"><div style="font-size:12px;color:var(--text3);margin-bottom:4px">Admins (${admins})</div><div class="pb-wrap" style="height:10px"><div class="pb-fill pb-purple" style="width:${adminPct}%"></div></div></div></div>`;const ru=document.getElementById('recent-users-list');const recent=[...authState.users].reverse().slice(0,5);ru.innerHTML=recent.map(u=>`<div class="habit-row"><div style="width:32px;height:32px;border-radius:50%;background:${u.role==='admin'?'#EEEDFE':'var(--green-light)'};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:${u.role==='admin'?'#3C3489':'var(--green-dark)'};">${u.name.charAt(0).toUpperCase()}</div><div style="flex:1"><div style="font-size:14px;font-weight:500">${u.name}</div><div style="font-size:12px;color:var(--text3)">${u.email}</div></div><span class="role-badge ${u.role==='admin'?'role-admin':'role-user'}">${u.role==='admin'?'Admin':'Usuario'}</span></div>`).join('');}
+function openEditUser(id){const u=authState.users.find(x=>x.id===id);if(!u)return;document.getElementById('eu-id').value=id;document.getElementById('eu-name').value=u.name;document.getElementById('eu-email').value=u.email;document.getElementById('eu-role').value=u.role;document.getElementById('eu-status').value=u.status;openModal('modal-edit-user');}
+function adminSaveUser(){const id=parseInt(document.getElementById('eu-id').value);const u=authState.users.find(x=>x.id===id);if(!u)return;u.name=document.getElementById('eu-name').value.trim()||u.name;u.email=document.getElementById('eu-email').value.trim()||u.email;u.role=document.getElementById('eu-role').value;u.status=document.getElementById('eu-status').value;closeModal('modal-edit-user');renderAdminUsers();renderAdminStats();}
+function toggleUserStatus(id){const u=authState.users.find(x=>x.id===id);if(!u)return;u.status=u.status==='active'?'inactive':'active';renderAdminUsers();}
+function deleteUser(id){const u=authState.users.find(x=>x.id===id);if(!u||u.role==='admin')return;if(confirm(`¿Eliminar al usuario "${u.name}"? Esta acción no se puede deshacer.`)){authState.users=authState.users.filter(x=>x.id!==id);renderAdminUsers();renderAdminStats();}}
+function adminAddUser(){const name=document.getElementById('au-name').value.trim();const email=document.getElementById('au-email').value.trim().toLowerCase();const pass=document.getElementById('au-pass').value;const role=document.getElementById('au-role').value;const err=document.getElementById('au-error');if(!name||!email||!pass){err.textContent='Completa todos los campos.';err.style.display='block';return;}if(authState.users.find(u=>u.email.toLowerCase()===email)){err.textContent='Ya existe un usuario con ese correo.';err.style.display='block';return;}err.style.display='none';authState.users.push({id:authState.nextUserId++,name,email,pass,role,status:'active',created:todayKey});document.getElementById('au-name').value='';document.getElementById('au-email').value='';document.getElementById('au-pass').value='';closeModal('modal-add-user');renderAdminUsers();renderAdminStats();}
+function changeAdminPass(){const p1=document.getElementById('new-admin-pass').value;const p2=document.getElementById('new-admin-pass2').value;const msg=document.getElementById('settings-msg');if(p1.length<6){msg.textContent='La contraseña debe tener al menos 6 caracteres.';msg.style.color='var(--red)';msg.style.display='block';return;}if(p1!==p2){msg.textContent='Las contraseñas no coinciden.';msg.style.color='var(--red)';msg.style.display='block';return;}const admin=authState.users.find(u=>u.role==='admin'&&u.id===authState.currentUser.id);if(admin)admin.pass=p1;document.getElementById('new-admin-pass').value='';document.getElementById('new-admin-pass2').value='';msg.textContent='Contraseña actualizada correctamente.';msg.style.color='var(--green)';msg.style.display='block';setTimeout(()=>msg.style.display='none',3000);}
+function clearNonAdmins(){if(confirm('¿Eliminar todos los usuarios que no son administradores?')){authState.users=authState.users.filter(u=>u.role==='admin');renderAdminUsers();renderAdminStats();}}
+function toggleFaq(item){const wasOpen=item.classList.contains('open');document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));if(!wasOpen)item.classList.add('open');}
+(function(){document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.style.display='none';});const landing=document.getElementById('screen-landing');landing.style.display='block';landing.classList.add('active');})();
+</script>
+</body>
+</html>

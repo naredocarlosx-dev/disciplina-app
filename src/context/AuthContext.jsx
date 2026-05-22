@@ -1,0 +1,148 @@
+import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { supabase } from '../lib/supabase'
+
+const AuthContext = createContext(null)
+
+export function useAuth() {
+  return useContext(AuthContext)
+}
+
+export function AuthProvider({ children }) {
+  const [currentUser, setCurrentUser] = useState(null)
+  const [subscription, setSubscription] = useState({ plan: 'free' })
+  const [authLoading, setAuthLoading] = useState(true)
+
+  // Carga perfil + suscripción desde Supabase
+  const loadProfile = useCallback(async (authUser) => {
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', authUser.id)
+      .single()
+
+    if (error || !profile) return null
+    if (profile.status === 'inactive') {
+      await supabase.auth.signOut()
+      return null
+    }
+
+    const { data: sub } = await supabase
+      .from('subscriptions')
+      .select('*')
+      .eq('user_id', authUser.id)
+      .single()
+
+    const user = {
+      id: authUser.id,
+      email: authUser.email,
+      name: profile.name,
+      role: profile.role,
+      status: profile.status,
+      created: profile.created_at,
+    }
+
+    setCurrentUser(user)
+    setSubscription(sub || { plan: 'free' })
+    return user
+  }, [])
+
+  // Revisar sesión activa al montar
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        loadProfile(session.user).finally(() => setAuthLoading(false))
+      } else {
+        setAuthLoading(false)
+      }
+    })
+
+    const { data: { subscription: authSub } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        setCurrentUser(null)
+        setSubscription({ plan: 'free' })
+      }
+    })
+
+    return () => authSub.unsubscribe()
+  }, [loadProfile])
+
+  const doLogin = useCallback(async (email, pass) => {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass })
+    if (error) return { ok: false, error: 'Correo o contraseña incorrectos.' }
+
+    const user = await loadProfile(data.user)
+    if (!user) return { ok: false, error: 'Esta cuenta está desactivada. Contacta al administrador.' }
+
+    return { ok: true, user }
+  }, [loadProfile])
+
+  const doRegister = useCallback(async ({ name, email, pass, pass2 }) => {
+    if (!name || !email || !pass) return { ok: false, error: 'Por favor completa todos los campos.' }
+    if (pass.length < 6) return { ok: false, error: 'La contraseña debe tener al menos 6 caracteres.' }
+    if (pass !== pass2) return { ok: false, error: 'Las contraseñas no coinciden.' }
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password: pass,
+      options: { data: { name } },
+    })
+
+    if (error) {
+      if (error.message.toLowerCase().includes('already')) {
+        return { ok: false, error: 'Ya existe una cuenta con ese correo.' }
+      }
+      return { ok: false, error: error.message }
+    }
+
+    if (!data.user) return { ok: false, error: 'Error al crear la cuenta. Intenta de nuevo.' }
+
+    // Crear perfil y suscripción (el trigger de Supabase también lo hace como respaldo)
+    await Promise.all([
+      supabase.from('profiles').upsert(
+        { id: data.user.id, name, email, role: 'user', status: 'active' },
+        { onConflict: 'id' }
+      ),
+      supabase.from('subscriptions').upsert(
+        { user_id: data.user.id, plan: 'free' },
+        { onConflict: 'user_id' }
+      ),
+    ])
+
+    if (!data.session) {
+      return { ok: false, error: 'Revisa tu correo para confirmar tu cuenta antes de continuar.' }
+    }
+
+    const user = await loadProfile(data.user)
+    if (!user) return { ok: false, error: 'Error al cargar el perfil. Intenta iniciar sesión.' }
+
+    return { ok: true, user }
+  }, [loadProfile])
+
+  const doLogout = useCallback(async () => {
+    await supabase.auth.signOut()
+    setCurrentUser(null)
+    setSubscription({ plan: 'free' })
+  }, [])
+
+  const upgradeToPro = useCallback(async () => {
+    if (!currentUser) return
+    const { data } = await supabase
+      .from('subscriptions')
+      .upsert({ user_id: currentUser.id, plan: 'pro' }, { onConflict: 'user_id' })
+      .select()
+      .single()
+    setSubscription(data || { plan: 'pro' })
+  }, [currentUser])
+
+  const value = {
+    currentUser,
+    subscription,
+    authLoading,
+    doLogin,
+    doRegister,
+    doLogout,
+    upgradeToPro,
+  }
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+}
