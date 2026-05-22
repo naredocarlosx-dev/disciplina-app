@@ -1,0 +1,39 @@
+{
+  "name": "Disciplina",
+  "short_name": "Disciplina",
+  "description": "Construye tu mejor versión cada día — hábitos, ahorro, fitness y más.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#111111",
+  "theme_color": "#1D9E75",
+  "categories": ["health", "lifestyle", "productivity"],
+  "lang": "es",
+  "icons": [
+    {
+      "src": "/icons/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Hábitos",
+      "url": "/",
+      "description": "Ver mis hábitos de hoy"
+    },
+    {
+      "name": "Ahorro",
+      "url": "/",
+      "description": "Ver mis metas de ahorro"
+    }
+  ]
+}
