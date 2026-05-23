@@ -11,7 +11,9 @@ export function AuthProvider({ children }) {
   const [currentUser,       setCurrentUser]       = useState(null)
   const [subscription,      setSubscription]      = useState({ plan: 'free' })
   const [authLoading,       setAuthLoading]        = useState(true)
-  const [resetPasswordMode, setResetPasswordMode] = useState(false)
+  const [resetPasswordMode, setResetPasswordMode] = useState(() =>
+    new URLSearchParams(window.location.hash.slice(1)).get('type') === 'recovery'
+  )
 
   // Carga perfil + suscripción desde Supabase
   const loadProfile = useCallback(async (authUser) => {
@@ -56,7 +58,8 @@ export function AuthProvider({ children }) {
         return
       }
       if (event === 'INITIAL_SESSION') {
-        if (session?.user) {
+        const isRecovery = new URLSearchParams(window.location.hash.slice(1)).get('type') === 'recovery'
+        if (!isRecovery && session?.user) {
           await loadProfile(session.user)
         }
         setAuthLoading(false)
