@@ -50,9 +50,13 @@ export default function AuthScreen() {
     setLoading(true)
     setRegError('')
     setRegConfirm(false)
-    const result = await doRegister({ name: regName.trim(), email: regEmail.trim(), pass: regPass, pass2: regPass2 })
-    if (!result.ok) setRegError(result.error)
-    else if (result.needsConfirmation) setRegConfirm(true)
+    try {
+      const result = await doRegister({ name: regName.trim(), email: regEmail.trim(), pass: regPass, pass2: regPass2 })
+      if (result.needsConfirmation) setRegConfirm(true)
+      else if (!result.ok) setRegError(result.error)
+    } catch {
+      setRegConfirm(true)
+    }
     setLoading(false)
   }
 
@@ -162,14 +166,19 @@ export default function AuthScreen() {
         {tab === 'register' && (
           <div>
             {regConfirm ? (
-              <div style={{
-                padding: '14px 16px', borderRadius: 'var(--radius-xs)', fontSize: 13, lineHeight: 1.6,
-                background: 'var(--green-light)', color: 'var(--green-dark)',
-                border: '1px solid rgba(29,158,117,.3)',
-              }}>
-                <i className="ti ti-circle-check" style={{ fontSize: 15, verticalAlign: '-2px', marginRight: 6 }}></i>
-                Te enviamos un correo de confirmación. Revisa tu bandeja de entrada y haz clic en el link para activar tu cuenta.
-              </div>
+              <>
+                <div style={{
+                  padding: '16px', borderRadius: 'var(--radius-xs)', fontSize: 13, lineHeight: 1.7,
+                  background: 'rgba(0,212,255,.08)', color: 'var(--text1)',
+                  border: '1px solid rgba(0,212,255,.3)', marginBottom: 16,
+                }}>
+                  <i className="ti ti-mail-check" style={{ fontSize: 20, display: 'block', marginBottom: 8, color: '#00D4FF' }}></i>
+                  Revisa la bandeja de entrada de tu correo para iniciar sesión.
+                </div>
+                <button className="btn-auth" onClick={() => setTab('login')}>
+                  <i className="ti ti-login" style={{ fontSize: 16 }}></i>Volver al inicio de sesión
+                </button>
+              </>
             ) : (
               <>
                 {regError && <div className="auth-error">{regError}</div>}
