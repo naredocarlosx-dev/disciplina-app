@@ -49,13 +49,21 @@ export function AuthProvider({ children }) {
 
   // Revisar sesión activa al montar
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        loadProfile(session.user).finally(() => setAuthLoading(false))
-      } else {
-        setAuthLoading(false)
-      }
-    })
+    const hashParams = new URLSearchParams(window.location.hash.substring(1))
+    const isRecovery = hashParams.get('type') === 'recovery'
+
+    if (isRecovery) {
+      setResetPasswordMode(true)
+      setAuthLoading(false)
+    } else {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user) {
+          loadProfile(session.user).finally(() => setAuthLoading(false))
+        } else {
+          setAuthLoading(false)
+        }
+      })
+    }
 
     const { data: { subscription: authSub } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_OUT') {
@@ -137,11 +145,12 @@ export function AuthProvider({ children }) {
   }, [])
 
   const confirmNewPassword = useCallback(async (newPass) => {
-    const { error } = await supabase.auth.updateUser({ password: newPass })
+    const { data, error } = await supabase.auth.updateUser({ password: newPass })
     if (error) return { ok: false, error: error.message }
+    if (data.user) await loadProfile(data.user)
     setResetPasswordMode(false)
     return { ok: true }
-  }, [])
+  }, [loadProfile])
 
   const upgradeToPro = useCallback(async () => {
     if (!currentUser) return
