@@ -1,11 +1,16 @@
 import { useContext, useState } from 'react'
 import { AppContext } from '../context/AppContext'
+import { useAuth } from '../context/AuthContext'
 
 export default function AuthScreen() {
   const { doLogin, doRegister, setScreen } = useContext(AppContext)
+  const { sendPasswordReset }              = useAuth()
 
   const [tab,        setTab]        = useState('login')
   const [loading,    setLoading]    = useState(false)
+
+  const [forgotEmail,   setForgotEmail]   = useState('')
+  const [forgotMsg,     setForgotMsg]     = useState(null) // { text, ok }
 
   const [loginEmail, setLoginEmail] = useState('')
   const [loginPass,  setLoginPass]  = useState('')
@@ -23,6 +28,18 @@ export default function AuthScreen() {
     setLoginError('')
     const result = await doLogin(loginEmail.trim(), loginPass)
     if (!result.ok) setLoginError(result.error)
+    setLoading(false)
+  }
+
+  const handleForgot = async () => {
+    if (loading || !forgotEmail.trim()) return
+    setLoading(true)
+    setForgotMsg(null)
+    const result = await sendPasswordReset(forgotEmail)
+    setForgotMsg(result.ok
+      ? { text: 'Te enviamos un correo con instrucciones para restablecer tu contraseña.', ok: true }
+      : { text: result.error, ok: false }
+    )
     setLoading(false)
   }
 
@@ -44,7 +61,7 @@ export default function AuthScreen() {
         </div>
 
         <div className="auth-tabs">
-          <button className={`auth-tab${tab === 'login' ? ' active' : ''}`} onClick={() => setTab('login')}>Iniciar sesión</button>
+          <button className={`auth-tab${tab === 'login'    ? ' active' : ''}`} onClick={() => setTab('login')}>Iniciar sesión</button>
           <button className={`auth-tab${tab === 'register' ? ' active' : ''}`} onClick={() => setTab('register')}>Crear cuenta</button>
         </div>
 
@@ -80,6 +97,62 @@ export default function AuthScreen() {
                 ? <span style={{ opacity: .6 }}>Entrando...</span>
                 : <><i className="ti ti-login" style={{ fontSize: 16 }}></i>Entrar</>}
             </button>
+            <div style={{ textAlign: 'center', marginTop: 12 }}>
+              <span
+                onClick={() => { setTab('forgot'); setForgotMsg(null); setForgotEmail('') }}
+                style={{ fontSize: 13, color: 'var(--text2)', cursor: 'pointer', textDecoration: 'underline' }}
+              >
+                ¿Olvidaste tu contraseña?
+              </span>
+            </div>
+          </div>
+        )}
+
+        {tab === 'forgot' && (
+          <div>
+            {forgotMsg && (
+              <div style={{
+                padding: '10px 12px', borderRadius: 'var(--radius-xs)', fontSize: 13, marginBottom: 16,
+                background: forgotMsg.ok ? 'var(--green-light)' : 'var(--red-light)',
+                color:      forgotMsg.ok ? 'var(--green-dark)'  : 'var(--red)',
+                border:     `1px solid ${forgotMsg.ok ? 'rgba(29,158,117,.3)' : 'rgba(224,85,85,.3)'}`,
+              }}>
+                <i className={`ti ti-${forgotMsg.ok ? 'circle-check' : 'alert-circle'}`} style={{ fontSize: 14, verticalAlign: '-2px', marginRight: 6 }}></i>
+                {forgotMsg.text}
+              </div>
+            )}
+            {!forgotMsg?.ok && (
+              <>
+                <div style={{ fontSize: 13, color: 'var(--text2)', marginBottom: 16, lineHeight: 1.6 }}>
+                  Escribe tu correo y te enviaremos instrucciones para restablecer tu contraseña.
+                </div>
+                <div className="form-row-m">
+                  <label className="form-label-m">Correo electrónico</label>
+                  <input
+                    type="email"
+                    className="form-input"
+                    placeholder="tu@correo.com"
+                    value={forgotEmail}
+                    onChange={e => setForgotEmail(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && handleForgot()}
+                    disabled={loading}
+                  />
+                </div>
+                <button className="btn-auth" onClick={handleForgot} disabled={loading || !forgotEmail.trim()}>
+                  {loading
+                    ? <span style={{ opacity: .6 }}>Enviando...</span>
+                    : <><i className="ti ti-mail" style={{ fontSize: 16 }}></i>Enviar instrucciones</>}
+                </button>
+              </>
+            )}
+            <div style={{ textAlign: 'center', marginTop: 12 }}>
+              <span
+                onClick={() => setTab('login')}
+                style={{ fontSize: 13, color: 'var(--text2)', cursor: 'pointer', textDecoration: 'underline' }}
+              >
+                Volver al inicio de sesión
+              </span>
+            </div>
           </div>
         )}
 

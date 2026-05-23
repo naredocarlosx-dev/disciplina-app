@@ -1,10 +1,11 @@
 import { useContext } from 'react'
-import { AuthProvider } from './context/AuthContext'
+import { AuthProvider, useAuth } from './context/AuthContext'
 import { AppProvider, AppContext } from './context/AppContext'
-import LandingScreen from './screens/LandingScreen'
-import AuthScreen    from './screens/AuthScreen'
-import AppScreen     from './screens/AppScreen'
-import AdminScreen   from './screens/AdminScreen'
+import LandingScreen        from './screens/LandingScreen'
+import AuthScreen           from './screens/AuthScreen'
+import AppScreen            from './screens/AppScreen'
+import AdminScreen          from './screens/AdminScreen'
+import ResetPasswordScreen  from './screens/ResetPasswordScreen'
 
 function LoadingScreen() {
   return (
@@ -16,8 +17,13 @@ function LoadingScreen() {
 }
 
 function Router() {
-  const { screen } = useContext(AppContext)
-  if (screen === 'loading') return <LoadingScreen />
+  const { screen }           = useContext(AppContext)
+  const { resetPasswordMode } = useAuth()
+
+  // El usuario llegó desde el link del correo de recuperación
+  if (resetPasswordMode) return <ResetPasswordScreen />
+  if (screen === 'loading')  return <LoadingScreen />
+
   return (
     <>
       {screen === 'landing' && <LandingScreen />}

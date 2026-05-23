@@ -8,9 +8,10 @@ export function useAuth() {
 }
 
 export function AuthProvider({ children }) {
-  const [currentUser, setCurrentUser] = useState(null)
-  const [subscription, setSubscription] = useState({ plan: 'free' })
-  const [authLoading, setAuthLoading] = useState(true)
+  const [currentUser,       setCurrentUser]       = useState(null)
+  const [subscription,      setSubscription]      = useState({ plan: 'free' })
+  const [authLoading,       setAuthLoading]        = useState(true)
+  const [resetPasswordMode, setResetPasswordMode] = useState(false)
 
   // Carga perfil + suscripción desde Supabase
   const loadProfile = useCallback(async (authUser) => {
@@ -60,6 +61,9 @@ export function AuthProvider({ children }) {
       if (event === 'SIGNED_OUT') {
         setCurrentUser(null)
         setSubscription({ plan: 'free' })
+      }
+      if (event === 'PASSWORD_RECOVERY') {
+        setResetPasswordMode(true)
       }
     })
 
@@ -124,6 +128,21 @@ export function AuthProvider({ children }) {
     setSubscription({ plan: 'free' })
   }, [])
 
+  const sendPasswordReset = useCallback(async (email) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: 'https://joyful-starburst-90dde1.netlify.app',
+    })
+    if (error) return { ok: false, error: 'No pudimos enviar el correo. Verifica que el email sea correcto.' }
+    return { ok: true }
+  }, [])
+
+  const confirmNewPassword = useCallback(async (newPass) => {
+    const { error } = await supabase.auth.updateUser({ password: newPass })
+    if (error) return { ok: false, error: error.message }
+    setResetPasswordMode(false)
+    return { ok: true }
+  }, [])
+
   const upgradeToPro = useCallback(async () => {
     if (!currentUser) return
     const { data } = await supabase
@@ -138,10 +157,13 @@ export function AuthProvider({ children }) {
     currentUser,
     subscription,
     authLoading,
+    resetPasswordMode,
     doLogin,
     doRegister,
     doLogout,
     upgradeToPro,
+    sendPasswordReset,
+    confirmNewPassword,
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
