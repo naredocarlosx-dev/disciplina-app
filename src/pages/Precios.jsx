@@ -1,5 +1,6 @@
 import { useContext } from 'react'
 import { AppContext } from '../context/AppContext'
+import SubscribeButton from '../components/SubscribeButton'
 
 const FEATURES_FREE = [
   'Hasta 3 hábitos',
@@ -98,9 +99,7 @@ export default function Precios() {
           {isPro ? (
             <div style={{ fontSize: 12, color: 'var(--text3)', textAlign: 'center' }}>Tu plan actual</div>
           ) : (
-            <button className="btn btn-dark" style={{ width: '100%', justifyContent: 'center' }} onClick={upgradeToPro}>
-              <i className="ti ti-bolt" style={{ fontSize: 15 }}></i>Activar PRO
-            </button>
+            <SubscribeButton style={{ width: '100%' }} />
           )}
         </div>
       </div>

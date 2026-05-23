@@ -23,12 +23,15 @@ create table public.profiles (
 
 -- 2. SUBSCRIPTIONS
 create table public.subscriptions (
-  id         uuid primary key default gen_random_uuid(),
-  user_id    uuid not null unique references auth.users(id) on delete cascade,
-  plan       text not null default 'free' check (plan in ('free','pro')),
-  started_at timestamptz not null default now(),
-  expires_at timestamptz,
-  created_at timestamptz not null default now()
+  id                 uuid primary key default gen_random_uuid(),
+  user_id            uuid not null unique references auth.users(id) on delete cascade,
+  plan               text not null default 'free' check (plan in ('free','pro')),
+  status             text not null default 'active',
+  stripe_customer_id text,
+  stripe_session_id  text,
+  started_at         timestamptz not null default now(),
+  expires_at         timestamptz,
+  created_at         timestamptz not null default now()
 );
 
 -- 3. HABITS
