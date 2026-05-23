@@ -1,6 +1,7 @@
 import { useContext } from 'react'
 import { AppContext } from '../context/AppContext'
 import { PiggyBank } from 'lucide-react'
+import EpisodioUnoLogo from '../components/EpisodioUnoLogo'
 import Dashboard  from '../pages/Dashboard'
 import Habitos    from '../pages/Habitos'
 import Ahorro     from '../pages/Ahorro'
@@ -28,8 +29,7 @@ export default function AppScreen() {
     <div style={{ display: 'flex', minHeight: '100vh' }}>
       <aside className="sidebar">
         <div className="logo">
-          <div className="logo-mark"><i className="ti ti-bolt"></i></div>
-          <span className="logo-name">Disciplina</span>
+          <EpisodioUnoLogo dark width={120} />
         </div>
 
         {navItems.map(item => (

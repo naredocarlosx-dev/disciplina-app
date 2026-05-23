@@ -1,6 +1,7 @@
 import { useContext, useState } from 'react'
 import { AppContext } from '../context/AppContext'
 import { useAuth } from '../context/AuthContext'
+import EpisodioUnoLogo from '../components/EpisodioUnoLogo'
 
 export default function AuthScreen() {
   const { doLogin, doRegister, setScreen } = useContext(AppContext)
@@ -56,8 +57,7 @@ export default function AuthScreen() {
     <div className="auth-wrap">
       <div className="auth-card">
         <div className="auth-logo">
-          <div className="auth-logo-mark"><i className="ti ti-bolt"></i></div>
-          <span style={{ fontSize: 17, fontWeight: 600, letterSpacing: '-.3px' }}>Disciplina</span>
+          <EpisodioUnoLogo dark width={180} />
         </div>
 
         <div className="auth-tabs">

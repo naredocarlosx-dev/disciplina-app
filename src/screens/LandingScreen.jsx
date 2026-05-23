@@ -1,10 +1,11 @@
 import { useContext, useState } from 'react'
 import { AppContext } from '../context/AppContext'
+import EpisodioUnoLogo from '../components/EpisodioUnoLogo'
 
 const FAQ_ITEMS = [
-  { q: '¿Disciplina es gratuita?', a: 'Sí, completamente gratuita. No hay planes de pago, suscripciones ni funciones ocultas. Toda la app está disponible desde el primer día sin costo alguno.' },
-  { q: '¿Mis datos están seguros? ¿Se guardan en la nube?', a: 'Todo se guarda localmente en tu navegador (localStorage). No enviamos información a ningún servidor. Tus hábitos, comidas y metas son completamente privados.' },
-  { q: '¿Puedo usar Disciplina en mi teléfono?', a: 'Sí. La app está diseñada con diseño responsivo y funciona correctamente en dispositivos móviles. Solo abre la app en tu navegador favorito.' },
+  { q: '¿Episodio Uno es gratuita?', a: 'Tiene un plan gratuito con acceso a todas las funciones principales. El plan PRO desbloquea hábitos y metas ilimitadas por $50 MXN/mes.' },
+  { q: '¿Mis datos están seguros? ¿Se guardan en la nube?', a: 'Sí, tus datos se guardan de forma segura en la nube con Supabase. Puedes acceder desde cualquier dispositivo iniciando sesión con tu cuenta.' },
+  { q: '¿Puedo usar Episodio Uno en mi teléfono?', a: 'Sí. La app está diseñada con diseño responsivo y funciona correctamente en dispositivos móviles. También puedes instalarla como PWA desde tu navegador.' },
   { q: '¿Qué pasa si cierro el navegador? ¿Se pierden mis datos?', a: 'Los datos se guardan en localStorage y persisten entre sesiones. Solo necesitas volver a iniciar sesión para continuar desde donde lo dejaste.' },
   { q: '¿Hay un panel de administrador?', a: 'Sí. El administrador tiene acceso a un panel especial donde puede ver todos los usuarios registrados, activar o desactivar cuentas y cambiar roles. El acceso demo es con correo admin@disciplina.com y contraseña admin123.' },
   { q: '¿Por qué frases de Brian Tracy específicamente?', a: 'Brian Tracy es uno de los autores de desarrollo personal más reconocidos del mundo, especializado en hábitos, productividad y metas. Sus frases son prácticas, directas y motivadoras para empezar el día con enfoque.' },
@@ -30,8 +31,7 @@ export default function LandingScreen() {
       {/* NAV */}
       <nav className="land-nav">
         <a href="#" className="land-logo">
-          <div className="land-logo-mark"><i className="ti ti-bolt"></i></div>
-          <span className="land-logo-name">Disciplina</span>
+          <EpisodioUnoLogo width={140} />
         </a>
         <div className="land-nav-links">
           <a href="#features">Características</a>
@@ -46,7 +46,7 @@ export default function LandingScreen() {
         <div>
           <div className="hero-eyebrow"><i className="ti ti-bolt" style={{ fontSize: 13 }}></i>Hábitos que transforman</div>
           <h1 className="hero-title">Construye tu <em>mejor versión</em> cada día</h1>
-          <p className="hero-sub">Disciplina es la app todo-en-uno para rastrear hábitos, controlar tu alimentación, alcanzar metas de ahorro y mantenerte activo. Simple, rápida y sin distracciones.</p>
+          <p className="hero-sub">Episodio Uno es la app todo-en-uno para rastrear hábitos, controlar tu alimentación, alcanzar metas de ahorro y mantenerte activo. Simple, rápida y sin distracciones.</p>
           <div className="hero-actions">
             <a href="#" className="btn-hero-primary" onClick={goAuth}><i className="ti ti-arrow-right" style={{ fontSize: 16 }}></i>Comenzar gratis</a>
             <a href="#features" className="btn-hero-secondary"><i className="ti ti-eye" style={{ fontSize: 16 }}></i>Ver características</a>
@@ -100,8 +100,8 @@ export default function LandingScreen() {
         <h2 className="section-title">Una app hecha por personas que buscan mejorar</h2>
         <div className="about-grid">
           <div className="about-text">
-            <p>Disciplina nació de una pregunta simple: ¿por qué es tan difícil mantener buenos hábitos si todo el mundo sabe lo que necesita hacer?</p>
-            <p>La respuesta no es falta de voluntad, sino falta de sistema. Disciplina es ese sistema: visual, sin fricción y enfocado en lo que más importa para tu salud, finanzas y bienestar.</p>
+            <p>Episodio Uno nació de una pregunta simple: ¿por qué es tan difícil mantener buenos hábitos si todo el mundo sabe lo que necesita hacer?</p>
+            <p>La respuesta no es falta de voluntad, sino falta de sistema. Episodio Uno es ese sistema: visual, sin fricción y enfocado en lo que más importa para tu salud, finanzas y bienestar.</p>
             <p>No somos una gran corporación. Somos un equipo pequeño obsesionado con el diseño limpio y la efectividad real. Cada función fue incluida porque la usamos nosotros mismos.</p>
             <div className="about-values">
               <div className="about-value"><div className="about-value-icon"><i className="ti ti-target"></i></div><div><div className="about-value-title">Claridad sobre complejidad</div><div className="about-value-sub">Menos ruido, más acción. Cada pantalla tiene un propósito claro.</div></div></div>
@@ -145,7 +145,7 @@ export default function LandingScreen() {
       <footer className="land-footer">
         <div className="footer-grid">
           <div>
-            <div className="footer-brand">⚡ Disciplina</div>
+            <div className="footer-brand"><EpisodioUnoLogo width={140} /></div>
             <div className="footer-desc">La app para construir hábitos que duran. Simple, rápida y sin distracciones. Hecha para personas que quieren mejorar de verdad.</div>
           </div>
           <div>
@@ -165,7 +165,7 @@ export default function LandingScreen() {
           </div>
         </div>
         <div className="footer-bottom">
-          <span>© 2025 Disciplina · Todos los derechos reservados</span>
+          <span>© 2025 Episodio Uno · Todos los derechos reservados</span>
           <span>Hecho con dedicación · Sin anuncios · Sin rastreo</span>
         </div>
       </footer>
