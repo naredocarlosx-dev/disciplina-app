@@ -108,6 +108,12 @@ export function AuthProvider({ children }) {
       return { ok: false, error: error.message }
     }
 
+    // Supabase devuelve user=null, session=null (sin error) cuando el correo ya existe
+    // pero no está confirmado — simplemente reenvía el email de confirmación silenciosamente.
+    if (!data.user && !data.session) {
+      return { ok: true, needsConfirmation: true }
+    }
+
     if (!data.user) return { ok: false, error: 'Error al crear la cuenta. Intenta de nuevo.' }
 
     // Crear perfil y suscripción (el trigger de Supabase también lo hace como respaldo)
