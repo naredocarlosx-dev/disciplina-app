@@ -49,29 +49,23 @@ export function AuthProvider({ children }) {
 
   // Revisar sesión activa al montar
   useEffect(() => {
-    const hashParams = new URLSearchParams(window.location.hash.substring(1))
-    const isRecovery = hashParams.get('type') === 'recovery'
-
-    if (isRecovery) {
-      setResetPasswordMode(true)
-      setAuthLoading(false)
-    } else {
-      supabase.auth.getSession().then(({ data: { session } }) => {
+    const { data: { subscription: authSub } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        setResetPasswordMode(true)
+        setAuthLoading(false)
+        return
+      }
+      if (event === 'INITIAL_SESSION') {
         if (session?.user) {
-          loadProfile(session.user).finally(() => setAuthLoading(false))
-        } else {
-          setAuthLoading(false)
+          await loadProfile(session.user)
         }
-      })
-    }
-
-    const { data: { subscription: authSub } } = supabase.auth.onAuthStateChange((event, session) => {
+        setAuthLoading(false)
+        return
+      }
       if (event === 'SIGNED_OUT') {
         setCurrentUser(null)
         setSubscription({ plan: 'free' })
-      }
-      if (event === 'PASSWORD_RECOVERY') {
-        setResetPasswordMode(true)
+        setResetPasswordMode(false)
       }
     })
 
