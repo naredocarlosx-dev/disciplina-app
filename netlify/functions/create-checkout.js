@@ -46,8 +46,8 @@ exports.handler = async (event) => {
       subscription_data: {
         metadata: { user_id: userId },
       },
-      success_url: 'https://joyful-starburst-90dde1.netlify.app/success',
-      cancel_url:  'https://joyful-starburst-90dde1.netlify.app/cancel',
+      success_url: 'https://episodiouno.com/success',
+      cancel_url:  'https://episodiouno.com/cancel',
     })
 
     return {

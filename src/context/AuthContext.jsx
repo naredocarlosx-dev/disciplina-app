@@ -135,7 +135,7 @@ export function AuthProvider({ children }) {
 
   const sendPasswordReset = useCallback(async (email) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-      redirectTo: 'https://joyful-starburst-90dde1.netlify.app',
+      redirectTo: 'https://episodiouno.com',
     })
     if (error) return { ok: false, error: 'No pudimos enviar el correo. Verifica que el email sea correcto.' }
     return { ok: true }
