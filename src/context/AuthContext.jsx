@@ -77,7 +77,12 @@ export function AuthProvider({ children }) {
 
   const doLogin = useCallback(async (email, pass) => {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass })
-    if (error) return { ok: false, error: 'Correo o contraseña incorrectos.' }
+    if (error) {
+      if (error.code === 'email_not_confirmed' || error.message?.toLowerCase().includes('email not confirmed')) {
+        return { ok: false, error: 'Debes verificar tu correo antes de iniciar sesión. Revisa tu bandeja de entrada.' }
+      }
+      return { ok: false, error: 'Correo o contraseña incorrectos.' }
+    }
 
     const user = await loadProfile(data.user)
     if (!user) return { ok: false, error: 'Esta cuenta está desactivada. Contacta al administrador.' }
@@ -118,7 +123,7 @@ export function AuthProvider({ children }) {
     ])
 
     if (!data.session) {
-      return { ok: false, error: 'Revisa tu correo para confirmar tu cuenta antes de continuar.' }
+      return { ok: true, needsConfirmation: true }
     }
 
     const user = await loadProfile(data.user)

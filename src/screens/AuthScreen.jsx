@@ -17,11 +17,12 @@ export default function AuthScreen() {
   const [loginPass,  setLoginPass]  = useState('')
   const [loginError, setLoginError] = useState('')
 
-  const [regName,  setRegName]  = useState('')
-  const [regEmail, setRegEmail] = useState('')
-  const [regPass,  setRegPass]  = useState('')
-  const [regPass2, setRegPass2] = useState('')
-  const [regError, setRegError] = useState('')
+  const [regName,    setRegName]    = useState('')
+  const [regEmail,   setRegEmail]   = useState('')
+  const [regPass,    setRegPass]    = useState('')
+  const [regPass2,   setRegPass2]   = useState('')
+  const [regError,   setRegError]   = useState('')
+  const [regConfirm, setRegConfirm] = useState(false)
 
   const handleLogin = async () => {
     if (loading) return
@@ -48,8 +49,10 @@ export default function AuthScreen() {
     if (loading) return
     setLoading(true)
     setRegError('')
+    setRegConfirm(false)
     const result = await doRegister({ name: regName.trim(), email: regEmail.trim(), pass: regPass, pass2: regPass2 })
     if (!result.ok) setRegError(result.error)
+    else if (result.needsConfirmation) setRegConfirm(true)
     setLoading(false)
   }
 
@@ -158,28 +161,41 @@ export default function AuthScreen() {
 
         {tab === 'register' && (
           <div>
-            {regError && <div className="auth-error">{regError}</div>}
-            <div className="form-row-m">
-              <label className="form-label-m">Nombre completo</label>
-              <input type="text" className="form-input" placeholder="Tu nombre" value={regName} onChange={e => setRegName(e.target.value)} disabled={loading} />
-            </div>
-            <div className="form-row-m">
-              <label className="form-label-m">Correo electrónico</label>
-              <input type="email" className="form-input" placeholder="tu@correo.com" value={regEmail} onChange={e => setRegEmail(e.target.value)} disabled={loading} />
-            </div>
-            <div className="form-row-m">
-              <label className="form-label-m">Contraseña</label>
-              <input type="password" className="form-input" placeholder="Mínimo 6 caracteres" value={regPass} onChange={e => setRegPass(e.target.value)} disabled={loading} />
-            </div>
-            <div className="form-row-m">
-              <label className="form-label-m">Confirmar contraseña</label>
-              <input type="password" className="form-input" placeholder="Repite tu contraseña" value={regPass2} onChange={e => setRegPass2(e.target.value)} disabled={loading} />
-            </div>
-            <button className="btn-auth" onClick={handleRegister} disabled={loading}>
-              {loading
-                ? <span style={{ opacity: .6 }}>Creando cuenta...</span>
-                : <><i className="ti ti-user-plus" style={{ fontSize: 16 }}></i>Crear cuenta</>}
-            </button>
+            {regConfirm ? (
+              <div style={{
+                padding: '14px 16px', borderRadius: 'var(--radius-xs)', fontSize: 13, lineHeight: 1.6,
+                background: 'var(--green-light)', color: 'var(--green-dark)',
+                border: '1px solid rgba(29,158,117,.3)',
+              }}>
+                <i className="ti ti-circle-check" style={{ fontSize: 15, verticalAlign: '-2px', marginRight: 6 }}></i>
+                Te enviamos un correo de confirmación. Revisa tu bandeja de entrada y haz clic en el link para activar tu cuenta.
+              </div>
+            ) : (
+              <>
+                {regError && <div className="auth-error">{regError}</div>}
+                <div className="form-row-m">
+                  <label className="form-label-m">Nombre completo</label>
+                  <input type="text" className="form-input" placeholder="Tu nombre" value={regName} onChange={e => setRegName(e.target.value)} disabled={loading} />
+                </div>
+                <div className="form-row-m">
+                  <label className="form-label-m">Correo electrónico</label>
+                  <input type="email" className="form-input" placeholder="tu@correo.com" value={regEmail} onChange={e => setRegEmail(e.target.value)} disabled={loading} />
+                </div>
+                <div className="form-row-m">
+                  <label className="form-label-m">Contraseña</label>
+                  <input type="password" className="form-input" placeholder="Mínimo 6 caracteres" value={regPass} onChange={e => setRegPass(e.target.value)} disabled={loading} />
+                </div>
+                <div className="form-row-m">
+                  <label className="form-label-m">Confirmar contraseña</label>
+                  <input type="password" className="form-input" placeholder="Repite tu contraseña" value={regPass2} onChange={e => setRegPass2(e.target.value)} disabled={loading} />
+                </div>
+                <button className="btn-auth" onClick={handleRegister} disabled={loading}>
+                  {loading
+                    ? <span style={{ opacity: .6 }}>Creando cuenta...</span>
+                    : <><i className="ti ti-user-plus" style={{ fontSize: 16 }}></i>Crear cuenta</>}
+                </button>
+              </>
+            )}
           </div>
         )}
 
