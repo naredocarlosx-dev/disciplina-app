@@ -1,7 +1,7 @@
 import { useContext } from 'react'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { AppProvider, AppContext } from './context/AppContext'
-import LandingScreen        from './screens/LandingScreen'
+import Landing              from './pages/Landing'
 import AuthScreen           from './screens/AuthScreen'
 import AppScreen            from './screens/AppScreen'
 import AdminScreen          from './screens/AdminScreen'
@@ -26,7 +26,7 @@ function Router() {
 
   return (
     <>
-      {screen === 'landing' && <LandingScreen />}
+      {screen === 'landing' && <Landing />}
       {screen === 'auth'    && <AuthScreen />}
       {screen === 'app'     && <AppScreen />}
       {screen === 'admin'   && <AdminScreen />}
