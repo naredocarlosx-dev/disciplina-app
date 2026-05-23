@@ -1,5 +1,6 @@
 import { useContext } from 'react'
 import { AppContext } from '../context/AppContext'
+import { PiggyBank } from 'lucide-react'
 import Dashboard  from '../pages/Dashboard'
 import Habitos    from '../pages/Habitos'
 import Ahorro     from '../pages/Ahorro'
@@ -15,12 +16,12 @@ export default function AppScreen() {
   const isPro     = subscription?.plan === 'pro'
 
   const navItems = [
-    { id: 'dashboard',   icon: 'ti-home',       label: 'Inicio' },
-    { id: 'habitos',     icon: 'ti-check',       label: 'Hábitos' },
-    { id: 'ahorro',      icon: 'ti-piggy-bank',  label: 'Ahorro' },
-    { id: 'comidas',     icon: 'ti-salad',       label: 'Comidas' },
-    { id: 'fitness',     icon: 'ti-barbell',     label: 'Fitness' },
-    { id: 'inventario',  icon: 'ti-package',     label: 'Cocina',  badge: alerts.total },
+    { id: 'dashboard',  icon: 'ti-home',    label: 'Inicio' },
+    { id: 'habitos',    icon: 'ti-check',   label: 'Hábitos' },
+    { id: 'ahorro',     Icon: PiggyBank,    label: 'Ahorro' },
+    { id: 'comidas',    icon: 'ti-salad',   label: 'Comidas' },
+    { id: 'fitness',    icon: 'ti-barbell', label: 'Fitness' },
+    { id: 'inventario', icon: 'ti-package', label: 'Cocina', badge: alerts.total },
   ]
 
   return (
@@ -37,7 +38,9 @@ export default function AppScreen() {
             className={`nav-item${appPage === item.id ? ' active' : ''}`}
             onClick={() => setAppPage(item.id)}
           >
-            <i className={`ti ${item.icon}`}></i>
+            {item.Icon
+            ? <item.Icon size={18} strokeWidth={2} />
+            : <i className={`ti ${item.icon}`}></i>}
             <span>{item.label}</span>
             {item.badge > 0 && <span className="badge">{item.badge}</span>}
           </button>
