@@ -84,7 +84,7 @@ export default function Landing() {
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '0 5vw', height: 60,
       }}>
-        <EpisodioUnoLogo width={130} />
+        <EpisodioUnoLogo dark width={130} />
         <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
           <button style={btnSecondary} onClick={goAuth}>Iniciar sesión</button>
           <button style={btnPrimary}   onClick={goAuth}>Empieza gratis</button>
@@ -279,7 +279,7 @@ export default function Landing() {
         display: 'flex', flexWrap: 'wrap', alignItems: 'center',
         justifyContent: 'space-between', gap: 20,
       }}>
-        <EpisodioUnoLogo width={120} />
+        <EpisodioUnoLogo dark width={120} />
         <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
           <span style={{ fontSize: 13, color: GRAY, cursor: 'pointer' }}>Privacidad</span>
           <span style={{ fontSize: 13, color: GRAY, cursor: 'pointer' }}>Términos</span>

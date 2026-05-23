@@ -1,6 +1,6 @@
 export default function EpisodioUnoLogo({ dark = false, width = 220 }) {
-  const primary = dark ? "#ffffff" : "#111111"
-  const secondary = dark ? "#888888" : "#888888"
+  const primary   = dark ? "#ffffff" : "#111111"
+  const secondary = dark ? "#aaaaaa" : "#888888"
 
   return (
     <svg
