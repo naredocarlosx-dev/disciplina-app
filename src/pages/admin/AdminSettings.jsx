@@ -49,10 +49,10 @@ export default function AdminSettings() {
       <div className="card">
         <div className="section-title-sm" style={{ marginBottom: 16 }}>Información de la plataforma</div>
         <div style={{ fontSize: 13, color: 'var(--text2)', lineHeight: 1.8 }}>
-          <div><strong>Nombre:</strong> Disciplina v1.0</div>
+          <div><strong>Nombre:</strong> Episodio Uno v1.0</div>
           <div><strong>Tipo:</strong> Aplicación React+Vite con backend Supabase</div>
           <div><strong>Almacenamiento:</strong> Base de datos PostgreSQL (Supabase)</div>
-          <div><strong>Tecnologías:</strong> React, Vite, Supabase, Chart.js, Tabler Icons</div>
+          <div><strong>Tecnologías:</strong> React, Vite, Supabase, Stripe, Tabler Icons</div>
         </div>
       </div>
 

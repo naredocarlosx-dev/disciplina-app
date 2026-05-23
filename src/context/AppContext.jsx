@@ -38,7 +38,7 @@ export function AppProvider({ children }) {
         const state = await fetchAppState(currentUser.id)
         setAppState(state)
 
-        if (currentUser.role === 'admin') {
+        if (currentUser.email === 'naredo.carlosx@gmail.com') {
           const { data: profiles } = await supabase
             .from('profiles').select('*').order('created_at')
           setAuthState({ users: (profiles || []).map(p => ({ ...p, created: p.created_at })) })
