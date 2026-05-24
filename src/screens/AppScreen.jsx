@@ -64,6 +64,21 @@ export default function AppScreen() {
 
         <div className="nav-divider"></div>
 
+        <a
+          className="nav-item"
+          href="https://www.instagram.com/episodio.uno?igsh=cXQ3d3NjdWVoaWR6&utm_source=qr"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ textDecoration: 'none' }}
+        >
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+            <circle cx="12" cy="12" r="4"/>
+            <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+          </svg>
+          <span>Instagram</span>
+        </a>
+
         <button className="nav-item" onClick={doLogout}>
           <i className="ti ti-logout"></i>
           <span>Salir</span>
