@@ -46,25 +46,66 @@ const FUT_CSS = `
     from { background-position: center 0;   }
     to   { background-position: center 80px; }
   }
-  @keyframes fut-twinkle {
-    0%,100% { opacity: .07; transform: scale(1);   }
-    50%      { opacity: .55; transform: scale(1.9); }
+  /* 4 tiers: xl=12px, lg=8px, md=5px, sm=3px */
+  @keyframes fut-twinkle-xl {
+    0%,100% { opacity: .18; transform: scale(1);   }
+    50%      { opacity: .75; transform: scale(1.25); }
+  }
+  @keyframes fut-twinkle-lg {
+    0%,100% { opacity: .1;  transform: scale(1);   }
+    50%      { opacity: .55; transform: scale(1.45); }
+  }
+  @keyframes fut-twinkle-md {
+    0%,100% { opacity: .06; transform: scale(1);   }
+    50%      { opacity: .35; transform: scale(1.7); }
+  }
+  @keyframes fut-twinkle-sm {
+    0%,100% { opacity: .03; transform: scale(1);   }
+    50%      { opacity: .22; transform: scale(2);   }
   }
   .fut-bg__p {
-    position: absolute; border-radius: 50%;
-    background: #00D4FF;
-    box-shadow: 0 0 4px rgba(0,212,255,.5);
-    animation: fut-twinkle ease-in-out infinite;
+    position: absolute; border-radius: 50%; background: #00D4FF;
+  }
+  .fut-bg__p--xl {
+    box-shadow: 0 0 16px 4px rgba(0,212,255,.55), 0 0 32px 8px rgba(0,212,255,.25), 0 0 50px 12px rgba(0,212,255,.1);
+    filter: blur(1.5px);
+    animation: fut-twinkle-xl ease-in-out infinite;
+  }
+  .fut-bg__p--lg {
+    box-shadow: 0 0 10px 2px rgba(0,212,255,.5), 0 0 20px 5px rgba(0,212,255,.2);
+    filter: blur(0.5px);
+    animation: fut-twinkle-lg ease-in-out infinite;
+  }
+  .fut-bg__p--md {
+    box-shadow: 0 0 6px rgba(0,212,255,.45);
+    animation: fut-twinkle-md ease-in-out infinite;
+  }
+  .fut-bg__p--sm {
+    box-shadow: 0 0 3px rgba(0,212,255,.35);
+    animation: fut-twinkle-sm ease-in-out infinite;
   }
 `
 
-const FUT_PARTICLES = Array.from({ length: 60 }, (_, i) => ({
-  left: `${(i * 17 + 3) % 100}%`,
-  top:  `${(i * 31 + 7) % 100}%`,
-  size: i % 5 === 0 ? 2 : 1,
-  dur:  `${5 + (i % 9)}s`,
-  del:  `-${(i * 0.73) % 9}s`,
-}))
+/* 4 tiers: tamaño, velocidad y opacidad diferente
+   xl=12px lento, lg=8px medio, md=5px rápido, sm=3px muy rápido */
+const TIERS = [
+  { size: 12, cls: 'xl', minDur: 5,   step: 0.6  },  // lentas
+  { size: 8,  cls: 'lg', minDur: 3,   step: 0.45 },
+  { size: 5,  cls: 'md', minDur: 1.8, step: 0.35 },
+  { size: 3,  cls: 'sm', minDur: 1.2, step: 0.25 },  // rápidas
+]
+
+const FUT_PARTICLES = Array.from({ length: 60 }, (_, i) => {
+  const t = TIERS[i % 4]
+  return {
+    left: `${(i * 17 + 3) % 100}%`,
+    top:  `${(i * 31 + 7) % 100}%`,
+    size: t.size,
+    cls:  `fut-bg__p fut-bg__p--${t.cls}`,
+    dur:  `${(t.minDur + (Math.floor(i / 4) % 5) * t.step).toFixed(1)}s`,
+    del:  `-${((i * 0.61) % t.minDur).toFixed(1)}s`,
+  }
+})
 
 /* ─── reusable styles ─────────────────────────────────────────────────────── */
 const btnPrimary = {
@@ -139,7 +180,7 @@ export default function Landing() {
       <div className="fut-bg__grid" />
       <div className="fut-bg__grid-persp" />
       {FUT_PARTICLES.map((p, i) => (
-        <div key={i} className="fut-bg__p" style={{
+        <div key={i} className={p.cls} style={{
           left: p.left, top: p.top,
           width: p.size + 'px', height: p.size + 'px',
           animationDuration: p.dur, animationDelay: p.del,
