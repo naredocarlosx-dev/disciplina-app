@@ -8,6 +8,64 @@ const CARD   = '#111'
 const BORDER = '#222'
 const GRAY   = '#888'
 
+/* ─── Futuristic background ───────────────────────────────────────────────── */
+const FUT_CSS = `
+  .fut-bg {
+    position: fixed; inset: 0; z-index: -1;
+    background: #000; overflow: hidden; pointer-events: none;
+  }
+  .fut-bg__glow {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 65% 50% at 50% 38%, rgba(0,212,255,.065) 0%, transparent 65%);
+    animation: fut-glow 7s ease-in-out infinite;
+  }
+  @keyframes fut-glow {
+    0%,100% { opacity: .6; }
+    50%      { opacity: 1;  }
+  }
+  .fut-bg__grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,.028) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,.028) 1px, transparent 1px);
+    background-size: 80px 80px;
+  }
+  .fut-bg__grid-persp {
+    position: absolute; bottom: -8%; left: -130%; right: -130%; height: 52%;
+    background-image:
+      linear-gradient(rgba(0,212,255,.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,.055) 1px, transparent 1px);
+    background-size: 80px 80px;
+    transform: perspective(340px) rotateX(62deg);
+    transform-origin: center bottom;
+    animation: fut-grid-scroll 10s linear infinite;
+    -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,.6) 0%, transparent 78%);
+    mask-image: linear-gradient(to top, rgba(0,0,0,.6) 0%, transparent 78%);
+  }
+  @keyframes fut-grid-scroll {
+    from { background-position: center 0;   }
+    to   { background-position: center 80px; }
+  }
+  @keyframes fut-twinkle {
+    0%,100% { opacity: .07; transform: scale(1);   }
+    50%      { opacity: .55; transform: scale(1.9); }
+  }
+  .fut-bg__p {
+    position: absolute; border-radius: 50%;
+    background: #00D4FF;
+    box-shadow: 0 0 4px rgba(0,212,255,.5);
+    animation: fut-twinkle ease-in-out infinite;
+  }
+`
+
+const FUT_PARTICLES = Array.from({ length: 60 }, (_, i) => ({
+  left: `${(i * 17 + 3) % 100}%`,
+  top:  `${(i * 31 + 7) % 100}%`,
+  size: i % 5 === 0 ? 2 : 1,
+  dur:  `${5 + (i % 9)}s`,
+  del:  `-${(i * 0.73) % 9}s`,
+}))
+
 /* ─── reusable styles ─────────────────────────────────────────────────────── */
 const btnPrimary = {
   display: 'inline-flex', alignItems: 'center', gap: 8,
@@ -74,7 +132,22 @@ export default function Landing() {
   const goAuth = () => setScreen('auth')
 
   return (
-    <div style={{ background: BG, minHeight: '100vh', color: '#fff', fontFamily: "'DM Sans', sans-serif" }}>
+    <>
+    <style>{FUT_CSS}</style>
+    <div className="fut-bg">
+      <div className="fut-bg__glow" />
+      <div className="fut-bg__grid" />
+      <div className="fut-bg__grid-persp" />
+      {FUT_PARTICLES.map((p, i) => (
+        <div key={i} className="fut-bg__p" style={{
+          left: p.left, top: p.top,
+          width: p.size + 'px', height: p.size + 'px',
+          animationDuration: p.dur, animationDelay: p.del,
+        }} />
+      ))}
+    </div>
+
+    <div style={{ background: 'transparent', minHeight: '100vh', color: '#fff', fontFamily: "'DM Sans', sans-serif" }}>
 
       {/* ── NAVBAR ─────────────────────────────────────────────────────────── */}
       <nav style={{
@@ -160,7 +233,7 @@ export default function Landing() {
       </section>
 
       {/* ── ¿CÓMO FUNCIONA? ────────────────────────────────────────────────── */}
-      <section style={{ padding: '80px 5vw', borderTop: `1px solid ${BORDER}`, background: '#050505' }}>
+      <section style={{ padding: '80px 5vw', borderTop: `1px solid ${BORDER}`, background: 'rgba(5,5,5,.88)' }}>
         <div style={{ maxWidth: 760, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 52 }}>
             <div style={sectionLabel}>Proceso</div>
@@ -304,5 +377,6 @@ export default function Landing() {
       </footer>
 
     </div>
+    </>
   )
 }
