@@ -20,12 +20,12 @@ export default function Habitos() {
           <div className="page-title">Hábitos</div>
           <div className="page-sub">Construye consistencia día a día</div>
         </div>
-        <button className="btn btn-dark" onClick={() => openModal('habit')}>
+        <button className="btn btn-dark" onClick={() => openModal('habit')} data-tour="habits-add">
           <i className="ti ti-plus"></i>Nuevo hábito
         </button>
       </div>
 
-      <div className="card">
+      <div className="card" data-tour="habits-list">
         <div className="section-row"><div className="section-title-sm">Mis hábitos</div></div>
         {appState.habits.length === 0 ? (
           <div className="empty">No hay hábitos. ¡Crea uno!</div>
@@ -48,7 +48,7 @@ export default function Habitos() {
         )}
       </div>
 
-      <div className="card">
+      <div className="card" data-tour="habits-streak">
         <div className="card-title"><i className="ti ti-flame"></i>Rachas activas</div>
         {sorted.length === 0 ? (
           <div className="empty">Sin rachas aún.</div>

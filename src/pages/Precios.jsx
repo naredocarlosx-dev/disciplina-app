@@ -46,7 +46,7 @@ export default function Precios() {
       </div>
 
       {/* Tarjetas de plan */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 20, maxWidth: 680, marginBottom: 40 }}>
+      <div data-tour="precios-plan" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 20, maxWidth: 680, marginBottom: 40 }}>
 
         {/* FREE */}
         <div className="card" style={{ border: subscription?.plan === 'free' ? '2px solid var(--accent)' : '1px solid var(--border)', position: 'relative' }}>
@@ -99,7 +99,9 @@ export default function Precios() {
           {isPro ? (
             <div style={{ fontSize: 12, color: 'var(--text3)', textAlign: 'center' }}>Tu plan actual</div>
           ) : (
-            <SubscribeButton style={{ width: '100%' }} />
+            <div data-tour="precios-subscribe">
+              <SubscribeButton style={{ width: '100%' }} />
+            </div>
           )}
         </div>
       </div>

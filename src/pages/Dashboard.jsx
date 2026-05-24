@@ -96,7 +96,7 @@ export default function Dashboard() {
 
   return (
     <div>
-      <div className="topbar">
+      <div className="topbar" data-tour="dash-greeting">
         <div>
           <div className="topbar-greeting">{getGreeting()}</div>
           <div className="topbar-date">{getDateStr()}</div>
@@ -136,15 +136,15 @@ export default function Dashboard() {
       )}
 
       <div className="metric-grid">
-        <div className="metric-card accent-green"><div className="metric-label">Completados hoy</div><div className="metric-val c-green">{done}/{total}</div></div>
-        <div className="metric-card accent-amber"><div className="metric-label">Racha máxima</div><div className="metric-val c-amber">{maxStreak} 🔥</div></div>
-        <div className="metric-card accent-blue"><div className="metric-label">Progreso del día</div><div className="metric-val c-blue">{pct}%</div></div>
+        <div className="metric-card accent-green" data-tour="dash-completed"><div className="metric-label">Completados hoy</div><div className="metric-val c-green">{done}/{total}</div></div>
+        <div className="metric-card accent-amber" data-tour="dash-streak"><div className="metric-label">Racha máxima</div><div className="metric-val c-amber">{maxStreak} 🔥</div></div>
+        <div className="metric-card accent-blue" data-tour="dash-progress"><div className="metric-label">Progreso del día</div><div className="metric-val c-blue">{pct}%</div></div>
         <div className="metric-card accent-red"><div className="metric-label">Alertas cocina</div><div className="metric-val c-red">{alerts.total}</div></div>
       </div>
 
       <div className="dash-grid">
         <div className="dash-col">
-          <div className="card">
+          <div className="card" data-tour="dash-chart">
             <div className="card-title"><i className="ti ti-chart-bar"></i>Progreso semanal</div>
             <div className="chart-wrap"><canvas ref={chartRef}></canvas></div>
           </div>

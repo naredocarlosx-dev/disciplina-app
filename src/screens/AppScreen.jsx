@@ -1,7 +1,8 @@
-import { useContext } from 'react'
+import { useContext, useState, useEffect } from 'react'
 import { AppContext } from '../context/AppContext'
 import { PiggyBank } from 'lucide-react'
 import EpisodioUnoLogo from '../components/EpisodioUnoLogo'
+import TourOverlay from '../components/TourOverlay'
 import Dashboard  from '../pages/Dashboard'
 import Habitos    from '../pages/Habitos'
 import Ahorro     from '../pages/Ahorro'
@@ -11,10 +12,49 @@ import Inventario from '../pages/Inventario'
 import Precios    from '../pages/Precios'
 import AllModals  from '../components/AllModals'
 
+const TOURS = {
+  dashboard: {
+    key: 'home',
+    steps: [
+      { target: 'dash-greeting',  title: 'Resumen del día',  text: 'Tu saludo personalizado y la fecha de hoy.',                                   placement: 'bottom' },
+      { target: 'dash-completed', title: 'Completados hoy',  text: 'Cuántos hábitos has completado hasta este momento.',                           placement: 'bottom' },
+      { target: 'dash-streak',    title: 'Racha máxima',     text: 'Tu racha más larga. ¡No la rompas!',                                           placement: 'bottom' },
+      { target: 'dash-progress',  title: 'Progreso del día', text: 'Tu porcentaje de avance diario en tiempo real.',                                placement: 'bottom' },
+      { target: 'dash-chart',     title: 'Progreso semanal', text: 'La gráfica de tu avance en los últimos 7 días.',                               placement: 'top'    },
+    ],
+  },
+  habitos: {
+    key: 'habits',
+    steps: [
+      { target: 'habits-add',    title: 'Nuevo hábito',   text: 'Toca aquí para agregar un nuevo hábito a tu lista.',                              placement: 'bottom' },
+      { target: 'habits-list',   title: 'Mis hábitos',    text: 'Marca cada hábito al completarlo. Tu racha sube automáticamente.',                placement: 'bottom' },
+      { target: 'habits-streak', title: 'Rachas activas', text: 'Los días consecutivos que has mantenido cada hábito sin faltar.',                 placement: 'top'    },
+    ],
+  },
+  precios: {
+    key: 'precios',
+    steps: [
+      { target: 'precios-plan',      title: 'Tu plan actual', text: 'Ve tu plan aquí. Activa PRO para desbloquear hábitos y metas ilimitados.',    placement: 'bottom' },
+      { target: 'precios-subscribe', title: 'Activa PRO',     text: 'Por solo $50 MXN/mes desbloqueas todo sin ningún límite.',                    placement: 'top'    },
+    ],
+  },
+}
+
 export default function AppScreen() {
   const { appPage, setAppPage, doLogout, currentUser, subscription, getAlerts } = useContext(AppContext)
   const alerts    = getAlerts()
   const isPro     = subscription?.plan === 'pro'
+
+  const [tourCfg, setTourCfg] = useState(null)
+
+  useEffect(() => {
+    const cfg = TOURS[appPage]
+    if (!cfg) { setTourCfg(null); return }
+    if (localStorage.getItem(`tour_${cfg.key}_done`)) { setTourCfg(null); return }
+    // Delay so the page has time to render before we measure elements
+    const t = setTimeout(() => setTourCfg(cfg), 480)
+    return () => { clearTimeout(t); }
+  }, [appPage])
 
   const navItems = [
     { id: 'dashboard',  icon: 'ti-home',    label: 'Inicio' },
@@ -104,6 +144,14 @@ export default function AppScreen() {
       </main>
 
       <AllModals />
+
+      {tourCfg && (
+        <TourOverlay
+          steps={tourCfg.steps}
+          tourKey={tourCfg.key}
+          onDone={() => setTourCfg(null)}
+        />
+      )}
     </div>
   )
 }
