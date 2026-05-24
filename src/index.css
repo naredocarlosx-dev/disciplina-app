@@ -113,6 +113,28 @@
 .auth-error{font-size:12px;color:var(--red);background:var(--red-light);border:1px solid rgba(224,85,85,.4);border-radius:var(--radius-xs);padding:8px 12px;margin-bottom:12px}
 .auth-back{display:block;text-align:center;font-size:13px;color:var(--text3);margin-top:16px;cursor:pointer}
 .auth-back:hover{color:var(--text)}
+
+/* AUTH ANIMATED BACKGROUND — shared by AuthScreen, ResetPasswordScreen, OnboardingScreen */
+.auth-bg{position:fixed;inset:0;z-index:0;background:#000;overflow:hidden;pointer-events:none}
+.auth-bg__glow{position:absolute;inset:0;background:radial-gradient(ellipse 65% 50% at 50% 38%, rgba(0,212,255,.065) 0%, transparent 65%);animation:auth-glow 7s ease-in-out infinite}
+@keyframes auth-glow{0%,100%{opacity:.6}50%{opacity:1}}
+.auth-bg__grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,212,255,.028) 1px, transparent 1px),linear-gradient(90deg, rgba(0,212,255,.028) 1px, transparent 1px);background-size:80px 80px}
+.auth-bg__grid-persp{position:absolute;bottom:-8%;left:-130%;right:-130%;height:52%;background-image:linear-gradient(rgba(0,212,255,.08) 1px, transparent 1px),linear-gradient(90deg, rgba(0,212,255,.055) 1px, transparent 1px);background-size:80px 80px;transform:perspective(340px) rotateX(62deg);transform-origin:center bottom;animation:auth-grid-scroll 10s linear infinite;-webkit-mask-image:linear-gradient(to top, rgba(0,0,0,.6) 0%, transparent 78%);mask-image:linear-gradient(to top, rgba(0,0,0,.6) 0%, transparent 78%)}
+@keyframes auth-grid-scroll{from{background-position:center 0}to{background-position:center 80px}}
+@keyframes auth-twinkle-xl{0%,100%{opacity:.18;transform:scale(1)}50%{opacity:.75;transform:scale(1.25)}}
+@keyframes auth-twinkle-lg{0%,100%{opacity:.1;transform:scale(1)}50%{opacity:.55;transform:scale(1.45)}}
+@keyframes auth-twinkle-md{0%,100%{opacity:.06;transform:scale(1)}50%{opacity:.35;transform:scale(1.7)}}
+@keyframes auth-twinkle-sm{0%,100%{opacity:.03;transform:scale(1)}50%{opacity:.22;transform:scale(2)}}
+.auth-bg__p{position:absolute;border-radius:50%;background:#00D4FF}
+.auth-bg__p--xl{box-shadow:0 0 16px 4px rgba(0,212,255,.55),0 0 32px 8px rgba(0,212,255,.25),0 0 50px 12px rgba(0,212,255,.1);filter:blur(1.5px);animation:auth-twinkle-xl ease-in-out infinite}
+.auth-bg__p--lg{box-shadow:0 0 10px 2px rgba(0,212,255,.5),0 0 20px 5px rgba(0,212,255,.2);filter:blur(0.5px);animation:auth-twinkle-lg ease-in-out infinite}
+.auth-bg__p--md{box-shadow:0 0 6px rgba(0,212,255,.45);animation:auth-twinkle-md ease-in-out infinite}
+.auth-bg__p--sm{box-shadow:0 0 3px rgba(0,212,255,.35);animation:auth-twinkle-sm ease-in-out infinite}
+@keyframes onboard-in{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.onboard-step{animation:onboard-in 0.32s ease forwards}
+@keyframes onboard-pop{0%{transform:scale(0) rotate(-20deg);opacity:0}70%{transform:scale(1.2)}100%{transform:scale(1);opacity:1}}
+.onboard-icon{animation:onboard-pop 0.45s ease forwards}
+
 .btn-auth{width:100%;padding:11px;border:none;border-radius:var(--radius-sm);background:#00D4FF;color:#000;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 0 18px rgba(0,212,255,.35)}
 .btn-auth:hover{background:#19daff;box-shadow:0 0 28px rgba(0,212,255,.55)}
 .btn-auth:disabled{background:rgba(0,212,255,.35);color:rgba(0,0,0,.5);box-shadow:none;cursor:not-allowed}

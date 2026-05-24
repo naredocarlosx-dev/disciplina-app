@@ -127,7 +127,6 @@ export default function AuthScreen() {
 
   return (
     <>
-    <style>{AUTH_CSS}</style>
     <div className="auth-bg">
       <div className="auth-bg__glow" />
       <div className="auth-bg__grid" />

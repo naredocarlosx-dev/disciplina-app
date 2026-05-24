@@ -46,7 +46,8 @@ export function AppProvider({ children }) {
           setScreen('admin')
         } else {
           setAppPage('dashboard')
-          setScreen('app')
+          const done = localStorage.getItem('onboarding_completed')
+          setScreen(done ? 'app' : 'onboarding')
         }
       } finally {
         setAppLoading(false)
