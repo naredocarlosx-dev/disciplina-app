@@ -2,6 +2,24 @@ import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import EpisodioUnoLogo from '../components/EpisodioUnoLogo'
 
+const RESET_TIERS = [
+  { size: 12, cls: 'xl', minDur: 5,   step: 0.6  },
+  { size: 8,  cls: 'lg', minDur: 3,   step: 0.45 },
+  { size: 5,  cls: 'md', minDur: 1.8, step: 0.35 },
+  { size: 3,  cls: 'sm', minDur: 1.2, step: 0.25 },
+]
+const RESET_PARTICLES = Array.from({ length: 50 }, (_, i) => {
+  const t = RESET_TIERS[i % 4]
+  return {
+    left: `${(i * 19 + 5) % 100}%`,
+    top:  `${(i * 37 + 11) % 100}%`,
+    size: t.size,
+    cls:  `auth-bg__p auth-bg__p--${t.cls}`,
+    dur:  `${(t.minDur + (Math.floor(i / 4) % 5) * t.step).toFixed(1)}s`,
+    del:  `-${((i * 0.53) % t.minDur).toFixed(1)}s`,
+  }
+})
+
 export default function ResetPasswordScreen() {
   const { confirmNewPassword } = useAuth()
 
@@ -35,6 +53,20 @@ export default function ResetPasswordScreen() {
   }
 
   return (
+    <>
+    <div className="auth-bg">
+      <div className="auth-bg__glow" />
+      <div className="auth-bg__grid" />
+      <div className="auth-bg__grid-persp" />
+      {RESET_PARTICLES.map((p, i) => (
+        <div key={i} className={p.cls} style={{
+          left: p.left, top: p.top,
+          width: p.size + 'px', height: p.size + 'px',
+          animationDuration: p.dur, animationDelay: p.del,
+        }} />
+      ))}
+    </div>
+
     <div className="auth-wrap">
       <div className="auth-card">
         <div className="auth-logo">
@@ -96,5 +128,6 @@ export default function ResetPasswordScreen() {
         )}
       </div>
     </div>
+    </>
   )
 }

@@ -47,30 +47,7 @@ const AUTH_CSS = `
   .auth-bg__p--md { box-shadow:0 0 6px rgba(0,212,255,.45); animation:auth-twinkle-md ease-in-out infinite; }
   .auth-bg__p--sm { box-shadow:0 0 3px rgba(0,212,255,.35); animation:auth-twinkle-sm ease-in-out infinite; }
 
-  /* ── Card glassmorphism ── */
-  .auth-wrap { background: transparent !important; position: relative; z-index: 1; }
-  .auth-card {
-    background: rgba(0,0,0,.55) !important;
-    backdrop-filter: blur(10px) !important;
-    -webkit-backdrop-filter: blur(10px) !important;
-    border: 1px solid rgba(0,212,255,.18) !important;
-    box-shadow: 0 0 40px rgba(0,212,255,.07), 0 24px 64px rgba(0,0,0,.6) !important;
-  }
-
-  /* ── Botones neon ── */
-  .btn-auth {
-    background: #00D4FF !important; color: #000 !important; font-weight: 700 !important;
-    box-shadow: 0 0 18px rgba(0,212,255,.35) !important;
-  }
-  .btn-auth:hover:not(:disabled) {
-    background: #19daff !important;
-    box-shadow: 0 0 28px rgba(0,212,255,.55) !important;
-  }
-  .btn-auth:disabled {
-    background: rgba(0,212,255,.35) !important;
-    color: rgba(0,0,0,.5) !important;
-    box-shadow: none !important;
-  }
+  /* glassmorphism y btn-auth neon definidos en index.css */
 `
 
 const AUTH_TIERS = [
