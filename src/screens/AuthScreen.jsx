@@ -2,6 +2,7 @@ import { useContext, useState } from 'react'
 import { AppContext } from '../context/AppContext'
 import { useAuth } from '../context/AuthContext'
 import EpisodioUnoLogo from '../components/EpisodioUnoLogo'
+import LegalModal from '../components/LegalModal'
 
 /* ─── Futuristic background (same system as Landing.jsx) ─────────────────── */
 const AUTH_CSS = `
@@ -88,6 +89,8 @@ export default function AuthScreen() {
   const [regPass2,   setRegPass2]   = useState('')
   const [regError,   setRegError]   = useState('')
   const [regConfirm, setRegConfirm] = useState(false)
+  const [termsAccepted, setTermsAccepted] = useState(false)
+  const [legalModal, setLegalModal] = useState(null) // 'terms' | 'privacy' | null
 
   const handleLogin = async () => {
     if (loading) return
@@ -112,6 +115,7 @@ export default function AuthScreen() {
 
   const handleRegister = async () => {
     if (loading) return
+    if (!termsAccepted) { setRegError('Debes aceptar los términos para continuar.'); return }
     setLoading(true)
     setRegError('')
     setRegConfirm(false)
@@ -277,6 +281,33 @@ export default function AuthScreen() {
                   <label className="form-label-m">Confirmar contraseña</label>
                   <input type="password" className="form-input" placeholder="Repite tu contraseña" value={regPass2} onChange={e => setRegPass2(e.target.value)} disabled={loading} />
                 </div>
+                {/* Terms checkbox */}
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, margin: '4px 0 14px' }}>
+                  <input
+                    type="checkbox"
+                    id="terms-check"
+                    checked={termsAccepted}
+                    onChange={e => { setTermsAccepted(e.target.checked); if (e.target.checked) setRegError('') }}
+                    style={{ marginTop: 2, accentColor: '#00D4FF', flexShrink: 0, width: 16, height: 16, cursor: 'pointer' }}
+                  />
+                  <label htmlFor="terms-check" style={{ fontSize: 12, color: 'var(--text2)', lineHeight: 1.6, cursor: 'pointer' }}>
+                    Acepto los{' '}
+                    <span
+                      onClick={e => { e.preventDefault(); setLegalModal('terms') }}
+                      style={{ color: '#00D4FF', textDecoration: 'underline', cursor: 'pointer' }}
+                    >
+                      Términos y Condiciones
+                    </span>
+                    {' '}y la{' '}
+                    <span
+                      onClick={e => { e.preventDefault(); setLegalModal('privacy') }}
+                      style={{ color: '#00D4FF', textDecoration: 'underline', cursor: 'pointer' }}
+                    >
+                      Política de Privacidad
+                    </span>
+                  </label>
+                </div>
+
                 <button className="btn-auth" onClick={handleRegister} disabled={loading}>
                   {loading
                     ? <span style={{ opacity: .6 }}>Creando cuenta...</span>
@@ -292,6 +323,7 @@ export default function AuthScreen() {
         </span>
       </div>
     </div>
+    {legalModal && <LegalModal type={legalModal} onClose={() => setLegalModal(null)} />}
     </>
   )
 }

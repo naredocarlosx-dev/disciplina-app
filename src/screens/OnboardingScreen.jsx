@@ -65,7 +65,7 @@ export default function OnboardingScreen() {
     setInstalling(true)
     await triggerInstall()
     setInstalling(false)
-    goToApp()
+    setStep(5)
   }
 
   return (
@@ -91,7 +91,7 @@ export default function OnboardingScreen() {
 
         {/* Dot progress */}
         <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginBottom: 28 }}>
-          {[1, 2, 3, 4].map(n => (
+          {[1, 2, 3, 4, 5].map(n => (
             <div key={n} style={{
               width: n === step ? 22 : 8, height: 8, borderRadius: 4,
               background: n <= step ? '#00D4FF' : 'rgba(0,212,255,.2)',
@@ -206,15 +206,15 @@ export default function OnboardingScreen() {
         {step === 4 && (
           <div key="s4" className="onboard-step">
             {isStandalone ? (
-              /* Already installed — skip straight to app */
+              /* Already installed — skip to notifications */
               <div style={{ textAlign: 'center' }}>
                 <span style={{ fontSize: 52, display: 'block', marginBottom: 14 }}>✅</span>
                 <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8 }}>¡Ya tienes la app instalada!</div>
                 <div style={{ fontSize: 14, color: 'var(--text2)', marginBottom: 28 }}>
                   Episodio Uno ya está en tu pantalla de inicio.
                 </div>
-                <button className="btn-auth" onClick={goToApp} disabled={saving}>
-                  <i className="ti ti-rocket" style={{ fontSize: 16 }}></i>Ir a mi app
+                <button className="btn-auth" onClick={() => setStep(5)}>
+                  <i className="ti ti-arrow-right" style={{ fontSize: 16 }}></i>Siguiente
                 </button>
               </div>
             ) : (
@@ -285,8 +285,7 @@ export default function OnboardingScreen() {
                 {/* Skip / fallback */}
                 <button
                   className={canInstallNatively ? undefined : 'btn-auth'}
-                  onClick={goToApp}
-                  disabled={saving}
+                  onClick={() => setStep(5)}
                   style={canInstallNatively ? {
                     display: 'block', width: '100%', textAlign: 'center',
                     marginTop: 8, background: 'none', border: 'none',
@@ -295,10 +294,77 @@ export default function OnboardingScreen() {
                 >
                   {canInstallNatively
                     ? 'Continuar sin instalar'
-                    : <><i className="ti ti-rocket" style={{ fontSize: 16 }}></i>Ir a mi app</>}
+                    : <><i className="ti ti-arrow-right" style={{ fontSize: 16 }}></i>Siguiente</>}
                 </button>
               </>
             )}
+          </div>
+        )}
+
+        {step === 5 && (
+          <div key="s5" className="onboard-step">
+            <div style={{ textAlign: 'center', marginBottom: 20 }}>
+              <i className="onboard-icon ti ti-bell" style={{
+                fontSize: 44, color: '#00D4FF', display: 'block', marginBottom: 12,
+                textShadow: '0 0 20px rgba(0,212,255,.6)',
+              }} />
+              <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 6 }}>
+                Activa las notificaciones
+              </div>
+              <div style={{ fontSize: 13, color: 'var(--text2)', lineHeight: 1.65 }}>
+                Te avisaremos cuando tengas hábitos pendientes,<br />
+                tu racha esté en riesgo o tu stock esté bajo.
+              </div>
+            </div>
+
+            <div style={{
+              background: 'rgba(0,212,255,.05)', border: '1px solid rgba(0,212,255,.12)',
+              borderRadius: 10, padding: '14px 16px', marginBottom: 20,
+            }}>
+              {[
+                { icon: '🔥', label: 'Rachas en riesgo' },
+                { icon: '✅', label: 'Hábitos pendientes' },
+                { icon: '🍽️', label: 'Recordatorios de comidas' },
+                { icon: '📦', label: 'Stock crítico de inventario' },
+                { icon: '💪', label: 'Rutinas de gym' },
+              ].map(n => (
+                <div key={n.label} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                  <span style={{ fontSize: 16, width: 24, textAlign: 'center', flexShrink: 0 }}>{n.icon}</span>
+                  <span style={{ fontSize: 13, color: '#c0c0c0' }}>{n.label}</span>
+                </div>
+              ))}
+            </div>
+
+            {'Notification' in window && Notification.permission !== 'denied' ? (
+              <button
+                className="btn-auth"
+                onClick={async () => {
+                  await Notification.requestPermission()
+                  localStorage.setItem('notifications_asked', 'true')
+                  goToApp()
+                }}
+                style={{ marginBottom: 8 }}
+              >
+                <i className="ti ti-bell" style={{ fontSize: 16 }}></i>Activar notificaciones
+              </button>
+            ) : (
+              <button className="btn-auth" onClick={goToApp} disabled={saving} style={{ marginBottom: 8 }}>
+                <i className="ti ti-rocket" style={{ fontSize: 16 }}></i>Ir a mi app
+              </button>
+            )}
+
+            <button
+              onClick={() => { localStorage.setItem('notifications_asked', 'true'); goToApp() }}
+              disabled={saving}
+              style={{
+                display: 'block', width: '100%', textAlign: 'center',
+                background: 'none', border: 'none', color: 'var(--text3)',
+                fontSize: 13, cursor: 'pointer', textDecoration: 'underline',
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              Ahora no
+            </button>
           </div>
         )}
       </div>

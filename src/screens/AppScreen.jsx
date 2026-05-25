@@ -13,8 +13,9 @@ import Comidas    from '../pages/Comidas'
 import Fitness    from '../pages/Fitness'
 import Inventario from '../pages/Inventario'
 import Precios    from '../pages/Precios'
-import Instalar   from '../pages/Instalar'
-import AllModals  from '../components/AllModals'
+import Instalar       from '../pages/Instalar'
+import Notificaciones from '../pages/Notificaciones'
+import AllModals      from '../components/AllModals'
 
 const TOURS = {
   dashboard: {
@@ -68,7 +69,8 @@ export default function AppScreen() {
     { id: 'comidas',    icon: 'ti-salad',   label: 'Comidas' },
     { id: 'fitness',    icon: 'ti-barbell', label: 'Fitness' },
     { id: 'inventario', icon: 'ti-package', label: 'Cocina',   badge: isPro ? alerts.total : 0, pro: true },
-    { id: 'instalar',   icon: 'ti-download', label: 'Instalar', hidden: isStandalone },
+    { id: 'instalar',       icon: 'ti-download', label: 'Instalar',       hidden: isStandalone },
+    { id: 'notificaciones', icon: 'ti-bell',     label: 'Notificaciones' },
   ]
 
   return (
@@ -163,7 +165,8 @@ export default function AppScreen() {
               />
         )}
         {appPage === 'precios'    && <Precios />}
-        {appPage === 'instalar'   && <Instalar />}
+        {appPage === 'instalar'       && <Instalar />}
+        {appPage === 'notificaciones' && <Notificaciones />}
       </main>
 
       <AllModals />

@@ -1,7 +1,8 @@
-import { useContext } from 'react'
+import { useContext, useState } from 'react'
 import { AppContext } from '../context/AppContext'
 import EpisodioUnoLogo from '../components/EpisodioUnoLogo'
 import { Heart } from 'lucide-react'
+import LegalModal from '../components/LegalModal'
 
 const NEON   = '#00D4FF'
 const BG     = '#000'
@@ -181,6 +182,7 @@ const PRO_FEATURES = [
 export default function Landing() {
   const { setScreen } = useContext(AppContext)
   const goAuth = () => setScreen('auth')
+  const [legalModal, setLegalModal] = useState(null)
 
   return (
     <>
@@ -406,8 +408,8 @@ export default function Landing() {
       }}>
         <EpisodioUnoLogo dark width={120} />
         <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'center' }}>
-          <span style={{ fontSize: 13, color: GRAY, cursor: 'pointer' }}>Privacidad</span>
-          <span style={{ fontSize: 13, color: GRAY, cursor: 'pointer' }}>Términos</span>
+          <span style={{ fontSize: 13, color: GRAY, cursor: 'pointer' }} onClick={() => setLegalModal('privacy')}>Privacidad</span>
+          <span style={{ fontSize: 13, color: GRAY, cursor: 'pointer' }} onClick={() => setLegalModal('terms')}>Términos</span>
           <span style={{ fontSize: 13, color: GRAY, cursor: 'pointer' }} onClick={goAuth}>Iniciar sesión</span>
           <a
             href="https://www.instagram.com/episodio.uno?igsh=cXQ3d3NjdWVoaWR6&utm_source=qr"
@@ -429,6 +431,8 @@ export default function Landing() {
       </footer>
 
     </div>
+
+    {legalModal && <LegalModal type={legalModal} onClose={() => setLegalModal(null)} />}
     </>
   )
 }
