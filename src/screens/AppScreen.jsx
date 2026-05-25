@@ -3,6 +3,7 @@ import { AppContext } from '../context/AppContext'
 import { PiggyBank } from 'lucide-react'
 import EpisodioUnoLogo from '../components/EpisodioUnoLogo'
 import TourOverlay from '../components/TourOverlay'
+import ProGate    from '../components/ProGate'
 import Dashboard  from '../pages/Dashboard'
 import Habitos    from '../pages/Habitos'
 import Ahorro     from '../pages/Ahorro'
@@ -62,7 +63,7 @@ export default function AppScreen() {
     { id: 'ahorro',     Icon: PiggyBank,    label: 'Ahorro' },
     { id: 'comidas',    icon: 'ti-salad',   label: 'Comidas' },
     { id: 'fitness',    icon: 'ti-barbell', label: 'Fitness' },
-    { id: 'inventario', icon: 'ti-package', label: 'Cocina', badge: alerts.total },
+    { id: 'inventario', icon: 'ti-package', label: 'Cocina', badge: isPro ? alerts.total : 0, pro: true },
   ]
 
   return (
@@ -83,6 +84,14 @@ export default function AppScreen() {
             : <i className={`ti ${item.icon}`}></i>}
             <span>{item.label}</span>
             {item.badge > 0 && <span className="badge">{item.badge}</span>}
+            {item.pro && !isPro && (
+              <span style={{
+                marginLeft: 'auto', fontSize: 9, fontWeight: 700,
+                background: 'rgba(255,184,0,.15)', color: '#FFB800',
+                border: '1px solid rgba(255,184,0,.35)',
+                padding: '1px 6px', borderRadius: 20, letterSpacing: .5,
+              }}>PRO</span>
+            )}
           </button>
         ))}
 
@@ -139,7 +148,14 @@ export default function AppScreen() {
         {appPage === 'ahorro'     && <Ahorro />}
         {appPage === 'comidas'    && <Comidas />}
         {appPage === 'fitness'    && <Fitness />}
-        {appPage === 'inventario' && <Inventario />}
+        {appPage === 'inventario' && (
+          isPro
+            ? <Inventario />
+            : <ProGate
+                title="Inventario de cocina"
+                description="El inventario de cocina está disponible en el plan PRO. Controla tu stock, recibe alertas de productos por agotarse y nunca te quedes sin ingredientes."
+              />
+        )}
         {appPage === 'precios'    && <Precios />}
       </main>
 

@@ -7,7 +7,6 @@ const FEATURES_FREE = [
   '1 meta de ahorro',
   'Planificador de comidas completo',
   'Rutinas de fitness ilimitadas',
-  'Inventario de cocina ilimitado',
   'Frase diaria de motivación',
   'Acceso desde cualquier dispositivo',
 ]
