@@ -35,6 +35,17 @@ export function AuthProvider({ children }) {
       .eq('user_id', authUser.id)
       .single()
 
+    // Auto-downgrade expired promo subscriptions (non-Stripe, with expiry date)
+    let effectiveSub = sub || { plan: 'free' }
+    if (effectiveSub.plan === 'pro' && effectiveSub.expires_at && !effectiveSub.stripe_customer_id) {
+      if (new Date(effectiveSub.expires_at) < new Date()) {
+        await supabase.from('subscriptions')
+          .update({ plan: 'free', status: 'cancelled' })
+          .eq('user_id', authUser.id)
+        effectiveSub = { plan: 'free' }
+      }
+    }
+
     // Compute trial expiry (only for non-PRO users that have a trial_end_date)
     const trialExpired = (() => {
       if (!profile.trial_end_date) return false
@@ -59,19 +70,6 @@ export function AuthProvider({ children }) {
     }
 
     setCurrentUser(user)
-
-    // Auto-downgrade expired promo subscriptions (non-Stripe, with expiry date)
-    let effectiveSub = sub || { plan: 'free' }
-    if (effectiveSub.plan === 'pro' && effectiveSub.expires_at && !effectiveSub.stripe_customer_id) {
-      const expired = new Date(effectiveSub.expires_at) < new Date()
-      if (expired) {
-        await supabase.from('subscriptions')
-          .update({ plan: 'free', status: 'cancelled' })
-          .eq('user_id', authUser.id)
-        effectiveSub = { plan: 'free' }
-      }
-    }
-
     setSubscription(effectiveSub)
     return user
   }, [])
@@ -172,6 +170,13 @@ export function AuthProvider({ children }) {
         { onConflict: 'user_id' }
       ),
     ])
+
+    // Fire welcome email — non-blocking
+    fetch('/.netlify/functions/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'welcome', email, name }),
+    }).catch(() => {})
 
     if (!data.session) {
       return { ok: true, needsConfirmation: true }
