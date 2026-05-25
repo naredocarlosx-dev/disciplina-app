@@ -45,7 +45,20 @@ export function AuthProvider({ children }) {
     }
 
     setCurrentUser(user)
-    setSubscription(sub || { plan: 'free' })
+
+    // Auto-downgrade expired promo subscriptions (non-Stripe, with expiry date)
+    let effectiveSub = sub || { plan: 'free' }
+    if (effectiveSub.plan === 'pro' && effectiveSub.expires_at && !effectiveSub.stripe_customer_id) {
+      const expired = new Date(effectiveSub.expires_at) < new Date()
+      if (expired) {
+        await supabase.from('subscriptions')
+          .update({ plan: 'free', status: 'cancelled' })
+          .eq('user_id', authUser.id)
+        effectiveSub = { plan: 'free' }
+      }
+    }
+
+    setSubscription(effectiveSub)
     return user
   }, [])
 
