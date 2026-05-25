@@ -35,6 +35,17 @@ export function AuthProvider({ children }) {
       .eq('user_id', authUser.id)
       .single()
 
+    // Compute trial expiry (only for non-PRO users that have a trial_end_date)
+    const trialExpired = (() => {
+      if (!profile.trial_end_date) return false
+      if (effectiveSub.plan === 'pro') return false
+      return new Date(profile.trial_end_date) < new Date()
+    })()
+
+    const trialDaysLeft = profile.trial_end_date && !trialExpired
+      ? Math.max(0, Math.ceil((new Date(profile.trial_end_date) - new Date()) / (1000 * 60 * 60 * 24)))
+      : 0
+
     const user = {
       id: authUser.id,
       email: authUser.email,
@@ -42,6 +53,9 @@ export function AuthProvider({ children }) {
       role: profile.role,
       status: profile.status,
       created: profile.created_at,
+      trialExpired,
+      trialDaysLeft,
+      trialEndDate: profile.trial_end_date || null,
     }
 
     setCurrentUser(user)
@@ -108,6 +122,21 @@ export function AuthProvider({ children }) {
     if (pass.length < 6) return { ok: false, error: 'La contraseña debe tener al menos 6 caracteres.' }
     if (pass !== pass2) return { ok: false, error: 'Las contraseñas no coinciden.' }
 
+    // Check if this email already used its free trial
+    try {
+      const trialCheck = await fetch('/.netlify/functions/check-trial', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim() }),
+      })
+      if (trialCheck.ok) {
+        const { trialUsed } = await trialCheck.json()
+        if (trialUsed) {
+          return { ok: false, error: 'Este correo ya utilizó la prueba gratuita. Para continuar necesitas activar el plan PRO.' }
+        }
+      }
+    } catch (_) { /* if check fails, allow registration */ }
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password: pass,
@@ -130,9 +159,12 @@ export function AuthProvider({ children }) {
     if (!data.user) return { ok: false, error: 'Error al crear la cuenta. Intenta de nuevo.' }
 
     // Crear perfil y suscripción (el trigger de Supabase también lo hace como respaldo)
+    const trialStart = new Date().toISOString()
+    const trialEnd   = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString()
     await Promise.all([
       supabase.from('profiles').upsert(
-        { id: data.user.id, name, email, role: 'user', status: 'active' },
+        { id: data.user.id, name, email, role: 'user', status: 'active',
+          trial_start_date: trialStart, trial_end_date: trialEnd, trial_used: true },
         { onConflict: 'id' }
       ),
       supabase.from('subscriptions').upsert(

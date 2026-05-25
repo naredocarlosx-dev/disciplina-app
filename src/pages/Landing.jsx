@@ -247,7 +247,7 @@ export default function Landing() {
               Iniciar sesión
             </button>
           </div>
-          <p style={{ marginTop: 20, fontSize: 12, color: '#555' }}>Sin tarjeta de crédito · Gratis para siempre en plan básico</p>
+          <p style={{ marginTop: 20, fontSize: 12, color: '#555' }}>3 meses gratis — sin tarjeta de crédito</p>
         </div>
       </section>
 

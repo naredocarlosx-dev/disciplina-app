@@ -7,6 +7,7 @@ import AppScreen            from './screens/AppScreen'
 import AdminScreen          from './screens/AdminScreen'
 import ResetPasswordScreen  from './screens/ResetPasswordScreen'
 import OnboardingScreen     from './screens/OnboardingScreen'
+import TrialExpiredScreen   from './screens/TrialExpiredScreen'
 
 function LoadingScreen() {
   return (
@@ -29,9 +30,10 @@ function Router() {
     <>
       {screen === 'landing' && <Landing />}
       {screen === 'auth'    && <AuthScreen />}
-      {screen === 'app'        && <AppScreen />}
-      {screen === 'onboarding' && <OnboardingScreen />}
-      {screen === 'admin'      && <AdminScreen />}
+      {screen === 'app'           && <AppScreen />}
+      {screen === 'onboarding'    && <OnboardingScreen />}
+      {screen === 'admin'         && <AdminScreen />}
+      {screen === 'trial-expired' && <TrialExpiredScreen />}
     </>
   )
 }

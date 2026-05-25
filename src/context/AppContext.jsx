@@ -44,6 +44,8 @@ export function AppProvider({ children }) {
           setAuthState({ users: (profiles || []).map(p => ({ ...p, created: p.created_at })) })
           setAdminPage('users')
           setScreen('admin')
+        } else if (currentUser.trialExpired) {
+          setScreen('trial-expired')
         } else {
           setAppPage('dashboard')
           const done = localStorage.getItem('onboarding_completed')

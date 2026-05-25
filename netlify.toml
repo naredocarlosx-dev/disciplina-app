@@ -5,6 +5,9 @@
 [functions]
   directory = "netlify/functions"
 
+[functions."check-trial-expiry"]
+  schedule = "0 12 * * *"
+
 [[redirects]]
   from   = "/*"
   to     = "/index.html"

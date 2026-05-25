@@ -34,7 +34,7 @@ export default function Precios() {
           <div className="page-sub">
             {isPro
               ? 'Estás en el plan PRO — gracias por tu apoyo.'
-              : 'Estás en el plan FREE. Actualiza para desbloquear todo.'}
+              : 'Disfruta tu prueba gratuita de 3 meses. Activa PRO para continuar después.'}
           </div>
         </div>
         {isPro && (
@@ -54,11 +54,11 @@ export default function Precios() {
               TU PLAN ACTUAL
             </div>
           )}
-          <div style={{ marginBottom: 4, fontWeight: 700, fontSize: 16 }}>FREE</div>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 20 }}>
-            <span style={{ fontSize: 36, fontWeight: 800 }}>$0</span>
-            <span style={{ fontSize: 13, color: 'var(--text2)' }}>/mes</span>
+          <div style={{ marginBottom: 4, fontWeight: 700, fontSize: 16 }}>PRUEBA GRATUITA</div>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 4 }}>
+            <span style={{ fontSize: 36, fontWeight: 800 }}>3 meses</span>
           </div>
+          <div style={{ fontSize: 12, color: 'var(--text3)', marginBottom: 20 }}>Sin tarjeta de crédito</div>
           <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', display: 'flex', flexDirection: 'column', gap: 10 }}>
             {FEATURES_FREE.map(f => (
               <li key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
@@ -67,7 +67,7 @@ export default function Precios() {
               </li>
             ))}
           </ul>
-          <div style={{ fontSize: 12, color: 'var(--text3)', textAlign: 'center' }}>Tu plan actual</div>
+          <div style={{ fontSize: 12, color: 'var(--text3)', textAlign: 'center' }}>Prueba gratuita — 90 días</div>
         </div>
 
         {/* PRO */}
