@@ -1,6 +1,7 @@
 import { useContext, useState } from 'react'
 import { AppContext } from '../context/AppContext'
 import EpisodioUnoLogo from '../components/EpisodioUnoLogo'
+import { usePWA } from '../hooks/usePWA'
 
 const CHIPS = [
   { label: 'Ejercicio',   cat: 'fitness' },
@@ -30,11 +31,13 @@ const OB_PARTICLES = Array.from({ length: 50 }, (_, i) => {
 
 export default function OnboardingScreen() {
   const { setScreen, addHabit } = useContext(AppContext)
+  const { isStandalone, isIOS, isSafari, canInstallNatively, triggerInstall } = usePWA()
 
   const [step,         setStep]         = useState(1)
   const [habitName,    setHabitName]    = useState('')
   const [selectedChip, setSelectedChip] = useState(null)
   const [saving,       setSaving]       = useState(false)
+  const [installing,   setInstalling]   = useState(false)
 
   const chipCat = CHIPS.find(c => c.label === selectedChip)?.cat || 'salud'
 
@@ -56,6 +59,13 @@ export default function OnboardingScreen() {
     }
     localStorage.setItem('onboarding_completed', 'true')
     setScreen('app')
+  }
+
+  const handleInstall = async () => {
+    setInstalling(true)
+    await triggerInstall()
+    setInstalling(false)
+    goToApp()
   }
 
   return (
@@ -81,7 +91,7 @@ export default function OnboardingScreen() {
 
         {/* Dot progress */}
         <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginBottom: 28 }}>
-          {[1, 2, 3].map(n => (
+          {[1, 2, 3, 4].map(n => (
             <div key={n} style={{
               width: n === step ? 22 : 8, height: 8, borderRadius: 4,
               background: n <= step ? '#00D4FF' : 'rgba(0,212,255,.2)',
@@ -187,11 +197,108 @@ export default function OnboardingScreen() {
                 Tu streak empieza hoy.
               </div>
             </div>
-            <button className="btn-auth" onClick={goToApp} disabled={saving}>
-              {saving
-                ? <span style={{ opacity: .6 }}>Entrando...</span>
-                : <><i className="ti ti-rocket" style={{ fontSize: 16 }}></i>Ir a mi app</>}
+            <button className="btn-auth" onClick={() => setStep(4)}>
+              <i className="ti ti-arrow-right" style={{ fontSize: 16 }}></i>Siguiente
             </button>
+          </div>
+        )}
+
+        {step === 4 && (
+          <div key="s4" className="onboard-step">
+            {isStandalone ? (
+              /* Already installed — skip straight to app */
+              <div style={{ textAlign: 'center' }}>
+                <span style={{ fontSize: 52, display: 'block', marginBottom: 14 }}>✅</span>
+                <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 8 }}>¡Ya tienes la app instalada!</div>
+                <div style={{ fontSize: 14, color: 'var(--text2)', marginBottom: 28 }}>
+                  Episodio Uno ya está en tu pantalla de inicio.
+                </div>
+                <button className="btn-auth" onClick={goToApp} disabled={saving}>
+                  <i className="ti ti-rocket" style={{ fontSize: 16 }}></i>Ir a mi app
+                </button>
+              </div>
+            ) : (
+              <>
+                <div style={{ textAlign: 'center', marginBottom: 20 }}>
+                  <i className="onboard-icon ti ti-device-mobile" style={{
+                    fontSize: 44, color: '#00D4FF', display: 'block', marginBottom: 12,
+                    textShadow: '0 0 20px rgba(0,212,255,.6)',
+                  }} />
+                  <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 6 }}>
+                    Lleva Episodio Uno contigo
+                  </div>
+                  <div style={{ fontSize: 13, color: 'var(--text2)', lineHeight: 1.65 }}>
+                    Instala la app para acceso rápido desde tu pantalla de inicio.
+                  </div>
+                </div>
+
+                {/* iOS non-Safari */}
+                {isIOS && !isSafari && (
+                  <div style={{
+                    padding: '14px', borderRadius: 10, marginBottom: 16,
+                    background: 'rgba(255,184,0,.07)', border: '1px solid rgba(255,184,0,.25)',
+                    fontSize: 13, color: '#FFB800', lineHeight: 1.6,
+                  }}>
+                    <strong>iPhone:</strong> Abre episodiouno.com en <strong>Safari</strong> para poder instalar la app.
+                  </div>
+                )}
+
+                {/* iOS Safari instructions */}
+                {isIOS && isSafari && (
+                  <div style={{
+                    background: 'rgba(0,212,255,.05)', border: '1px solid rgba(0,212,255,.15)',
+                    borderRadius: 10, padding: '14px', marginBottom: 16,
+                  }}>
+                    {[
+                      { n: '1', t: 'Toca el botón Compartir (↑)', i: 'ti-share' },
+                      { n: '2', t: 'Toca "En la pantalla de inicio"', i: 'ti-plus' },
+                      { n: '3', t: 'Confirma tocando "Agregar"', i: 'ti-check' },
+                    ].map(s => (
+                      <div key={s.n} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                        <div style={{
+                          width: 24, height: 24, borderRadius: '50%', flexShrink: 0,
+                          background: 'rgba(0,212,255,.15)', border: '1px solid rgba(0,212,255,.35)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: 11, fontWeight: 700, color: '#00D4FF',
+                        }}>{s.n}</div>
+                        <i className={`ti ${s.i}`} style={{ color: '#00D4FF', fontSize: 14, flexShrink: 0 }} />
+                        <span style={{ fontSize: 13, color: '#c0c0c0' }}>{s.t}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Android / Chrome — native prompt */}
+                {canInstallNatively && (
+                  <button
+                    className="btn-auth"
+                    onClick={handleInstall}
+                    disabled={installing}
+                    style={{ marginBottom: 8 }}
+                  >
+                    {installing
+                      ? <span style={{ opacity: .6 }}>Instalando…</span>
+                      : <><i className="ti ti-download" style={{ fontSize: 16 }}></i>Instalar ahora</>}
+                  </button>
+                )}
+
+                {/* Skip / fallback */}
+                <button
+                  className={canInstallNatively ? undefined : 'btn-auth'}
+                  onClick={goToApp}
+                  disabled={saving}
+                  style={canInstallNatively ? {
+                    display: 'block', width: '100%', textAlign: 'center',
+                    marginTop: 8, background: 'none', border: 'none',
+                    color: 'var(--text3)', fontSize: 13, cursor: 'pointer', textDecoration: 'underline',
+                  } : undefined}
+                >
+                  {canInstallNatively
+                    ? 'Continuar sin instalar'
+                    : <><i className="ti ti-rocket" style={{ fontSize: 16 }}></i>Ir a mi app</>}
+                </button>
+              </>
+            )}
           </div>
         )}
       </div>

@@ -3,7 +3,9 @@ import { AppContext } from '../context/AppContext'
 import { PiggyBank } from 'lucide-react'
 import EpisodioUnoLogo from '../components/EpisodioUnoLogo'
 import TourOverlay from '../components/TourOverlay'
-import ProGate    from '../components/ProGate'
+import ProGate     from '../components/ProGate'
+import InstallBanner from '../components/InstallBanner'
+import { usePWA }  from '../hooks/usePWA'
 import Dashboard  from '../pages/Dashboard'
 import Habitos    from '../pages/Habitos'
 import Ahorro     from '../pages/Ahorro'
@@ -11,6 +13,7 @@ import Comidas    from '../pages/Comidas'
 import Fitness    from '../pages/Fitness'
 import Inventario from '../pages/Inventario'
 import Precios    from '../pages/Precios'
+import Instalar   from '../pages/Instalar'
 import AllModals  from '../components/AllModals'
 
 const TOURS = {
@@ -45,6 +48,7 @@ export default function AppScreen() {
   const { appPage, setAppPage, doLogout, currentUser, subscription, getAlerts } = useContext(AppContext)
   const alerts    = getAlerts()
   const isPro     = subscription?.plan === 'pro'
+  const { isStandalone } = usePWA()
 
   const [tourCfg, setTourCfg] = useState(null)
 
@@ -63,7 +67,8 @@ export default function AppScreen() {
     { id: 'ahorro',     Icon: PiggyBank,    label: 'Ahorro' },
     { id: 'comidas',    icon: 'ti-salad',   label: 'Comidas' },
     { id: 'fitness',    icon: 'ti-barbell', label: 'Fitness' },
-    { id: 'inventario', icon: 'ti-package', label: 'Cocina', badge: isPro ? alerts.total : 0, pro: true },
+    { id: 'inventario', icon: 'ti-package', label: 'Cocina',   badge: isPro ? alerts.total : 0, pro: true },
+    { id: 'instalar',   icon: 'ti-download', label: 'Instalar', hidden: isStandalone },
   ]
 
   return (
@@ -73,7 +78,7 @@ export default function AppScreen() {
           <EpisodioUnoLogo dark width={120} />
         </div>
 
-        {navItems.map(item => (
+        {navItems.filter(item => !item.hidden).map(item => (
           <button
             key={item.id}
             className={`nav-item${appPage === item.id ? ' active' : ''}`}
@@ -143,6 +148,7 @@ export default function AppScreen() {
       </aside>
 
       <main className="app-main">
+        {appPage !== 'instalar' && <InstallBanner />}
         {appPage === 'dashboard'  && <Dashboard />}
         {appPage === 'habitos'    && <Habitos />}
         {appPage === 'ahorro'     && <Ahorro />}
@@ -157,6 +163,7 @@ export default function AppScreen() {
               />
         )}
         {appPage === 'precios'    && <Precios />}
+        {appPage === 'instalar'   && <Instalar />}
       </main>
 
       <AllModals />
