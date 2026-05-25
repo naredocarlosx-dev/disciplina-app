@@ -1,6 +1,7 @@
 import { useContext } from 'react'
 import { AppContext } from '../context/AppContext'
 import EpisodioUnoLogo from '../components/EpisodioUnoLogo'
+import { Heart } from 'lucide-react'
 
 const NEON   = '#00D4FF'
 const BG     = '#000'
@@ -84,6 +85,15 @@ const FUT_CSS = `
     box-shadow: 0 0 3px rgba(0,212,255,.35);
     animation: fut-twinkle-sm ease-in-out infinite;
   }
+  .feature-card {
+    border: 1px solid rgba(0,212,255,.3) !important;
+    box-shadow: 0 0 20px rgba(0,212,255,.1);
+    transition: border-color .25s, box-shadow .25s !important;
+  }
+  .feature-card:hover {
+    border: 1px solid rgba(0,212,255,.7) !important;
+    box-shadow: 0 0 30px rgba(0,212,255,.2);
+  }
 `
 
 /* 4 tiers: tamaño, velocidad y opacidad diferente
@@ -130,7 +140,7 @@ const sectionLabel = {
 /* ─── Feature cards data ──────────────────────────────────────────────────── */
 const FEATURES = [
   {
-    icon: 'ti-flame-off',
+    iconComponent: <Heart size={20} color={NEON} />,
     title: 'Baja la presión',
     desc: 'No es transformar tu vida de golpe. Es solo el episodio 1. Pequeño, manejable, tuyo.',
   },
@@ -253,17 +263,18 @@ export default function Landing() {
           </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 20 }}>
             {FEATURES.map((f, i) => (
-              <div key={i} style={{
-                background: CARD, border: `1px solid ${BORDER}`, borderRadius: 14,
+              <div key={i} className="feature-card" style={{
+                background: CARD, borderRadius: 14,
                 padding: '32px 28px', textAlign: 'left',
-                transition: 'border-color .2s',
               }}>
                 <div style={{
                   width: 44, height: 44, borderRadius: 10, marginBottom: 20,
                   background: `rgba(0,212,255,.1)`, border: `1px solid rgba(0,212,255,.2)`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  <i className={`ti ${f.icon}`} style={{ fontSize: 20, color: NEON }}></i>
+                  {f.iconComponent
+                    ? f.iconComponent
+                    : <i className={`ti ${f.icon}`} style={{ fontSize: 20, color: NEON }}></i>}
                 </div>
                 <div style={{ fontWeight: 600, fontSize: 17, marginBottom: 10 }}>{f.title}</div>
                 <div style={{ color: GRAY, fontSize: 14, lineHeight: 1.65 }}>{f.desc}</div>
