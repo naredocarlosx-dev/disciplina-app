@@ -337,13 +337,9 @@ export function AppProvider({ children }) {
     })
   }, [])
 
-  const deleteUser = useCallback(async (id) => {
-    const u = authState.users.find(x => x.id === id)
-    if (!u || u.role === 'admin') return
-    if (!window.confirm(`¿Eliminar al usuario "${u.name}"? No se puede deshacer.`)) return
-    setAuthState(prev => ({ users: prev.users.filter(x => x.id !== id) }))
-    supabase.from('profiles').update({ status: 'inactive' }).eq('id', id)
-  }, [authState])
+  const removeUserFromState = useCallback((id) => {
+    setAuthState(prev => ({ users: prev.users.filter(u => u.id !== id) }))
+  }, [])
 
   const changeAdminPass = useCallback(async ({ pass1, pass2 }) => {
     if (pass1.length < 6) return { ok: false, error: 'La contraseña debe tener al menos 6 caracteres.' }
@@ -379,7 +375,7 @@ export function AppProvider({ children }) {
     openInvMove, saveInvMove, setInvFilter,
     getAlerts,
     // admin
-    adminAddUser, adminSaveUser, toggleUserStatus, deleteUser,
+    adminAddUser, adminSaveUser, toggleUserStatus, removeUserFromState,
     changeAdminPass, clearNonAdmins,
   }
 
