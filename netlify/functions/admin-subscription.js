@@ -12,52 +12,6 @@ const HEADERS = {
   'Content-Type': 'application/json',
 }
 
-async function sendPromoEmail(email, name, months, expiresDate) {
-  if (!process.env.RESEND_API_KEY || !email) return
-
-  const expiresStr = expiresDate.toLocaleDateString('es-MX', {
-    day: 'numeric', month: 'long', year: 'numeric',
-  })
-  const mesLabel = months === 1 ? '1 mes gratis' : `${months} meses gratis`
-  const greeting = name ? `¡Hola, ${name}!` : '¡Hola!'
-
-  await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      from: 'Episodio Uno <noreply@episodiouno.com>',
-      to:   [email],
-      subject: `¡Tienes ${mesLabel} de Episodio Uno PRO!`,
-      html: `
-<!DOCTYPE html><html lang="es"><body style="margin:0;padding:0;background:#0a0a0a;font-family:'Helvetica Neue',Arial,sans-serif">
-<div style="max-width:520px;margin:40px auto;background:#111;border:1px solid rgba(0,212,255,.18);border-radius:16px;padding:40px 36px">
-  <div style="font-size:40px;margin-bottom:20px">⚡</div>
-  <h1 style="font-size:22px;font-weight:700;color:#efefed;margin:0 0 14px">${greeting}</h1>
-  <p style="font-size:15px;line-height:1.75;color:#8a8a85;margin:0 0 8px">
-    Tienes <strong style="color:#00D4FF">${mesLabel}</strong> de
-    <strong style="color:#fff">Episodio Uno PRO</strong>.
-  </p>
-  <p style="font-size:15px;line-height:1.75;color:#8a8a85;margin:0 0 28px">
-    Disfruta todas las funciones premium hasta el
-    <strong style="color:#fff">${expiresStr}</strong>.
-  </p>
-  <a href="https://episodiouno.com"
-     style="display:inline-block;background:#00D4FF;color:#000;font-weight:700;padding:13px 28px;border-radius:9px;text-decoration:none;font-size:14px;letter-spacing:.01em">
-    Ir a mi app →
-  </a>
-  <p style="font-size:12px;color:#3a3a3a;margin-top:36px;border-top:1px solid #1c1c1c;padding-top:20px">
-    Episodio Uno · Tu sistema de disciplina personal<br/>
-    <a href="https://episodiouno.com" style="color:#3a3a3a">episodiouno.com</a>
-  </p>
-</div>
-</body></html>`,
-    }),
-  }).catch(err => console.warn('Resend email failed:', err.message))
-}
-
 exports.handler = async (event) => {
   if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers: HEADERS, body: '' }
   if (event.httpMethod !== 'POST') {
@@ -131,8 +85,6 @@ exports.handler = async (event) => {
         await supabase.from('subscriptions')
           .insert({ user_id: targetUserId, plan: 'pro', status: 'active', started_at: now, expires_at: expires.toISOString() })
       }
-
-      await sendPromoEmail(targetEmail, targetName, numMonths, expires)
 
     } else {
       return { statusCode: 400, headers: HEADERS, body: JSON.stringify({ error: `Unknown action: ${action}` }) }

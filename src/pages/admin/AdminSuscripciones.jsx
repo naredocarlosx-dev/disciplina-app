@@ -127,6 +127,7 @@ export default function AdminSuscripciones() {
     const token = session?.access_token
 
     try {
+      // 1 — DB action
       const res = await fetch('/.netlify/functions/admin-subscription', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
@@ -138,16 +139,42 @@ export default function AdminSuscripciones() {
           months,
         }),
       })
-
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Error desconocido')
 
-      const msgs = {
-        activate: `PRO activado para ${row.name}`,
-        revoke:   `PRO revocado para ${row.name}`,
-        promo:    `Promo de ${months} mes${months > 1 ? 'es' : ''} enviada a ${row.name}`,
+      // 2 — Email notification
+      let expiresAt = null
+      if (action === 'promo' && months) {
+        const d = new Date()
+        d.setDate(d.getDate() + months * 30)
+        expiresAt = d.toISOString()
       }
-      setToast({ text: '✓ ' + (msgs[action] || 'Acción completada'), ok: true })
+
+      const emailRes = await fetch('/.netlify/functions/send-admin-email', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body:    JSON.stringify({
+          action,
+          targetEmail: row.email,
+          targetName:  row.name,
+          months,
+          expiresAt,
+        }),
+      })
+      const emailData = await emailRes.json()
+      const emailOk   = emailRes.ok && emailData.ok && !emailData.skipped
+
+      // 3 — Toast
+      const actionLabel = {
+        activate: 'PRO activado',
+        revoke:   'PRO revocado',
+        promo:    `Promo de ${months} mes${months > 1 ? 'es' : ''} otorgada`,
+      }
+      const suffix = emailOk
+        ? `. Correo enviado a ${row.email}`
+        : ` (correo no enviado)`
+      setToast({ text: `✓ ${actionLabel[action] || 'Listo'}${suffix}`, ok: true })
+
       await load()
     } catch (err) {
       setToast({ text: err.message, ok: false })
