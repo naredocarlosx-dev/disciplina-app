@@ -385,7 +385,7 @@ export default function Instalar() {
 
       <div style={{ marginTop: 20, textAlign: 'center' }}>
         <button
-          onClick={() => { localStorage.setItem('pwa_installed', 'true'); setAppPage('dashboard') }}
+          onClick={() => { localStorage.setItem('onboarding_completed', 'true'); setAppPage('dashboard') }}
           style={{ background: 'none', border: 'none', color: '#555', fontSize: 13, cursor: 'pointer', textDecoration: 'underline', fontFamily: "'DM Sans', sans-serif" }}
         >
           Ya la instalé ✓
