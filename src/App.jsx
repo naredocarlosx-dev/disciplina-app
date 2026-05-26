@@ -43,6 +43,13 @@ export default function App() {
     <AuthProvider>
       <AppProvider>
         <Router />
+        <span style={{
+          position: 'fixed', bottom: 8, right: 10,
+          fontSize: 11, color: 'var(--text3)',
+          opacity: 0.5, pointerEvents: 'none', zIndex: 9999
+        }}>
+          Versión de prueba
+        </span>
       </AppProvider>
     </AuthProvider>
   )
