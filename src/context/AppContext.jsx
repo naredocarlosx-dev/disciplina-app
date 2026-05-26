@@ -51,6 +51,9 @@ export function AppProvider({ children }) {
           const done = localStorage.getItem('onboarding_completed')
           setScreen(done ? 'app' : 'onboarding')
         }
+      } catch (e) {
+        console.error('[app] loadData error:', e)
+        setScreen('app')
       } finally {
         setAppLoading(false)
       }
