@@ -126,6 +126,26 @@ export function AuthProvider({ children }) {
         setAuthLoading(false)
         return
       }
+      if (event === 'SIGNED_IN') {
+        if (session?.user) {
+          await loadProfile(session.user)
+          // Detect email confirmation: confirmed_at is very recent (< 5 min)
+          const confirmedAt = session.user.email_confirmed_at
+          const isEmailProvider = (session.user.app_metadata?.provider || 'email') === 'email'
+          const isJustConfirmed = confirmedAt &&
+            (Date.now() - new Date(confirmedAt).getTime()) < 5 * 60 * 1000
+          if (isEmailProvider && isJustConfirmed) {
+            const name = session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'Usuario'
+            fetch('/.netlify/functions/send-email', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ type: 'welcome', email: session.user.email, name }),
+            }).catch(() => {})
+          }
+        }
+        setAuthLoading(false)
+        return
+      }
       if (event === 'SIGNED_OUT') {
         setCurrentUser(null)
         setSubscription({ plan: 'free' })
@@ -174,7 +194,7 @@ export function AuthProvider({ children }) {
     const { data, error } = await supabase.auth.signUp({
       email,
       password: pass,
-      options: { data: { name } },
+      options: { data: { name }, emailRedirectTo: window.location.origin },
     })
 
     if (error) {
@@ -206,13 +226,6 @@ export function AuthProvider({ children }) {
         { onConflict: 'user_id' }
       ),
     ])
-
-    // Fire welcome email — non-blocking
-    fetch('/.netlify/functions/send-email', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'welcome', email, name }),
-    }).catch(() => {})
 
     if (!data.session) {
       return { ok: true, needsConfirmation: true }
