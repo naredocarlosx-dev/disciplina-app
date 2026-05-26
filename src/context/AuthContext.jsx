@@ -99,6 +99,7 @@ export function AuthProvider({ children }) {
       role: profile.role,
       status: profile.status,
       created: profile.created_at,
+      provider: authUser.app_metadata?.provider || 'email',
       trialExpired,
       trialDaysLeft,
       trialEndDate: profile.trial_end_date || null,
@@ -245,6 +246,21 @@ export function AuthProvider({ children }) {
     return { ok: true }
   }, [loadProfile])
 
+  const updateName = useCallback(async (name) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { ok: false, error: 'No hay sesión activa.' }
+    const { error } = await supabase.from('profiles').update({ name }).eq('id', user.id)
+    if (error) return { ok: false, error: error.message }
+    setCurrentUser(prev => ({ ...prev, name }))
+    return { ok: true }
+  }, [])
+
+  const updatePassword = useCallback(async (newPass) => {
+    const { error } = await supabase.auth.updateUser({ password: newPass })
+    if (error) return { ok: false, error: error.message }
+    return { ok: true }
+  }, [])
+
   const upgradeToPro = useCallback(async () => {
     if (!currentUser) return
     const { data } = await supabase
@@ -264,6 +280,8 @@ export function AuthProvider({ children }) {
     doRegister,
     doLogout,
     upgradeToPro,
+    updateName,
+    updatePassword,
     sendPasswordReset,
     confirmNewPassword,
   }

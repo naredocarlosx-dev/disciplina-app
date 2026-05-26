@@ -15,6 +15,7 @@ import Inventario from '../pages/Inventario'
 import Precios    from '../pages/Precios'
 import Instalar       from '../pages/Instalar'
 import Notificaciones from '../pages/Notificaciones'
+import Perfil         from '../pages/Perfil'
 import AllModals      from '../components/AllModals'
 
 const TOURS = {
@@ -71,6 +72,7 @@ export default function AppScreen() {
     { id: 'inventario', icon: 'ti-package', label: 'Cocina',   badge: isPro ? alerts.total : 0, pro: true },
     { id: 'instalar',       icon: 'ti-download', label: 'Instalar',       hidden: isStandalone },
     { id: 'notificaciones', icon: 'ti-bell',     label: 'Notificaciones' },
+    { id: 'perfil',         icon: 'ti-user',     label: 'Perfil' },
   ]
 
   return (
@@ -167,6 +169,7 @@ export default function AppScreen() {
         {appPage === 'precios'    && <Precios />}
         {appPage === 'instalar'       && <Instalar />}
         {appPage === 'notificaciones' && <Notificaciones />}
+        {appPage === 'perfil'         && <Perfil />}
       </main>
 
       <AllModals />
