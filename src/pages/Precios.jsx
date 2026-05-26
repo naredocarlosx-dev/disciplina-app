@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useState, useContext } from 'react'
 import { AppContext } from '../context/AppContext'
 import SubscribeButton from '../components/SubscribeButton'
 import ManageSubscriptionButton from '../components/ManageSubscriptionButton'
@@ -25,8 +25,14 @@ const FEATURES_PRO = [
 
 export default function Precios() {
   const { subscription, upgradeToPro } = useContext(AppContext)
-  const isPro       = subscription?.plan === 'pro'
-  const hasStripe   = Boolean(subscription?.stripe_customer_id)
+  const [billing, setBilling] = useState('monthly')
+
+  const isPro     = subscription?.plan === 'pro'
+  const hasStripe = Boolean(subscription?.stripe_customer_id)
+
+  const price       = billing === 'annual' ? '$499' : '$50'
+  const priceSub    = billing === 'annual' ? 'MXN/año' : 'MXN/mes'
+  const savingsNote = billing === 'annual' ? 'Ahorras $101 vs. pago mensual' : 'O $499/año — ahorras $101'
 
   return (
     <div>
@@ -45,6 +51,47 @@ export default function Precios() {
           </span>
         )}
       </div>
+
+      {/* Toggle mensual / anual */}
+      {!isPro && (
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 28 }}>
+          <div style={{ display: 'inline-flex', background: 'var(--surface2)', borderRadius: 10, padding: 3, gap: 2 }}>
+            <button
+              onClick={() => setBilling('monthly')}
+              style={{
+                padding: '7px 20px', borderRadius: 8, border: 'none', cursor: 'pointer',
+                fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', sans-serif",
+                background: billing === 'monthly' ? 'var(--surface)' : 'transparent',
+                color: billing === 'monthly' ? 'var(--text)' : 'var(--text3)',
+                boxShadow: billing === 'monthly' ? '0 1px 4px rgba(0,0,0,.3)' : 'none',
+                transition: 'all .15s',
+              }}
+            >
+              Mensual
+            </button>
+            <button
+              onClick={() => setBilling('annual')}
+              style={{
+                padding: '7px 20px', borderRadius: 8, border: 'none', cursor: 'pointer',
+                fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', sans-serif",
+                display: 'flex', alignItems: 'center', gap: 6,
+                background: billing === 'annual' ? 'var(--surface)' : 'transparent',
+                color: billing === 'annual' ? 'var(--text)' : 'var(--text3)',
+                boxShadow: billing === 'annual' ? '0 1px 4px rgba(0,0,0,.3)' : 'none',
+                transition: 'all .15s',
+              }}
+            >
+              Anual
+              <span style={{
+                fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 20,
+                background: 'var(--green)', color: '#fff', letterSpacing: '.5px',
+              }}>
+                -17%
+              </span>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Tarjetas de plan */}
       <div data-tour="precios-plan" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 20, maxWidth: 680, marginBottom: 40 }}>
@@ -85,10 +132,15 @@ export default function Precios() {
             </div>
           )}
           <div style={{ marginBottom: 4, fontWeight: 700, fontSize: 16 }}>PRO</div>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 20 }}>
-            <span style={{ fontSize: 36, fontWeight: 800 }}>$49</span>
-            <span style={{ fontSize: 13, color: 'var(--text2)' }}>MXN/mes</span>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 4 }}>
+            <span style={{ fontSize: 36, fontWeight: 800 }}>{isPro ? '$50' : price}</span>
+            <span style={{ fontSize: 13, color: 'var(--text2)' }}>{isPro ? 'MXN/mes' : priceSub}</span>
           </div>
+          {!isPro && (
+            <div style={{ fontSize: 11, color: 'var(--green)', marginBottom: 16, fontWeight: 600 }}>
+              {savingsNote}
+            </div>
+          )}
           <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', display: 'flex', flexDirection: 'column', gap: 10 }}>
             {FEATURES_PRO.map(f => (
               <li key={f} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
@@ -108,7 +160,7 @@ export default function Precios() {
             </div>
           ) : (
             <div data-tour="precios-subscribe">
-              <SubscribeButton style={{ width: '100%' }} />
+              <SubscribeButton planType={billing} style={{ width: '100%' }} />
             </div>
           )}
         </div>
@@ -119,9 +171,9 @@ export default function Precios() {
         <div className="section-title-sm" style={{ marginBottom: 16 }}>Preguntas frecuentes</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {[
+            { q: '¿Cuánto cuesta el plan PRO?', a: '$50 MXN/mes o $499 MXN/año (ahorras $101 con el plan anual).' },
             { q: '¿Puedo cancelar en cualquier momento?', a: 'Sí. Desde "Gestionar suscripción" puedes cancelar cuando quieras. Tu acceso PRO se mantiene hasta el fin del período pagado.' },
             { q: '¿Cómo cambio mi tarjeta de crédito?', a: 'Usa el botón "Gestionar suscripción" en tu plan PRO. Te llevará al portal de Stripe donde puedes actualizar tu método de pago de forma segura.' },
-            { q: '¿Mis datos están seguros en PRO?', a: 'Igual que en FREE: tus datos se guardan en Supabase con cifrado en tránsito y en reposo.' },
             { q: '¿Qué pasa con mis datos si bajo de plan?', a: 'Tus datos no se eliminan. Si tienes más de 3 hábitos o más de 1 meta de ahorro, simplemente no podrás agregar más hasta que borres los que sobren.' },
           ].map(({ q, a }) => (
             <div key={q}>

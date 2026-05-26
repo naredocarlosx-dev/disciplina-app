@@ -1,10 +1,14 @@
 import { useState, useContext } from 'react'
 import { AppContext } from '../context/AppContext'
 
-export default function SubscribeButton({ label = 'Activar PRO — $49 MXN/mes', style }) {
+export default function SubscribeButton({ label, style, planType = 'monthly' }) {
   const { currentUser } = useContext(AppContext)
   const [loading, setLoading] = useState(false)
   const [error,   setError]   = useState('')
+
+  const defaultLabel = planType === 'annual'
+    ? 'Activar PRO — $499 MXN/año'
+    : 'Activar PRO — $50 MXN/mes'
 
   const handleClick = async () => {
     if (!currentUser?.id) {
@@ -18,7 +22,7 @@ export default function SubscribeButton({ label = 'Activar PRO — $49 MXN/mes',
       const res = await fetch('/.netlify/functions/create-checkout', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ userId: currentUser.id }),
+        body:    JSON.stringify({ userId: currentUser.id, planType }),
       })
 
       const data = await res.json()
@@ -27,7 +31,6 @@ export default function SubscribeButton({ label = 'Activar PRO — $49 MXN/mes',
         throw new Error(data.error || 'No se pudo iniciar el pago.')
       }
 
-      // Redirige al usuario a Stripe Checkout
       window.location.href = data.url
     } catch (err) {
       setError(err.message)
@@ -48,7 +51,7 @@ export default function SubscribeButton({ label = 'Activar PRO — $49 MXN/mes',
         ) : (
           <>
             <i className="ti ti-bolt" style={{ fontSize: 15 }}></i>
-            {label}
+            {label || defaultLabel}
           </>
         )}
       </button>

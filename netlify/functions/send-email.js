@@ -184,9 +184,9 @@ function buildEmail(type, { name, nextBillingDate } = {}) {
         ${sub(hi)}
         ${body(`Tu período de prueba gratuito de ${neon('Episodio Uno')} vence en ${neon('7 días')}.`)}
         ${body('Activa el plan PRO para seguir construyendo tu disciplina sin interrupciones. Conservas todos tus hábitos, rachas y progreso.')}
-        ${highlight('Precio del plan PRO', '$49 MXN / mes')}
+        ${highlight('Precio del plan PRO', '$50 MXN / mes  ·  $499 MXN / año')}
         ${body('Cancela cuando quieras. Sin compromisos.')}
-        ${ctaButton('Activar PRO — $49 MXN/mes →')}
+        ${ctaButton('Activar PRO — desde $50 MXN/mes →')}
       `),
     }
   }
@@ -201,7 +201,7 @@ function buildEmail(type, { name, nextBillingDate } = {}) {
         ${highlight('Tu prueba vence en', '3 días')}
         ${body(`Has construido algo real estos meses. No dejes que se pierda.`)}
         ${body(`Activa ${neon('PRO')} hoy y mantén tus rachas, hábitos y todo tu progreso intacto.`)}
-        ${ctaButton('Activar PRO — $49 MXN/mes →')}
+        ${ctaButton('Activar PRO — $50 MXN/mes →')}
         <p style="font-size:12px;color:#505050;margin:16px 0 0">Cancela cuando quieras. Sin compromisos.</p>
       `),
     }
@@ -223,7 +223,7 @@ function buildEmail(type, { name, nextBillingDate } = {}) {
         </table>
         ${body(`Activa ${neon('PRO hoy')} y no pierdas ni un día de tus rachas.`)}
         ${body('Todos tus datos seguirán ahí, esperándote.')}
-        ${ctaButton('Activar PRO ahora — $49 MXN/mes →')}
+        ${ctaButton('Activar PRO ahora — $50 MXN/mes →')}
         <p style="font-size:12px;color:#505050;margin:16px 0 0">Cancela cuando quieras. Sin compromisos.</p>
       `),
     }
@@ -239,7 +239,7 @@ function buildEmail(type, { name, nextBillingDate } = {}) {
         ${body(`Gracias por probar ${neon('Episodio Uno')} durante 3 meses.`)}
         ${body('Para continuar construyendo tus hábitos y mantener todo tu progreso, activa el plan PRO.')}
         ${body('Todos tus datos siguen guardados, esperando que regreses.')}
-        ${ctaButton('Activar PRO — $49 MXN/mes →')}
+        ${ctaButton('Activar PRO — $50 MXN/mes →')}
         <p style="font-size:12px;color:#505050;margin:20px 0 0;line-height:1.6">
           ¿Tienes preguntas? Responde este correo y con gusto te ayudamos.
         </p>

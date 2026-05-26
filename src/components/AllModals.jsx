@@ -571,7 +571,8 @@ function UpgradeModal() {
         <div style={{ border: '2px solid var(--accent)', borderRadius: 'var(--radius-sm)', padding: '16px 14px', background: 'var(--accent-light, #f0f7ff)', position: 'relative' }}>
           <div style={{ position: 'absolute', top: -10, right: 10, background: 'var(--accent)', color: '#fff', fontSize: 10, fontWeight: 700, padding: '2px 8px', borderRadius: 20 }}>RECOMENDADO</div>
           <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 4 }}>PRO</div>
-          <div style={{ fontSize: 22, fontWeight: 700, marginBottom: 12 }}>$49 <span style={{ fontSize: 13, fontWeight: 400, color: 'var(--text2)' }}>MXN/mes</span></div>
+          <div style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>$50 <span style={{ fontSize: 13, fontWeight: 400, color: 'var(--text2)' }}>MXN/mes</span></div>
+          <div style={{ fontSize: 12, color: 'var(--text3)', marginBottom: 12 }}>o $499 MXN/año (ahorras $101)</div>
           <div style={{ fontSize: 12, color: 'var(--text2)', lineHeight: 2 }}>
             <div>✓ Hábitos ilimitados</div>
             <div>✓ Metas de ahorro ilimitadas</div>

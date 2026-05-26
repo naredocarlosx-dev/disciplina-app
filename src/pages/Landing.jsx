@@ -183,6 +183,7 @@ export default function Landing() {
   const { setScreen } = useContext(AppContext)
   const goAuth = () => setScreen('auth')
   const [legalModal, setLegalModal] = useState(null)
+  const [billing, setBilling] = useState('monthly')
 
   return (
     <>
@@ -331,12 +332,46 @@ export default function Landing() {
       {/* ── PRECIOS ────────────────────────────────────────────────────────── */}
       <section style={{ padding: '80px 5vw', borderTop: `1px solid ${BORDER}` }}>
         <div style={{ maxWidth: 860, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 52 }}>
+          <div style={{ textAlign: 'center', marginBottom: 40 }}>
             <div style={sectionLabel}>Planes</div>
             <h2 style={{ fontSize: 'clamp(26px, 4vw, 40px)', fontWeight: 700, letterSpacing: '-.5px', marginBottom: 12 }}>
               Empieza gratis. Escala cuando quieras.
             </h2>
-            <p style={{ color: GRAY, fontSize: 15 }}>Sin sorpresas. Sin anuncios. Sin vender tus datos.</p>
+            <p style={{ color: GRAY, fontSize: 15, marginBottom: 28 }}>Sin sorpresas. Sin anuncios. Sin vender tus datos.</p>
+
+            {/* Toggle mensual / anual */}
+            <div style={{ display: 'inline-flex', background: '#1a1a1a', borderRadius: 12, padding: 4, gap: 2, border: `1px solid ${BORDER}` }}>
+              <button
+                onClick={() => setBilling('monthly')}
+                style={{
+                  padding: '8px 22px', borderRadius: 9, border: 'none', cursor: 'pointer',
+                  fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', sans-serif",
+                  background: billing === 'monthly' ? '#2a2a2a' : 'transparent',
+                  color: billing === 'monthly' ? '#fff' : GRAY,
+                  boxShadow: billing === 'monthly' ? '0 1px 4px rgba(0,0,0,.5)' : 'none',
+                  transition: 'all .15s',
+                }}
+              >
+                Mensual
+              </button>
+              <button
+                onClick={() => setBilling('annual')}
+                style={{
+                  padding: '8px 22px', borderRadius: 9, border: 'none', cursor: 'pointer',
+                  fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', sans-serif",
+                  display: 'flex', alignItems: 'center', gap: 7,
+                  background: billing === 'annual' ? '#2a2a2a' : 'transparent',
+                  color: billing === 'annual' ? '#fff' : GRAY,
+                  boxShadow: billing === 'annual' ? '0 1px 4px rgba(0,0,0,.5)' : 'none',
+                  transition: 'all .15s',
+                }}
+              >
+                Anual
+                <span style={{ fontSize: 9, fontWeight: 800, padding: '2px 6px', borderRadius: 20, background: '#1de88a', color: '#000', letterSpacing: '.5px' }}>
+                  -17%
+                </span>
+              </button>
+            </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20 }}>
@@ -376,10 +411,16 @@ export default function Landing() {
               </div>
               <div style={{ fontSize: 13, fontWeight: 600, color: NEON, marginBottom: 8, textTransform: 'uppercase', letterSpacing: 1 }}>PRO</div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 4 }}>
-                <span style={{ fontSize: 42, fontWeight: 800 }}>$49</span>
-                <span style={{ fontSize: 14, color: GRAY }}>MXN/mes</span>
+                <span style={{ fontSize: 42, fontWeight: 800 }}>
+                  {billing === 'annual' ? '$499' : '$50'}
+                </span>
+                <span style={{ fontSize: 14, color: GRAY }}>
+                  {billing === 'annual' ? 'MXN/año' : 'MXN/mes'}
+                </span>
               </div>
-              <div style={{ fontSize: 13, color: GRAY, marginBottom: 28 }}>Todo desbloqueado</div>
+              <div style={{ fontSize: 12, color: billing === 'annual' ? '#1de88a' : GRAY, marginBottom: 28, fontWeight: billing === 'annual' ? 600 : 400 }}>
+                {billing === 'annual' ? 'Ahorras $101 vs. pago mensual' : 'O $499/año — ahorras $101'}
+              </div>
               <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 32px', display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {PRO_FEATURES.map((f, i) => (
                   <li key={i} style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 14, color: '#fff' }}>
@@ -392,7 +433,7 @@ export default function Landing() {
                 fontSize: 15, padding: '12px 0',
               }} onClick={goAuth}>
                 <i className="ti ti-bolt" style={{ fontSize: 15 }}></i>
-                Activar PRO
+                {billing === 'annual' ? 'Activar PRO anual' : 'Activar PRO'}
               </button>
             </div>
 

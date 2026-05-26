@@ -41,7 +41,7 @@ const TOURS = {
     key: 'precios',
     steps: [
       { target: 'precios-plan',      title: 'Tu plan actual', text: 'Ve tu plan aquí. Activa PRO para desbloquear hábitos y metas ilimitados.',    placement: 'bottom' },
-      { target: 'precios-subscribe', title: 'Activa PRO',     text: 'Por solo $49 MXN/mes desbloqueas todo sin ningún límite.',                    placement: 'top'    },
+      { target: 'precios-subscribe', title: 'Activa PRO',     text: 'Por solo $50 MXN/mes desbloqueas todo sin ningún límite.',                    placement: 'top'    },
     ],
   },
 }

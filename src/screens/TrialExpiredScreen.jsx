@@ -91,7 +91,7 @@ export default function TrialExpiredScreen() {
           construyendo tus hábitos, activa el plan PRO.
         </p>
 
-        <SubscribeButton label="Activar PRO — $49 MXN/mes" style={{
+        <SubscribeButton label="Activar PRO — $50 MXN/mes" style={{
           background: '#00D4FF', color: '#000', border: 'none',
           fontWeight: 700, fontSize: 15, padding: '13px 32px',
           minWidth: 260,

@@ -19,10 +19,11 @@ exports.handler = async (event) => {
     return { statusCode: 405, headers: HEADERS, body: JSON.stringify({ error: 'Method not allowed' }) }
   }
 
-  let userId
+  let userId, planType
   try {
     const body = JSON.parse(event.body || '{}')
     userId = body.userId
+    planType = body.planType || 'monthly'
   } catch {
     return { statusCode: 400, headers: HEADERS, body: JSON.stringify({ error: 'Invalid JSON body' }) }
   }
@@ -37,7 +38,9 @@ exports.handler = async (event) => {
       payment_method_types: ['card'],
       line_items: [
         {
-          price:    process.env.STRIPE_PRICE_ID,
+          price:    planType === 'annual'
+            ? process.env.STRIPE_PRICE_ID_ANNUAL
+            : (process.env.STRIPE_PRICE_ID_MONTHLY || process.env.STRIPE_PRICE_ID),
           quantity: 1,
         },
       ],
