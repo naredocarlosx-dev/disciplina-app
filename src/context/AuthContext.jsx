@@ -121,22 +121,14 @@ export function AuthProvider({ children }) {
       if (event === 'INITIAL_SESSION') {
         const isRecovery = new URLSearchParams(window.location.hash.slice(1)).get('type') === 'recovery'
         if (!isRecovery && session?.user) {
-          try {
-            await loadProfile(session.user)
-          } catch (e) {
-            console.error('[auth] loadProfile error on INITIAL_SESSION:', e)
-          }
+          await loadProfile(session.user)
         }
         setAuthLoading(false)
         return
       }
       if (event === 'SIGNED_IN') {
         if (session?.user) {
-          try {
-            await loadProfile(session.user)
-          } catch (e) {
-            console.error('[auth] loadProfile error on SIGNED_IN:', e)
-          }
+          await loadProfile(session.user)
           // Detect email confirmation: confirmed_at is very recent (< 5 min)
           const confirmedAt = session.user.email_confirmed_at
           const isEmailProvider = (session.user.app_metadata?.provider || 'email') === 'email'
