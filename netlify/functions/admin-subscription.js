@@ -26,7 +26,8 @@ exports.handler = async (event) => {
   if (authErr || !user) return { statusCode: 401, headers: HEADERS, body: JSON.stringify({ error: 'Invalid token' }) }
 
   const { data: callerProfile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-  if (callerProfile?.role !== 'admin') {
+  const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'naredo.carlosx@gmail.com'
+  if (callerProfile?.role !== 'admin' && user.email !== ADMIN_EMAIL) {
     return { statusCode: 403, headers: HEADERS, body: JSON.stringify({ error: 'Admin role required' }) }
   }
 
