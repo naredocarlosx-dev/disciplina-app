@@ -102,26 +102,52 @@ function Step({ number, title, desc, svg }) {
   )
 }
 
-// ── iOS tab ────────────────────────────────────────────────────────────────
+// ── iOS Safari tab ─────────────────────────────────────────────────────────
 function IOSTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <Step
         number="1"
-        title='Toca el botón "Compartir" ↑'
-        desc='En la barra inferior del navegador, toca el ícono de compartir (cuadrado con flecha hacia arriba).'
+        title='Toca el ícono Compartir ↑'
+        desc='En la barra inferior de Safari, toca el ícono de compartir (cuadrado con flecha hacia arriba).'
         svg={<PhoneShareSVG />}
       />
       <Step
         number="2"
-        title='"Agregar a pantalla de inicio"'
-        desc='Desliza el menú hacia abajo y toca la opción "En la pantalla de inicio".'
+        title='"Añadir a pantalla de inicio"'
+        desc='Baja en el menú y toca "Añadir a pantalla de inicio".'
         svg={<AddHomeScreenSVG />}
       />
       <Step
         number="3"
-        title='Confirma tocando "Agregar"'
-        desc='Aparece una ventana de confirmación. Toca "Agregar" y la app aparecerá en tu pantalla de inicio.'
+        title='Toca "Añadir" para confirmar'
+        desc='Aparece una ventana de confirmación. Toca "Añadir" y la app aparecerá en tu pantalla de inicio.'
+        svg={<TapAddSVG />}
+      />
+    </div>
+  )
+}
+
+// ── iOS Chrome tab ──────────────────────────────────────────────────────────
+function ChromeIOSTab() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <Step
+        number="1"
+        title='Toca el ícono Compartir ↑'
+        desc='En la barra inferior de Chrome, toca el ícono de compartir (cuadrado con flecha hacia arriba).'
+        svg={<PhoneShareSVG />}
+      />
+      <Step
+        number="2"
+        title='"Añadir a pantalla de inicio"'
+        desc='Busca y toca "Añadir a pantalla de inicio" en el menú que aparece.'
+        svg={<AddHomeScreenSVG />}
+      />
+      <Step
+        number="3"
+        title='Toca "Añadir" para confirmar'
+        desc='Aparece una ventana de confirmación. Toca "Añadir" y la app aparecerá en tu pantalla de inicio.'
         svg={<TapAddSVG />}
       />
     </div>
@@ -129,66 +155,17 @@ function IOSTab() {
 }
 
 // ── Android tab ────────────────────────────────────────────────────────────
-function AndroidTab({ canInstallNatively, triggerInstall, onInstalled }) {
-  const [installing, setInstalling] = useState(false)
-  const [done, setDone] = useState(false)
-
-  const handleInstall = async () => {
-    setInstalling(true)
-    const accepted = await triggerInstall()
-    setInstalling(false)
-    if (accepted) { setDone(true); onInstalled?.() }
-  }
-
+function AndroidTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      {canInstallNatively ? (
-        <div style={{
-          padding: '20px', borderRadius: 12, textAlign: 'center',
-          background: 'rgba(0,212,255,.06)', border: '1px solid rgba(0,212,255,.2)',
-          marginBottom: 4,
-        }}>
-          {done ? (
-            <>
-              <div style={{ fontSize: 36, marginBottom: 12 }}>✅</div>
-              <div style={{ fontWeight: 700, fontSize: 16, color: '#4ade80' }}>¡Instalada correctamente!</div>
-            </>
-          ) : (
-            <>
-              <div style={{ fontSize: 36, marginBottom: 12 }}>📲</div>
-              <div style={{ fontWeight: 600, fontSize: 15, color: '#efefed', marginBottom: 8 }}>
-                Tu dispositivo está listo
-              </div>
-              <div style={{ fontSize: 13, color: '#8a8a85', marginBottom: 16 }}>
-                Instala Episodio Uno directamente desde aquí con un solo toque.
-              </div>
-              <button
-                onClick={handleInstall}
-                disabled={installing}
-                style={{
-                  background: '#00D4FF', color: '#000', border: 'none',
-                  borderRadius: 10, padding: '12px 28px',
-                  fontWeight: 700, fontSize: 14, cursor: 'pointer',
-                  fontFamily: "'DM Sans', sans-serif",
-                  opacity: installing ? .6 : 1,
-                }}
-              >
-                {installing ? 'Instalando…' : '⚡ Instalar ahora'}
-              </button>
-            </>
-          )}
-        </div>
-      ) : (
-        <Step
-          number="1"
-          title="Toca los tres puntos (⋮)"
-          desc="En la esquina superior derecha de Chrome, toca el menú de tres puntos."
-          svg={<ChromeMenuSVG />}
-        />
-      )}
-
       <Step
-        number={canInstallNatively ? '1' : '2'}
+        number="1"
+        title="Toca los tres puntos (⋮)"
+        desc="En la esquina superior derecha de Chrome, toca el menú de tres puntos."
+        svg={<ChromeMenuSVG />}
+      />
+      <Step
+        number="2"
         title='"Instalar aplicación" o "Agregar a pantalla de inicio"'
         desc='Selecciona la opción de instalación y confirma. La app aparecerá en tu pantalla de inicio.'
         svg={<TapAddSVG />}
@@ -198,54 +175,9 @@ function AndroidTab({ canInstallNatively, triggerInstall, onInstalled }) {
 }
 
 // ── Desktop tab ────────────────────────────────────────────────────────────
-function DesktopTab({ canInstallNatively, triggerInstall, onInstalled }) {
-  const [installing, setInstalling] = useState(false)
-  const [done, setDone] = useState(false)
-
-  const handleInstall = async () => {
-    setInstalling(true)
-    const accepted = await triggerInstall()
-    setInstalling(false)
-    if (accepted) { setDone(true); onInstalled?.() }
-  }
-
+function DesktopTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-      {canInstallNatively && (
-        <div style={{
-          padding: '20px', borderRadius: 12, textAlign: 'center',
-          background: 'rgba(0,212,255,.06)', border: '1px solid rgba(0,212,255,.2)',
-          marginBottom: 4,
-        }}>
-          {done ? (
-            <>
-              <div style={{ fontSize: 36, marginBottom: 12 }}>✅</div>
-              <div style={{ fontWeight: 700, fontSize: 16, color: '#4ade80' }}>¡Instalada correctamente!</div>
-            </>
-          ) : (
-            <>
-              <div style={{ fontSize: 36, marginBottom: 12 }}>💻</div>
-              <div style={{ fontWeight: 600, fontSize: 15, color: '#efefed', marginBottom: 8 }}>
-                Instala desde Chrome o Edge
-              </div>
-              <button
-                onClick={handleInstall}
-                disabled={installing}
-                style={{
-                  background: '#00D4FF', color: '#000', border: 'none',
-                  borderRadius: 10, padding: '12px 28px',
-                  fontWeight: 700, fontSize: 14, cursor: 'pointer',
-                  fontFamily: "'DM Sans', sans-serif",
-                  opacity: installing ? .6 : 1,
-                }}
-              >
-                {installing ? 'Instalando…' : '⚡ Instalar ahora'}
-              </button>
-            </>
-          )}
-        </div>
-      )}
-
       <Step
         number="1"
         title="Busca el ícono de instalación en la barra de direcciones"
@@ -267,15 +199,27 @@ export default function Instalar() {
   const { setAppPage } = useContext(AppContext)
   const { isStandalone, installed, isIOS, isAndroid, isSafari, canInstallNatively, triggerInstall } = usePWA()
 
-  const defaultTab = isIOS ? 'ios' : isAndroid ? 'android' : 'desktop'
-  const [tab, setTab] = useState(defaultTab)
-  const [done, setDone] = useState(false)
+  const defaultTab = isIOS
+    ? (isSafari ? 'ios' : 'chrome')
+    : isAndroid ? 'android' : 'desktop'
+
+  const [tab,        setTab]        = useState(defaultTab)
+  const [done,       setDone]       = useState(false)
+  const [installing, setInstalling] = useState(false)
 
   const TABS = [
     { id: 'ios',     label: 'iPhone / iPad' },
     { id: 'android', label: 'Android'       },
+    { id: 'chrome',  label: 'Chrome'        },
     { id: 'desktop', label: 'Mac / PC'      },
   ]
+
+  const handleNativeInstall = async () => {
+    setInstalling(true)
+    const accepted = await triggerInstall()
+    setInstalling(false)
+    if (accepted) setDone(true)
+  }
 
   if (isStandalone || installed || done) {
     return (
@@ -330,6 +274,26 @@ export default function Instalar() {
         </div>
       </div>
 
+      {/* Botón de instalación nativa (Android / Desktop con soporte) */}
+      {canInstallNatively && (
+        <button
+          onClick={handleNativeInstall}
+          disabled={installing}
+          style={{
+            display: 'block', width: '100%', marginBottom: 20,
+            padding: '15px', borderRadius: 12, border: 'none',
+            background: '#00D4FF', color: '#000',
+            fontWeight: 700, fontSize: 16, cursor: 'pointer',
+            fontFamily: "'DM Sans', sans-serif",
+            boxShadow: '0 0 28px rgba(0,212,255,.4)',
+            opacity: installing ? .7 : 1,
+            transition: 'opacity .15s',
+          }}
+        >
+          {installing ? 'Instalando…' : '⚡ Instalar Episodio Uno'}
+        </button>
+      )}
+
       {/* Tabs */}
       <div style={{ display: 'flex', gap: 4, marginBottom: 20, background: 'rgba(255,255,255,.04)', borderRadius: 10, padding: 4 }}>
         {TABS.map(t => (
@@ -337,8 +301,8 @@ export default function Instalar() {
             key={t.id}
             onClick={() => setTab(t.id)}
             style={{
-              flex: 1, padding: '8px 4px', borderRadius: 7,
-              border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600,
+              flex: 1, padding: '8px 2px', borderRadius: 7,
+              border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600,
               fontFamily: "'DM Sans', sans-serif",
               background: tab === t.id ? 'rgba(0,212,255,.15)' : 'transparent',
               color: tab === t.id ? '#00D4FF' : '#555',
@@ -354,8 +318,9 @@ export default function Instalar() {
       {/* Tab content */}
       <div className="card">
         {tab === 'ios'     && <IOSTab />}
-        {tab === 'android' && <AndroidTab canInstallNatively={canInstallNatively} triggerInstall={triggerInstall} onInstalled={() => setDone(true)} />}
-        {tab === 'desktop' && <DesktopTab canInstallNatively={canInstallNatively} triggerInstall={triggerInstall} onInstalled={() => setDone(true)} />}
+        {tab === 'android' && <AndroidTab />}
+        {tab === 'chrome'  && <ChromeIOSTab />}
+        {tab === 'desktop' && <DesktopTab />}
       </div>
 
       <div style={{ marginTop: 20, textAlign: 'center' }}>
