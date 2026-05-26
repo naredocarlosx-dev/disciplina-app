@@ -17,13 +17,48 @@ export function AuthProvider({ children }) {
 
   // Carga perfil + suscripción desde Supabase
   const loadProfile = useCallback(async (authUser) => {
-    const { data: profile, error } = await supabase
+    let { data: profile, error } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', authUser.id)
       .single()
 
-    if (error || !profile) return null
+    // Auto-provision profile for first-time OAuth users (Google, etc.)
+    if ((error || !profile) && authUser.app_metadata?.provider !== 'email') {
+      const name = authUser.user_metadata?.full_name
+        || authUser.user_metadata?.name
+        || authUser.email?.split('@')[0]
+        || 'Usuario'
+      const trialStart = new Date().toISOString()
+      const trialEnd   = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString()
+
+      await Promise.all([
+        supabase.from('profiles').upsert(
+          { id: authUser.id, name, email: authUser.email, role: 'user', status: 'active',
+            trial_start_date: trialStart, trial_end_date: trialEnd, trial_used: true },
+          { onConflict: 'id' }
+        ),
+        supabase.from('subscriptions').upsert(
+          { user_id: authUser.id, plan: 'free' },
+          { onConflict: 'user_id' }
+        ),
+      ])
+
+      // Welcome email (fire-and-forget)
+      fetch('/.netlify/functions/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'welcome', email: authUser.email, name }),
+      }).catch(() => {})
+
+      // Re-fetch the newly created profile
+      const fresh = await supabase.from('profiles').select('*').eq('id', authUser.id).single()
+      profile = fresh.data
+      if (!profile) return null
+    } else if (error || !profile) {
+      return null
+    }
+
     if (profile.status === 'inactive') {
       await supabase.auth.signOut()
       return null
