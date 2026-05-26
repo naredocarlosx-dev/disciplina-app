@@ -1,4 +1,4 @@
-const CACHE = 'episodio-v2'
+const CACHE = 'episodio-v3'
 
 // Recursos del app shell que se cachean al instalar
 const SHELL = [
@@ -60,11 +60,12 @@ self.addEventListener('fetch', event => {
   const { request } = event
   const url = new URL(request.url)
 
-  // Supabase y APIs externas → siempre red, sin cachear
+  // Supabase, APIs externas y Netlify functions → siempre red, sin cachear
   if (
     url.hostname.includes('supabase.co') ||
     url.hostname.includes('googleapis.com') ||
     url.hostname.includes('jsdelivr.net') ||
+    url.pathname.startsWith('/.netlify/') ||
     request.method !== 'GET'
   ) return
 
