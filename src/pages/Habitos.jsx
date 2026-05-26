@@ -2,6 +2,93 @@ import { useContext, useState } from 'react'
 import { AppContext } from '../context/AppContext'
 import SubscribeButton from '../components/SubscribeButton'
 
+// ── Historial helpers ──────────────────────────────────────────────────────
+function getLast30Days() {
+  const days = []
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date()
+    d.setDate(d.getDate() - i)
+    days.push(d.toISOString().split('T')[0])
+  }
+  return days
+}
+
+const DAYS_30 = getLast30Days()
+const TODAY   = new Date().toISOString().split('T')[0]
+
+const SHORT_MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']
+
+function HabitCalendar({ habit }) {
+  const [hovered, setHovered] = useState(null)
+  const completedCount = DAYS_30.filter(d => habit.history?.[d]).length
+  const rate = Math.round(completedCount / 30 * 100)
+
+  return (
+    <div style={{ marginBottom: 20 }}>
+      {/* Habit name + rate */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: '#efefed' }}>{habit.name}</div>
+        <div style={{ fontSize: 11, color: '#555' }}>
+          <span style={{ color: rate >= 70 ? '#00D4FF' : rate >= 40 ? '#FFB800' : '#555', fontWeight: 600 }}>
+            {completedCount}/30
+          </span>
+          {' '}días
+        </div>
+      </div>
+
+      {/* Dot grid */}
+      <div style={{ position: 'relative' }}>
+        <div style={{ display: 'flex', gap: 3, flexWrap: 'nowrap', overflowX: 'auto' }}>
+          {DAYS_30.map((date, i) => {
+            const done    = habit.history?.[date] === true
+            const isToday = date === TODAY
+            const month   = parseInt(date.split('-')[1], 10) - 1
+            const day     = parseInt(date.split('-')[2], 10)
+            const showLabel = day === 1 || i === 0
+
+            return (
+              <div key={date} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, flexShrink: 0 }}>
+                {showLabel && (
+                  <span style={{ fontSize: 9, color: '#444', whiteSpace: 'nowrap', height: 12, lineHeight: '12px' }}>
+                    {SHORT_MONTHS[month]}
+                  </span>
+                )}
+                {!showLabel && <span style={{ height: 12 }} />}
+                <div
+                  onMouseEnter={() => setHovered(date)}
+                  onMouseLeave={() => setHovered(null)}
+                  title={`${date}: ${done ? 'Completado ✓' : 'No completado'}`}
+                  style={{
+                    width: 12, height: 12, borderRadius: 3, cursor: 'default', flexShrink: 0,
+                    background: done ? '#00D4FF' : 'rgba(255,255,255,.07)',
+                    border: isToday ? '1px solid rgba(0,212,255,.6)' : '1px solid transparent',
+                    boxShadow: done ? '0 0 4px rgba(0,212,255,.4)' : 'none',
+                    transition: 'transform .1s',
+                    transform: hovered === date ? 'scale(1.4)' : 'scale(1)',
+                  }}
+                />
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Tooltip */}
+        {hovered && (
+          <div style={{
+            position: 'absolute', bottom: 'calc(100% + 6px)',
+            left: `${DAYS_30.indexOf(hovered) * 15}px`,
+            background: '#1a1a1a', border: '1px solid rgba(0,212,255,.2)',
+            borderRadius: 6, padding: '4px 8px', fontSize: 11, color: '#efefed',
+            whiteSpace: 'nowrap', pointerEvents: 'none', zIndex: 10,
+          }}>
+            {hovered} — {habit.history?.[hovered] ? '✓ Completado' : '✗ No completado'}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 const FREE_HABIT_LIMIT = 3
 
 function HabitLimitModal({ onClose }) {
@@ -146,6 +233,34 @@ export default function Habitos() {
           ))
         )}
       </div>
+
+      {/* Historial 30 días */}
+      {appState.habits.length > 0 && (
+        <div className="card">
+          <div className="section-row" style={{ marginBottom: 16 }}>
+            <div className="section-title-sm">Historial</div>
+            <span style={{ fontSize: 11, color: '#444' }}>Últimos 30 días</span>
+          </div>
+
+          {appState.habits.map(h => <HabitCalendar key={h.id} habit={h} />)}
+
+          {/* Legend */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginTop: 8, paddingTop: 12, borderTop: '1px solid rgba(255,255,255,.05)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+              <div style={{ width: 10, height: 10, borderRadius: 2, background: '#00D4FF', boxShadow: '0 0 4px rgba(0,212,255,.4)' }} />
+              <span style={{ fontSize: 11, color: '#555' }}>Completado</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+              <div style={{ width: 10, height: 10, borderRadius: 2, background: 'rgba(255,255,255,.07)' }} />
+              <span style={{ fontSize: 11, color: '#555' }}>No completado</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+              <div style={{ width: 10, height: 10, borderRadius: 2, border: '1px solid rgba(0,212,255,.6)' }} />
+              <span style={{ fontSize: 11, color: '#555' }}>Hoy</span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showLimitModal && <HabitLimitModal onClose={() => setShowLimitModal(false)} />}
     </div>
