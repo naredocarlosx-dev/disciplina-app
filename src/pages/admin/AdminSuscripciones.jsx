@@ -191,8 +191,6 @@ export default function AdminSuscripciones() {
       const suffix = emailOk ? `. Correo enviado a ${row.email}` : ` (correo no enviado)`
       setToast({ text: `✓ ${actionLabel[action] || 'Listo'}${suffix}`, ok: true })
 
-      // 5 — Re-sync from DB without hiding the table
-      await silentRefresh()
     } catch (err) {
       console.error('[admin] callAction error:', err)
       setToast({ text: err.message, ok: false })
