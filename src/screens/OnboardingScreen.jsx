@@ -31,7 +31,7 @@ const OB_PARTICLES = Array.from({ length: 50 }, (_, i) => {
 
 export default function OnboardingScreen() {
   const { setScreen, addHabit } = useContext(AppContext)
-  const { isStandalone, isIOS, isSafari, canInstallNatively, triggerInstall } = usePWA()
+  const { isStandalone, isIOS, isAndroid, isSafari, canInstallNatively, triggerInstall } = usePWA()
 
   const [step,         setStep]         = useState(1)
   const [habitName,    setHabitName]    = useState('')
@@ -233,7 +233,7 @@ export default function OnboardingScreen() {
                 </div>
 
                 {/* iOS non-Safari */}
-                {isIOS && !isSafari && (
+                {isIOS && !isAndroid && !isSafari && (
                   <div style={{
                     padding: '14px', borderRadius: 10, marginBottom: 16,
                     background: 'rgba(255,184,0,.07)', border: '1px solid rgba(255,184,0,.25)',

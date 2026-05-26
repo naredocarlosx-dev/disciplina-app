@@ -6,8 +6,8 @@ export function usePWA() {
     window.matchMedia('(display-mode: standalone)').matches ||
     window.navigator.standalone === true
 
-  const isIOS     = /iphone|ipad|ipod/.test(ua)
   const isAndroid = /android/.test(ua)
+  const isIOS     = !isAndroid && /iphone|ipad|ipod/.test(ua)
   const isSafari  = /safari/.test(ua) && !/chrome/.test(ua) && !/crios/.test(ua) && !/fxios/.test(ua)
   const isChrome  = /chrome/.test(ua) && !/edge/.test(ua) && !/opr/.test(ua)
   const isMac     = /macintosh/.test(ua) && !isIOS
