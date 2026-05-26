@@ -66,51 +66,32 @@ export default function AdminSuscripciones() {
   const [loading,   setLoading]   = useState(true)
   const [search,    setSearch]    = useState('')
   const [filter,    setFilter]    = useState('all')
-  const [actioning, setActioning] = useState(null)  // userId being processed
-  const [promoPos,  setPromoPos]  = useState(null)  // { top, left, row }
-  const [toast,     setToast]     = useState(null)  // { text, ok }
+  const [actioning, setActioning] = useState(null)
+  const [promoPos,  setPromoPos]  = useState(null)
+  const [toast,     setToast]     = useState(null)
 
+  // Everything fetched server-side via service role — bypasses RLS for both
+  // profiles and subscriptions tables
   const fetchRows = async () => {
     const { data: sessionData } = await supabase.auth.getSession()
     const token = sessionData?.session?.access_token
-    if (!token) console.warn('[admin-subs] no session token')
+    if (!token) {
+      console.warn('[admin-subs] no session token')
+      return []
+    }
 
-    const [{ data: profiles }, subsRes] = await Promise.all([
-      supabase.from('profiles').select('id, name, email, role, created_at').order('created_at'),
-      token
-        ? fetch('/.netlify/functions/admin-get-subs', {
-            headers: { Authorization: `Bearer ${token}` },
-          }).then(async r => {
-            if (!r.ok) {
-              const err = await r.json().catch(() => ({}))
-              console.error('[admin-subs] admin-get-subs', r.status, err)
-              return { subs: [] }
-            }
-            return r.json()
-          }).catch(e => {
-            console.error('[admin-subs] fetch error:', e)
-            return { subs: [] }
-          })
-        : Promise.resolve({ subs: [] }),
-    ])
+    const res = await fetch('/.netlify/functions/admin-get-subs', {
+      headers: { Authorization: `Bearer ${token}` },
+    }).catch(e => { console.error('[admin-subs] fetch error:', e); return null })
 
-    const subMap = {}
-    for (const s of (subsRes.subs || [])) subMap[s.user_id] = s
+    if (!res || !res.ok) {
+      const err = res ? await res.json().catch(() => ({})) : {}
+      console.error('[admin-subs] error', res?.status, err)
+      return []
+    }
 
-    return (profiles || [])
-      .filter(p => p.role !== 'admin')
-      .map(p => {
-        const s = subMap[p.id] || {}
-        return {
-          user_id:            p.id,
-          name:               p.name  || '—',
-          email:              p.email || '—',
-          plan:               s.plan        || 'free',
-          started_at:         s.started_at  || p.created_at,
-          expires_at:         s.expires_at  || null,
-          stripe_customer_id: s.stripe_customer_id || null,
-        }
-      })
+    const data = await res.json()
+    return data.rows || []
   }
 
   const load = async () => {
@@ -143,7 +124,6 @@ export default function AdminSuscripciones() {
     setPromoPos(null)
 
     try {
-      // getSession INSIDE try so any failure is caught and spinner is cleared
       const { data: sessionData } = await supabase.auth.getSession()
       const token = sessionData?.session?.access_token
       if (!token) throw new Error('Sesión expirada. Recarga la página.')
@@ -163,12 +143,12 @@ export default function AdminSuscripciones() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || `Error ${res.status}`)
 
-      // 2 — Optimistic local update — badge flips immediately
+      // 2 — Optimistic update so badge flips immediately
       const now = new Date().toISOString()
       setRows(prev => prev.map(r => {
         if (r.user_id !== row.user_id) return r
         if (action === 'activate') return { ...r, plan: 'pro', started_at: now, expires_at: null }
-        if (action === 'revoke')   return { ...r, plan: 'free', expires_at: null }
+        if (action === 'revoke')   return { ...r, plan: 'free', started_at: null, expires_at: null }
         if (action === 'promo') {
           const exp = new Date(); exp.setDate(exp.getDate() + (months || 1) * 30)
           return { ...r, plan: 'pro', started_at: now, expires_at: exp.toISOString() }
@@ -176,17 +156,15 @@ export default function AdminSuscripciones() {
         return r
       }))
 
-      // 3 — Re-sync from server (service role bypasses RLS → real plan)
+      // 3 — Re-sync from server to confirm real state
       fetchRows().then(fresh => setRows(fresh)).catch(() => {})
 
-      // 5 — Email notification (best-effort — failure doesn't block the action)
+      // 4 — Email notification (best-effort)
       let expiresAt = null
       if (action === 'promo' && months) {
-        const d = new Date()
-        d.setDate(d.getDate() + months * 30)
+        const d = new Date(); d.setDate(d.getDate() + months * 30)
         expiresAt = d.toISOString()
       }
-
       let emailOk = false
       try {
         const emailRes = await fetch('/.netlify/functions/send-admin-email', {
@@ -200,10 +178,10 @@ export default function AdminSuscripciones() {
         console.error('[admin] send-admin-email failed:', emailErr)
       }
 
-      // 6 — Toast
+      // 5 — Toast
       const actionLabel = {
         activate: 'PRO activado',
-        revoke:   'PRO revocado',
+        revoke:   'PRO suspendido',
         promo:    `Promo de ${months} mes${months > 1 ? 'es' : ''} otorgada`,
       }
       const suffix = emailOk ? `. Correo enviado a ${row.email}` : ` (correo no enviado)`
@@ -213,7 +191,6 @@ export default function AdminSuscripciones() {
       console.error('[admin] callAction error:', err)
       setToast({ text: err.message, ok: false })
     } finally {
-      // finally guarantees the spinner always clears regardless of what happened
       setActioning(null)
     }
   }
@@ -232,7 +209,7 @@ export default function AdminSuscripciones() {
 
   const total  = rows.length
   const pro    = rows.filter(r => r.plan === 'pro').length
-  const promos = rows.filter(r => r.expires_at && r.plan === 'pro').length
+  const promos = rows.filter(r => r.plan === 'pro' && r.expires_at).length
 
   return (
     <div>
@@ -344,7 +321,7 @@ export default function AdminSuscripciones() {
                             fontSize: 11, fontWeight: 700,
                             color: isPro ? '#00D4FF' : 'var(--text2)',
                           }}>
-                            {r.name.charAt(0).toUpperCase()}
+                            {(r.name || '?').charAt(0).toUpperCase()}
                           </div>
                           <span style={{ fontWeight: 500, fontSize: 13, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                             {r.name}
@@ -381,7 +358,7 @@ export default function AdminSuscripciones() {
                         </span>
                       </td>
 
-                      {/* Inicio */}
+                      {/* Inicio — fecha de activación del plan, no de registro */}
                       <td style={{ color: 'var(--text3)', fontSize: 12, whiteSpace: 'nowrap' }}>
                         {fmt(r.started_at)}
                       </td>
@@ -412,7 +389,7 @@ export default function AdminSuscripciones() {
                             title="Suspender plan PRO"
                           >
                             <i className="ti ti-ban" style={{ fontSize: 11 }}></i>
-                            Suspender plan
+                            Suspender
                           </button>
                         ) : (
                           <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'nowrap' }}>

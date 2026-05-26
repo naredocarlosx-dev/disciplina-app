@@ -30,12 +30,38 @@ exports.handler = async (event) => {
     return { statusCode: 403, headers: HEADERS, body: JSON.stringify({ error: 'Admin role required' }) }
   }
 
-  const { data: subs, error } = await supabase.from('subscriptions').select('*')
-  if (error) {
-    console.error('admin-get-subs supabase error:', error.message)
-    return { statusCode: 500, headers: HEADERS, body: JSON.stringify({ error: error.message }) }
+  // Both queries use service role → bypass RLS entirely
+  const [profilesRes, subsRes] = await Promise.all([
+    supabase.from('profiles').select('id, name, email, role, created_at').neq('role', 'admin').order('created_at'),
+    supabase.from('subscriptions').select('*'),
+  ])
+
+  if (profilesRes.error) {
+    console.error('admin-get-subs profiles error:', profilesRes.error.message)
+    return { statusCode: 500, headers: HEADERS, body: JSON.stringify({ error: profilesRes.error.message }) }
+  }
+  if (subsRes.error) {
+    console.error('admin-get-subs subs error:', subsRes.error.message)
+    return { statusCode: 500, headers: HEADERS, body: JSON.stringify({ error: subsRes.error.message }) }
   }
 
-  console.log(`admin-get-subs: returning ${(subs || []).length} subscriptions for ${user.email}`)
-  return { statusCode: 200, headers: HEADERS, body: JSON.stringify({ ok: true, subs: subs || [] }) }
+  const subMap = {}
+  for (const s of (subsRes.data || [])) subMap[s.user_id] = s
+
+  const rows = (profilesRes.data || []).map(p => {
+    const s = subMap[p.id] || {}
+    return {
+      user_id:            p.id,
+      name:               p.name  || '—',
+      email:              p.email || '—',
+      joined_at:          p.created_at,
+      plan:               s.plan               || 'free',
+      started_at:         s.started_at         || null,
+      expires_at:         s.expires_at         || null,
+      stripe_customer_id: s.stripe_customer_id || null,
+    }
+  })
+
+  console.log(`admin-get-subs: ${rows.length} users for ${user.email}`)
+  return { statusCode: 200, headers: HEADERS, body: JSON.stringify({ ok: true, rows }) }
 }
