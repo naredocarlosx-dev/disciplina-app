@@ -20,4 +20,9 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').catch(() => {})
   })
+  // Cuando un nuevo SW toma control (después de skipWaiting), recarga la página
+  // para que el usuario obtenga el código más reciente sin limpiar caché manualmente.
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    window.location.reload()
+  })
 }
