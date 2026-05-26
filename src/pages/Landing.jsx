@@ -226,7 +226,7 @@ export default function Landing() {
       }}>
         <div style={{ maxWidth: 740 }}>
           <div style={{ ...sectionLabel, marginBottom: 20 }}>
-            <i className="ti ti-bolt" style={{ marginRight: 6 }}></i>Tu disciplina empieza aquí
+            <i className="ti ti-bolt" style={{ marginRight: 6 }}></i>Tu nueva vida inicia aquí
           </div>
           <h1 style={{
             fontSize: 'clamp(36px, 6vw, 68px)', fontWeight: 700, lineHeight: 1.1,
