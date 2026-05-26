@@ -3,6 +3,43 @@ import { AppContext } from '../context/AppContext'
 import { useAuth } from '../context/AuthContext'
 import ManageSubscriptionButton from '../components/ManageSubscriptionButton'
 
+// ── CSV export helpers ─────────────────────────────────────────────────────
+function downloadCSV(filename, rows) {
+  const csv = rows.map(r => r.map(cell => {
+    const s = String(cell ?? '').replace(/"/g, '""')
+    return s.includes(',') || s.includes('"') || s.includes('\n') ? `"${s}"` : s
+  }).join(',')).join('\n')
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' })
+  const url  = URL.createObjectURL(blob)
+  const a    = Object.assign(document.createElement('a'), { href: url, download: filename })
+  document.body.appendChild(a); a.click()
+  setTimeout(() => { URL.revokeObjectURL(url); a.remove() }, 100)
+}
+
+function getLast30Keys() {
+  return Array.from({ length: 30 }, (_, i) => {
+    const d = new Date(); d.setDate(d.getDate() - (29 - i))
+    return d.toISOString().split('T')[0]
+  })
+}
+
+function exportHabits(habits) {
+  const days = getLast30Keys()
+  const header = ['Nombre', 'Categoría', 'Racha actual', ...days]
+  const rows   = habits.map(h => [h.name, h.cat, h.streak, ...days.map(d => h.history?.[d] ? '1' : '0')])
+  downloadCSV(`habitos_${new Date().toISOString().split('T')[0]}.csv`, [header, ...rows])
+}
+
+function exportSavings(savings) {
+  const header = ['Nombre', 'Meta ($)', 'Ahorrado ($)', 'Progreso (%)', 'Fecha límite']
+  const rows   = savings.map(s => [
+    s.name, s.goal, s.current,
+    Math.min(100, Math.round(s.current / s.goal * 100)),
+    s.deadline || '',
+  ])
+  downloadCSV(`ahorro_${new Date().toISOString().split('T')[0]}.csv`, [header, ...rows])
+}
+
 function Toast({ msg, ok }) {
   return (
     <div style={{
@@ -17,7 +54,7 @@ function Toast({ msg, ok }) {
 }
 
 export default function Perfil() {
-  const { currentUser, subscription } = useContext(AppContext)
+  const { currentUser, subscription, appState } = useContext(AppContext)
   const { updateName, updatePassword }  = useAuth()
 
   const isPro      = subscription?.plan === 'pro'
@@ -212,6 +249,71 @@ export default function Perfil() {
         </div>
         {passMsg && <Toast msg={passMsg.text} ok={passMsg.ok} />}
       </div>
+
+      {/* Export data */}
+      <div className="card">
+        <div style={{ fontWeight: 600, fontSize: 14, color: '#efefed', marginBottom: 4 }}>
+          Exportar mis datos
+        </div>
+        <div style={{ fontSize: 12, color: '#555', marginBottom: 16, lineHeight: 1.6 }}>
+          Descarga tus datos en formato CSV, compatible con Excel y Google Sheets.
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <ExportRow
+            icon="ti-check"
+            label="Hábitos y historial (30 días)"
+            detail={`${appState?.habits?.length ?? 0} hábitos`}
+            onExport={() => exportHabits(appState?.habits ?? [])}
+            disabled={!appState?.habits?.length}
+          />
+          <ExportRow
+            icon="ti-piggy-bank"
+            label="Metas de ahorro"
+            detail={`${appState?.savings?.length ?? 0} metas`}
+            onExport={() => exportSavings(appState?.savings ?? [])}
+            disabled={!appState?.savings?.length}
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ExportRow({ icon, label, detail, onExport, disabled }) {
+  const [done, setDone] = useState(false)
+  const handleClick = () => {
+    if (disabled) return
+    onExport()
+    setDone(true)
+    setTimeout(() => setDone(false), 2000)
+  }
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 12,
+      padding: '12px 14px', borderRadius: 10,
+      background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.07)',
+    }}>
+      <i className={`ti ${icon}`} style={{ fontSize: 18, color: '#555', flexShrink: 0 }}></i>
+      <div style={{ flex: 1 }}>
+        <div style={{ fontSize: 13, fontWeight: 500, color: '#efefed' }}>{label}</div>
+        <div style={{ fontSize: 11, color: '#555', marginTop: 2 }}>{detail}</div>
+      </div>
+      <button
+        onClick={handleClick}
+        disabled={disabled}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 6,
+          padding: '7px 14px', borderRadius: 8, cursor: disabled ? 'not-allowed' : 'pointer',
+          background: done ? 'rgba(29,158,117,.15)' : 'rgba(0,212,255,.1)',
+          border: `1px solid ${done ? 'rgba(29,158,117,.35)' : 'rgba(0,212,255,.25)'}`,
+          color: done ? 'var(--green)' : '#00D4FF',
+          fontSize: 12, fontWeight: 600, fontFamily: "'DM Sans', sans-serif",
+          opacity: disabled ? .4 : 1, transition: 'all .2s', flexShrink: 0,
+        }}
+      >
+        <i className={`ti ${done ? 'ti-check' : 'ti-download'}`} style={{ fontSize: 13 }}></i>
+        {done ? 'Descargado' : 'Descargar'}
+      </button>
     </div>
   )
 }
