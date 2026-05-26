@@ -12,8 +12,13 @@ const HEADERS = {
   'Content-Type': 'application/json',
 }
 
-// Maps daysLeft to the email type handled by send-email.js
-const DAY_TYPE_MAP = { 7: 'trial_warning_7', 3: 'trial_warning_3', 1: 'trial_warning_1', 0: 'trial_expired' }
+// Maps daysLeft to email type and push copy
+const DAY_TYPE_MAP = {
+  7: { email: 'trial_warning_7', pushTitle: 'Tu prueba termina en 7 días ⏳', pushBody: 'Activa PRO para no perder tus rachas y hábitos.' },
+  3: { email: 'trial_warning_3', pushTitle: 'Solo 3 días de prueba 🔥',        pushBody: 'No pierdas tu progreso — activa PRO hoy.' },
+  1: { email: 'trial_warning_1', pushTitle: 'Mañana termina tu prueba ⚠️',     pushBody: 'Último aviso — activa PRO para continuar.' },
+  0: { email: 'trial_expired',   pushTitle: 'Tu prueba ha terminado',           pushBody: 'Activa PRO para volver a usar Episodio Uno.' },
+}
 
 async function callSendEmail(payload) {
   const base = process.env.URL || 'http://localhost:8888'
@@ -25,6 +30,19 @@ async function callSendEmail(payload) {
   const data = await res.json()
   if (!res.ok) throw new Error(data.error || `send-email error ${res.status}`)
   return data.id
+}
+
+async function callSendPush(userId, title, pushBody) {
+  const base = process.env.URL || 'http://localhost:8888'
+  try {
+    await fetch(`${base}/.netlify/functions/send-push`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userIds: [userId], title, pushBody, url: '/', tag: 'trial' }),
+    })
+  } catch (err) {
+    console.error('send-push failed:', err.message)
+  }
 }
 
 // ── Handler ────────────────────────────────────────────────────────────────
@@ -65,16 +83,18 @@ exports.handler = async (event) => {
     trialEnd.setUTCHours(0, 0, 0, 0)
     const daysLeft = Math.round((trialEnd - today) / (1000 * 60 * 60 * 24))
 
-    const emailType = DAY_TYPE_MAP[daysLeft]
-    if (!emailType) continue
+    const typeMap = DAY_TYPE_MAP[daysLeft]
+    if (!typeMap) continue
 
     try {
-      const id = await callSendEmail({ type: emailType, email: p.email, name: p.name })
-      console.log(`Trial email (${emailType}) sent to ${p.email} — id: ${id}`)
-      results.push({ email: p.email, type: emailType, id })
+      const id = await callSendEmail({ type: typeMap.email, email: p.email, name: p.name })
+      console.log(`Trial email (${typeMap.email}) sent to ${p.email} — id: ${id}`)
+      // Also send push notification (fire-and-forget)
+      callSendPush(p.id, typeMap.pushTitle, typeMap.pushBody)
+      results.push({ email: p.email, type: typeMap.email, id })
     } catch (err) {
       console.error(`Failed to send to ${p.email}:`, err.message)
-      results.push({ email: p.email, type: emailType, error: err.message })
+      results.push({ email: p.email, type: typeMap.email, error: err.message })
     }
   }
 

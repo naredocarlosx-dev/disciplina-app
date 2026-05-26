@@ -1,4 +1,4 @@
-const CACHE = 'disciplina-v1'
+const CACHE = 'episodio-v2'
 
 // Recursos del app shell que se cachean al instalar
 const SHELL = [
@@ -24,6 +24,35 @@ self.addEventListener('activate', event => {
     )
   )
   self.clients.claim()
+})
+
+// ── Push notifications ────────────────────────────────────────
+self.addEventListener('push', event => {
+  const data = event.data?.json() || {}
+  const title   = data.title || 'Episodio Uno'
+  const options = {
+    body:    data.body  || '',
+    icon:    '/icons/icon-192x192.png',
+    badge:   '/icons/icon-72x72.png',
+    data:    { url: data.url || '/' },
+    vibrate: [100, 50, 100],
+    tag:     data.tag || 'episodio-uno',
+    renotify: true,
+  }
+  event.waitUntil(self.registration.showNotification(title, options))
+})
+
+self.addEventListener('notificationclick', event => {
+  event.notification.close()
+  const url = event.notification.data?.url || '/'
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
+      for (const client of list) {
+        if ('focus' in client) return client.focus()
+      }
+      return clients.openWindow(url)
+    })
+  )
 })
 
 // ── Fetch: estrategia según el tipo de recurso ────────────────

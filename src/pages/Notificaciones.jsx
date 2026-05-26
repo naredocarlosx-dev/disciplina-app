@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
+import { AppContext } from '../context/AppContext'
+import { supabase } from '../lib/supabase'
 
 const PREFS_KEY = 'notif_prefs'
 
@@ -17,6 +19,13 @@ const TYPES = [
   { key: 'stock',   icon: '📦', label: 'Stock crítico de inventario',  desc: 'Cuando algún producto de tu cocina esté por agotarse' },
   { key: 'gym',     icon: '💪', label: 'Rutinas de gym',               desc: 'Recordatorio de tus días de entrenamiento' },
 ]
+
+function urlBase64ToUint8Array(base64) {
+  const padding = '='.repeat((4 - base64.length % 4) % 4)
+  const b64 = (base64 + padding).replace(/-/g, '+').replace(/_/g, '/')
+  const raw = atob(b64)
+  return Uint8Array.from([...raw].map(c => c.charCodeAt(0)))
+}
 
 function Toggle({ checked, onChange }) {
   return (
@@ -41,25 +50,57 @@ function Toggle({ checked, onChange }) {
 }
 
 export default function Notificaciones() {
-  const supported = 'Notification' in window
-  const [permission, setPermission] = useState(supported ? Notification.permission : 'unsupported')
-  const [prefs, setPrefs] = useState(() => {
+  const { currentUser } = useContext(AppContext)
+  const supported = 'Notification' in window && 'serviceWorker' in navigator
+
+  const [permission,  setPermission]  = useState(supported ? Notification.permission : 'unsupported')
+  const [prefs,       setPrefs]       = useState(() => {
     try { return { ...DEFAULT_PREFS, ...JSON.parse(localStorage.getItem(PREFS_KEY) || '{}') } }
     catch { return DEFAULT_PREFS }
   })
-  const [requesting, setRequesting] = useState(false)
+  const [requesting,  setRequesting]  = useState(false)
+  const [pushSaved,   setPushSaved]   = useState(false)
 
   useEffect(() => {
     localStorage.setItem(PREFS_KEY, JSON.stringify(prefs))
   }, [prefs])
 
+  // Check if already subscribed on mount
+  useEffect(() => {
+    if (permission !== 'granted' || !supported) return
+    navigator.serviceWorker.ready.then(reg =>
+      reg.pushManager.getSubscription().then(sub => { if (sub) setPushSaved(true) })
+    )
+  }, [permission, supported])
+
   const toggle = (key) => setPrefs(p => ({ ...p, [key]: !p[key] }))
+
+  const subscribeToPush = async () => {
+    const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY
+    if (!vapidKey || !currentUser?.id) return
+    try {
+      const reg = await navigator.serviceWorker.ready
+      const existing = await reg.pushManager.getSubscription()
+      const sub = existing || await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(vapidKey),
+      })
+      await supabase.from('push_subscriptions').upsert(
+        { user_id: currentUser.id, subscription: sub.toJSON() },
+        { onConflict: 'user_id' }
+      )
+      setPushSaved(true)
+    } catch (err) {
+      console.error('Push subscription error:', err)
+    }
+  }
 
   const requestPermission = async () => {
     if (!supported || permission === 'denied') return
     setRequesting(true)
     const result = await Notification.requestPermission()
     setPermission(result)
+    if (result === 'granted') await subscribeToPush()
     setRequesting(false)
   }
 
@@ -114,6 +155,24 @@ export default function Notificaciones() {
                   {requesting ? 'Activando…' : '🔔 Activar notificaciones'}
                 </button>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Push active confirmation */}
+      {permission === 'granted' && pushSaved && (
+        <div className="card" style={{
+          marginBottom: 20,
+          background: 'rgba(29,158,117,.06)',
+          border: '1px solid rgba(29,158,117,.25)',
+          display: 'flex', alignItems: 'center', gap: 12,
+        }}>
+          <span style={{ fontSize: 20 }}>✅</span>
+          <div>
+            <div style={{ fontWeight: 600, fontSize: 14, color: '#efefed' }}>Notificaciones push activas</div>
+            <div style={{ fontSize: 12, color: '#8a8a85', marginTop: 2 }}>
+              Recibirás avisos aunque la app esté cerrada.
             </div>
           </div>
         </div>
