@@ -62,12 +62,14 @@ function ctaButton(text) {
 
 function buildEmail(action, name, months, expiresDate) {
   const hi = name ? `Hola, ${name}` : 'Hola'
+  const features = ['Hábitos ilimitados','Metas de ahorro ilimitadas','Planificador de comidas','Rutinas de fitness','Inventario de cocina']
 
   if (action === 'activate') {
     return {
-      subject: '¡Bienvenido a Episodio Uno PRO! 🚀',
+      subject: 'Bienvenido a Episodio Uno PRO',
+      text: `${hi}\n\nTu cuenta ha sido actualizada a Plan PRO. Ahora tienes acceso completo a todas las funciones de Episodio Uno:\n\n${features.map(f => `• ${f}`).join('\n')}\n\nEmpieza tu episodio hoy: https://episodiouno.com\n\n— Episodio Uno`,
       html: wrap(`
-        <h1 style="font-size:22px;font-weight:700;color:#efefed;margin:0 0 8px;line-height:1.3">¡Bienvenido a Plan PRO!</h1>
+        <h1 style="font-size:22px;font-weight:700;color:#efefed;margin:0 0 8px;line-height:1.3">Bienvenido a Plan PRO</h1>
         <p style="font-size:14px;color:#8a8a85;margin:0 0 20px">${hi}</p>
         <p style="font-size:15px;line-height:1.8;color:#8a8a85;margin:0 0 12px">
           Tu cuenta ha sido actualizada a
@@ -75,14 +77,14 @@ function buildEmail(action, name, months, expiresDate) {
           Ahora tienes acceso completo a todas las funciones de Episodio Uno:
         </p>
         <table cellpadding="0" cellspacing="0" style="margin:0 0 24px">
-          ${['Hábitos ilimitados','Metas de ahorro ilimitadas','Planificador de comidas','Rutinas de fitness','Inventario de cocina'].map(f =>
+          ${features.map(f =>
             `<tr><td style="padding:5px 0;font-size:14px;color:#8a8a85">
-               <span style="color:#00D4FF;margin-right:8px">✓</span>${f}
+               <span style="color:#00D4FF;margin-right:8px">+</span>${f}
              </td></tr>`
           ).join('')}
         </table>
-        <p style="font-size:15px;line-height:1.8;color:#8a8a85;margin:0 0 28px">¡Empieza tu episodio hoy!</p>
-        ${ctaButton('Ir a mi app →')}
+        <p style="font-size:15px;line-height:1.8;color:#8a8a85;margin:0 0 28px">Empieza tu episodio hoy.</p>
+        ${ctaButton('Ir a mi app')}
       `),
     }
   }
@@ -90,6 +92,7 @@ function buildEmail(action, name, months, expiresDate) {
   if (action === 'revoke') {
     return {
       subject: 'Tu plan PRO ha sido actualizado',
+      text: `${hi}\n\nTu plan PRO ha sido desactivado. Tu cuenta ha vuelto al plan gratuito.\n\nSi tienes dudas escríbenos a noreply@episodiouno.com\n\n— Episodio Uno`,
       html: wrap(`
         <h1 style="font-size:22px;font-weight:700;color:#efefed;margin:0 0 8px;line-height:1.3">Plan actualizado</h1>
         <p style="font-size:14px;color:#8a8a85;margin:0 0 20px">${hi}</p>
@@ -98,11 +101,8 @@ function buildEmail(action, name, months, expiresDate) {
           <strong style="color:#efefed">plan gratuito</strong>.
         </p>
         <p style="font-size:15px;line-height:1.8;color:#8a8a85;margin:0 0 28px">
-          Si tienes preguntas o dudas, contáctanos respondiendo a este correo o escríbenos a
+          Si tienes preguntas, contáctanos en
           <a href="mailto:noreply@episodiouno.com" style="color:#00D4FF;text-decoration:none">noreply@episodiouno.com</a>.
-        </p>
-        <p style="font-size:13px;color:#505050;margin:0">
-          Puedes seguir usando Episodio Uno con el plan gratuito sin restricciones en las funciones básicas.
         </p>
       `),
     }
@@ -116,24 +116,24 @@ function buildEmail(action, name, months, expiresDate) {
       : '—'
 
     return {
-      subject: `¡Tienes ${mesLabel} de Episodio Uno PRO! 🎁`,
+      subject: `Tienes ${mesLabel} de Episodio Uno PRO`,
+      text: `${hi}\n\nTe hemos regalado ${mesLabel} de Plan PRO. Tu acceso premium estara activo hasta el ${expiresStr}.\n\nDisfruta todas las funciones: https://episodiouno.com\n\n— Episodio Uno`,
       html: wrap(`
-        <h1 style="font-size:22px;font-weight:700;color:#efefed;margin:0 0 8px;line-height:1.3">¡${mesLabel} de Episodio Uno PRO!</h1>
+        <h1 style="font-size:22px;font-weight:700;color:#efefed;margin:0 0 8px;line-height:1.3">${mesLabel} de Episodio Uno PRO</h1>
         <p style="font-size:14px;color:#8a8a85;margin:0 0 20px">${hi}</p>
         <p style="font-size:15px;line-height:1.8;color:#8a8a85;margin:0 0 20px">
           Te hemos regalado <strong style="color:#00D4FF">${mesLabel}</strong> de Plan PRO.
-          Tu acceso premium estará activo hasta el
+          Tu acceso premium estara activo hasta el
           <strong style="color:#ffffff">${expiresStr}</strong>.
         </p>
-        <!-- expiry highlight box -->
         <table cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:28px">
-          <tr><td style="background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.2);border-radius:10px;padding:14px 18px">
-            <p style="margin:0;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:rgba(0,212,255,.6)">Acceso PRO activo hasta</p>
+          <tr><td style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:14px 18px">
+            <p style="margin:0;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#555">Acceso PRO activo hasta</p>
             <p style="margin:6px 0 0;font-size:18px;font-weight:700;color:#ffffff">${expiresStr}</p>
           </td></tr>
         </table>
-        <p style="font-size:15px;line-height:1.8;color:#8a8a85;margin:0 0 28px">¡Disfruta todas las funciones!</p>
-        ${ctaButton('Ir a mi app →')}
+        <p style="font-size:15px;line-height:1.8;color:#8a8a85;margin:0 0 28px">Disfruta todas las funciones.</p>
+        ${ctaButton('Ir a mi app')}
       `),
     }
   }
@@ -195,6 +195,7 @@ exports.handler = async (event) => {
         to:      [targetEmail],
         subject: email.subject,
         html:    email.html,
+        text:    email.text,
       }),
     })
 
