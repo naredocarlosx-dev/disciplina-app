@@ -23,8 +23,91 @@ function getDayOfYear() {
   return Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 86400000)
 }
 
+function PlanBanner({ currentUser, subscription, setAppPage }) {
+  const isPro      = subscription?.plan === 'pro'
+  const daysLeft   = currentUser?.trialDaysLeft ?? 0
+  const endDate    = currentUser?.trialEndDate
+  const trialTotal = 90
+  const daysUsed   = endDate
+    ? Math.max(0, trialTotal - daysLeft)
+    : trialTotal
+  const pct = Math.min(100, Math.round(daysUsed / trialTotal * 100))
+
+  // PRO activo
+  if (isPro) {
+    return (
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 12,
+        background: 'rgba(0,212,255,.06)', border: '1px solid rgba(0,212,255,.18)',
+        borderRadius: 12, padding: '12px 16px', marginBottom: 20,
+      }}>
+        <span style={{ fontSize: 20 }}>⚡</span>
+        <div style={{ flex: 1, fontSize: 13, color: '#8a8a85' }}>
+          Estás en el <strong style={{ color: '#00D4FF' }}>Plan PRO</strong> — acceso completo a todas las funciones.
+        </div>
+      </div>
+    )
+  }
+
+  // Sin trial asignado
+  if (!endDate) return null
+
+  // Colores según urgencia
+  const isUrgent   = daysLeft <= 3
+  const isWarning  = daysLeft <= 7 && daysLeft > 3
+  const accent     = isUrgent ? '#e05555' : isWarning ? '#FFB800' : '#00D4FF'
+  const bgAlpha    = isUrgent ? 'rgba(224,85,85,.06)' : isWarning ? 'rgba(255,184,0,.06)' : 'rgba(0,212,255,.06)'
+  const borderAlpha = isUrgent ? 'rgba(224,85,85,.25)' : isWarning ? 'rgba(255,184,0,.25)' : 'rgba(0,212,255,.18)'
+  const icon       = isUrgent ? '🚨' : isWarning ? '⏳' : '🎯'
+
+  const endFormatted = new Date(endDate).toLocaleDateString('es-MX', { day: 'numeric', month: 'long' })
+
+  return (
+    <div style={{
+      background: bgAlpha, border: `1px solid ${borderAlpha}`,
+      borderRadius: 12, padding: '14px 16px', marginBottom: 20,
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8, gap: 12, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 18 }}>{icon}</span>
+          <div>
+            <span style={{ fontSize: 13, fontWeight: 700, color: accent }}>
+              {daysLeft === 0 ? 'Tu prueba ha expirado' : `${daysLeft} día${daysLeft !== 1 ? 's' : ''} de prueba restantes`}
+            </span>
+            <span style={{ fontSize: 12, color: '#555', marginLeft: 8 }}>
+              {daysLeft > 0 ? `· Vence el ${endFormatted}` : ''}
+            </span>
+          </div>
+        </div>
+        <button
+          onClick={() => setAppPage('precios')}
+          style={{
+            fontSize: 12, fontWeight: 700, padding: '5px 14px', borderRadius: 20, cursor: 'pointer',
+            background: accent, color: isUrgent || isWarning ? '#000' : '#000',
+            border: 'none', fontFamily: "'DM Sans', sans-serif", flexShrink: 0,
+          }}
+        >
+          Activar PRO
+        </button>
+      </div>
+      {/* Progress bar */}
+      <div style={{ height: 4, background: 'rgba(255,255,255,.07)', borderRadius: 4, overflow: 'hidden' }}>
+        <div style={{
+          height: '100%', width: `${pct}%`,
+          background: `linear-gradient(90deg, ${accent}, ${accent}88)`,
+          borderRadius: 4, transition: 'width .4s',
+        }} />
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
+        <span style={{ fontSize: 10, color: '#555' }}>Día 1</span>
+        <span style={{ fontSize: 10, color: '#555' }}>90 días</span>
+      </div>
+    </div>
+  )
+}
+
 export default function Dashboard() {
-  const { appState, toggleHabit, toggleWorkoutDone, getAlerts } = useContext(AppContext)
+  const { appState, toggleHabit, toggleWorkoutDone, getAlerts, currentUser, subscription, setAppPage } = useContext(AppContext)
   const chartRef = useRef(null)
   const chartInstanceRef = useRef(null)
 
@@ -103,6 +186,8 @@ export default function Dashboard() {
         </div>
         <div className="today-pill">Hoy</div>
       </div>
+
+      <PlanBanner currentUser={currentUser} subscription={subscription} setAppPage={setAppPage} />
 
       <div className="quote-card">
         <div className="quote-accent"></div>
