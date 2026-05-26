@@ -86,7 +86,7 @@ export default function Precios() {
           )}
           <div style={{ marginBottom: 4, fontWeight: 700, fontSize: 16 }}>PRO</div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 20 }}>
-            <span style={{ fontSize: 36, fontWeight: 800 }}>$50</span>
+            <span style={{ fontSize: 36, fontWeight: 800 }}>$49</span>
             <span style={{ fontSize: 13, color: 'var(--text2)' }}>MXN/mes</span>
           </div>
           <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 24px', display: 'flex', flexDirection: 'column', gap: 10 }}>

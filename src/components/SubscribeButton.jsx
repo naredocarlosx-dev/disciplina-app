@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react'
 import { AppContext } from '../context/AppContext'
 
-export default function SubscribeButton({ label = 'Activar PRO — $50 MXN/mes', style }) {
+export default function SubscribeButton({ label = 'Activar PRO — $49 MXN/mes', style }) {
   const { currentUser } = useContext(AppContext)
   const [loading, setLoading] = useState(false)
   const [error,   setError]   = useState('')

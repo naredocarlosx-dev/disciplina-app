@@ -376,7 +376,7 @@ export default function Landing() {
               </div>
               <div style={{ fontSize: 13, fontWeight: 600, color: NEON, marginBottom: 8, textTransform: 'uppercase', letterSpacing: 1 }}>PRO</div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, marginBottom: 4 }}>
-                <span style={{ fontSize: 42, fontWeight: 800 }}>$50</span>
+                <span style={{ fontSize: 42, fontWeight: 800 }}>$49</span>
                 <span style={{ fontSize: 14, color: GRAY }}>MXN/mes</span>
               </div>
               <div style={{ fontSize: 13, color: GRAY, marginBottom: 28 }}>Todo desbloqueado</div>

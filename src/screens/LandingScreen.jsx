@@ -3,7 +3,7 @@ import { AppContext } from '../context/AppContext'
 import EpisodioUnoLogo from '../components/EpisodioUnoLogo'
 
 const FAQ_ITEMS = [
-  { q: '¿Episodio Uno es gratuita?', a: 'Tiene un plan gratuito con acceso a todas las funciones principales. El plan PRO desbloquea hábitos y metas ilimitadas por $50 MXN/mes.' },
+  { q: '¿Episodio Uno es gratuita?', a: 'Tiene un plan gratuito con acceso a todas las funciones principales. El plan PRO desbloquea hábitos y metas ilimitadas por $49 MXN/mes.' },
   { q: '¿Mis datos están seguros? ¿Se guardan en la nube?', a: 'Sí, tus datos se guardan de forma segura en la nube con Supabase. Puedes acceder desde cualquier dispositivo iniciando sesión con tu cuenta.' },
   { q: '¿Puedo usar Episodio Uno en mi teléfono?', a: 'Sí. La app está diseñada con diseño responsivo y funciona correctamente en dispositivos móviles. También puedes instalarla como PWA desde tu navegador.' },
   { q: '¿Qué pasa si cierro el navegador? ¿Se pierden mis datos?', a: 'Los datos se guardan en localStorage y persisten entre sesiones. Solo necesitas volver a iniciar sesión para continuar desde donde lo dejaste.' },

@@ -137,7 +137,7 @@ function buildEmail(type, { name, nextBillingDate } = {}) {
       html: wrap(`
         ${h1('¡Plan PRO activado!')}
         ${sub(hi)}
-        ${body(`Tu pago de ${neon('$50 MXN')} fue procesado exitosamente. Ahora tienes acceso completo a todas las funciones de Episodio Uno.`)}
+        ${body(`Tu pago de ${neon('$49 MXN')} fue procesado exitosamente. Ahora tienes acceso completo a todas las funciones de Episodio Uno.`)}
         ${highlight('Próximo cobro', billing)}
         <table role="presentation" cellpadding="0" cellspacing="0" style="margin:16px 0 4px">
           ${['Hábitos ilimitados','Metas de ahorro ilimitadas','Inventario de cocina PRO','Acceso a funciones nuevas primero','Soporte prioritario'].map(f =>
@@ -161,7 +161,7 @@ function buildEmail(type, { name, nextBillingDate } = {}) {
         <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin:0 0 20px">
           <tr><td style="background:rgba(224,85,85,0.08);border:1px solid rgba(224,85,85,0.25);border-radius:10px;padding:14px 18px">
             <p style="margin:0;font-size:13px;color:#e05555;line-height:1.7">
-              ⚠️&nbsp; No pudimos procesar tu pago de <strong>$50 MXN</strong>. Tu acceso PRO podría verse afectado si no actualizas tu método de pago.
+              ⚠️&nbsp; No pudimos procesar tu pago de <strong>$49 MXN</strong>. Tu acceso PRO podría verse afectado si no actualizas tu método de pago.
             </p>
           </td></tr>
         </table>
@@ -184,9 +184,9 @@ function buildEmail(type, { name, nextBillingDate } = {}) {
         ${sub(hi)}
         ${body(`Tu período de prueba gratuito de ${neon('Episodio Uno')} vence en ${neon('7 días')}.`)}
         ${body('Activa el plan PRO para seguir construyendo tu disciplina sin interrupciones. Conservas todos tus hábitos, rachas y progreso.')}
-        ${highlight('Precio del plan PRO', '$50 MXN / mes')}
+        ${highlight('Precio del plan PRO', '$49 MXN / mes')}
         ${body('Cancela cuando quieras. Sin compromisos.')}
-        ${ctaButton('Activar PRO — $50 MXN/mes →')}
+        ${ctaButton('Activar PRO — $49 MXN/mes →')}
       `),
     }
   }
@@ -201,7 +201,7 @@ function buildEmail(type, { name, nextBillingDate } = {}) {
         ${highlight('Tu prueba vence en', '3 días')}
         ${body(`Has construido algo real estos meses. No dejes que se pierda.`)}
         ${body(`Activa ${neon('PRO')} hoy y mantén tus rachas, hábitos y todo tu progreso intacto.`)}
-        ${ctaButton('Activar PRO — $50 MXN/mes →')}
+        ${ctaButton('Activar PRO — $49 MXN/mes →')}
         <p style="font-size:12px;color:#505050;margin:16px 0 0">Cancela cuando quieras. Sin compromisos.</p>
       `),
     }
@@ -223,7 +223,7 @@ function buildEmail(type, { name, nextBillingDate } = {}) {
         </table>
         ${body(`Activa ${neon('PRO hoy')} y no pierdas ni un día de tus rachas.`)}
         ${body('Todos tus datos seguirán ahí, esperándote.')}
-        ${ctaButton('Activar PRO ahora — $50 MXN/mes →')}
+        ${ctaButton('Activar PRO ahora — $49 MXN/mes →')}
         <p style="font-size:12px;color:#505050;margin:16px 0 0">Cancela cuando quieras. Sin compromisos.</p>
       `),
     }
@@ -239,7 +239,7 @@ function buildEmail(type, { name, nextBillingDate } = {}) {
         ${body(`Gracias por probar ${neon('Episodio Uno')} durante 3 meses.`)}
         ${body('Para continuar construyendo tus hábitos y mantener todo tu progreso, activa el plan PRO.')}
         ${body('Todos tus datos siguen guardados, esperando que regreses.')}
-        ${ctaButton('Activar PRO — $50 MXN/mes →')}
+        ${ctaButton('Activar PRO — $49 MXN/mes →')}
         <p style="font-size:12px;color:#505050;margin:20px 0 0;line-height:1.6">
           ¿Tienes preguntas? Responde este correo y con gusto te ayudamos.
         </p>
