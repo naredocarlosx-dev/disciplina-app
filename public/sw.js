@@ -1,4 +1,4 @@
-const CACHE = 'episodio-v3'
+const CACHE = 'episodio-v4'
 
 // Recursos del app shell que se cachean al instalar
 const SHELL = [
@@ -69,13 +69,25 @@ self.addEventListener('fetch', event => {
     request.method !== 'GET'
   ) return
 
-  // App shell y assets → cache-first, fallback a red
+  // HTML → network-first: siempre busca la versión más nueva en el servidor.
+  // Evita que index.html cacheado apunte a bundles JS con hashes viejos ya borrados.
+  if (request.destination === 'document' || request.headers.get('accept')?.includes('text/html')) {
+    event.respondWith(
+      fetch(request).then(response => {
+        const clone = response.clone()
+        caches.open(CACHE).then(cache => cache.put(request, clone))
+        return response
+      }).catch(() => caches.match(request))
+    )
+    return
+  }
+
+  // JS/CSS/imágenes (con hash en el nombre) → cache-first, fallback a red
   event.respondWith(
     caches.match(request).then(cached => {
       if (cached) return cached
 
       return fetch(request).then(response => {
-        // Solo cachear respuestas válidas
         if (!response || response.status !== 200 || response.type === 'opaque') {
           return response
         }
@@ -83,7 +95,6 @@ self.addEventListener('fetch', event => {
         caches.open(CACHE).then(cache => cache.put(request, clone))
         return response
       }).catch(() => {
-        // Sin red y sin caché → devuelve el index.html para que React maneje el error
         if (request.destination === 'document') {
           return caches.match('/index.html')
         }
