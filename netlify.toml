@@ -8,6 +8,16 @@
 [functions."check-trial-expiry"]
   schedule = "0 12 * * *"
 
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+
 [[redirects]]
   from   = "/*"
   to     = "/index.html"
