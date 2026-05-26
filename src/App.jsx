@@ -40,7 +40,7 @@ function LoadingScreen() {
 }
 
 function Router() {
-  const { screen }           = useContext(AppContext)
+  const { screen, saveError } = useContext(AppContext)
   const { resetPasswordMode } = useAuth()
 
   // El usuario llegó desde el link del correo de recuperación
@@ -55,6 +55,17 @@ function Router() {
       {screen === 'onboarding'    && <OnboardingScreen />}
       {screen === 'admin'         && <AdminScreen />}
       {screen === 'trial-expired' && <TrialExpiredScreen />}
+      {saveError && (
+        <div style={{
+          position: 'fixed', bottom: 88, left: 16, right: 16, zIndex: 9999,
+          background: '#dc2626', color: '#fff', padding: '12px 16px',
+          borderRadius: 10, fontSize: 13, textAlign: 'center',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
+          pointerEvents: 'none',
+        }}>
+          {saveError}
+        </div>
+      )}
     </>
   )
 }

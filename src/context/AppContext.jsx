@@ -18,6 +18,12 @@ export function AppProvider({ children }) {
   const [modal,     setModal]     = useState(null)
   const [modalData, setModalData] = useState(null)
   const [authState, setAuthState] = useState({ users: [] }) // lista de usuarios para el admin
+  const [saveError, setSaveError] = useState(null)
+
+  const showError = useCallback((msg) => {
+    setSaveError(msg)
+    setTimeout(() => setSaveError(null), 4000)
+  }, [])
 
   // ── Modales ────────────────────────────────────────────────────────────────
   const openModal  = useCallback((name, data = null) => { setModal(name); setModalData(data) }, [])
@@ -99,12 +105,14 @@ export function AppProvider({ children }) {
     })
 
     if (!toggled || !currentUser) return
-    supabase.from('habits').update({ streak: toggled.streak, history: toggled.history }).eq('id', id)
-    supabase.from('habit_logs').upsert(
-      { habit_id: id, user_id: currentUser.id, log_date: todayKey, done: toggled.doneToday },
-      { onConflict: 'habit_id,log_date' }
-    )
-    // Guardar progreso en perfil (sin await para no bloquear)
+    const writeToggle = () => Promise.all([
+      supabase.from('habits').update({ streak: toggled.streak, history: toggled.history }).eq('id', id),
+      supabase.from('habit_logs').upsert(
+        { habit_id: id, user_id: currentUser.id, log_date: todayKey, done: toggled.doneToday },
+        { onConflict: 'habit_id,log_date' }
+      ),
+    ])
+    writeToggle().catch(() => setTimeout(writeToggle, 3000))
     setAppState(prev => {
       if (prev) supabase.from('profiles').update({ progress_history: prev.progressHistory }).eq('id', currentUser.id)
       return prev
@@ -123,16 +131,36 @@ export function AppProvider({ children }) {
       const habits = [...prev.habits, row]
       return { ...prev, habits, progressHistory: { ...prev.progressHistory, [todayKey]: calcProgress(habits) } }
     })
-    if (currentUser) supabase.from('habits').insert({ id, user_id: currentUser.id, name, cat, streak: 0, history: {} })
-  }, [currentUser, subscription, appState, openModal, update])
+    if (currentUser) {
+      const { error } = await supabase.from('habits').insert({ id, user_id: currentUser.id, name, cat, streak: 0, history: {} })
+      if (error) {
+        update(prev => {
+          const habits = prev.habits.filter(h => h.id !== id)
+          return { ...prev, habits, progressHistory: { ...prev.progressHistory, [todayKey]: calcProgress(habits) } }
+        })
+        showError('No se pudo guardar el hábito. Verifica tu conexión.')
+      }
+    }
+  }, [currentUser, subscription, appState, openModal, update, showError])
 
   const deleteHabit = useCallback(async (id) => {
+    let removed = null
     update(prev => {
+      removed = prev.habits.find(h => h.id === id)
       const habits = prev.habits.filter(h => h.id !== id)
       return { ...prev, habits, progressHistory: { ...prev.progressHistory, [todayKey]: calcProgress(habits) } }
     })
-    if (currentUser) supabase.from('habits').delete().eq('id', id)
-  }, [currentUser, update])
+    if (currentUser) {
+      const { error } = await supabase.from('habits').delete().eq('id', id)
+      if (error && removed) {
+        update(prev => {
+          const habits = [...prev.habits, removed]
+          return { ...prev, habits, progressHistory: { ...prev.progressHistory, [todayKey]: calcProgress(habits) } }
+        })
+        showError('No se pudo eliminar el hábito. Verifica tu conexión.')
+      }
+    }
+  }, [currentUser, update, showError])
 
   // ═══════════════════════════════════════════════════════════════════════════
   // AHORROS
@@ -147,34 +175,59 @@ export function AppProvider({ children }) {
     const row = { id, name, goal: parseFloat(goal), current: 0, deadline: deadline || '' }
     update(prev => ({ ...prev, savings: [...prev.savings, row] }))
     if (currentUser) {
-      supabase.from('savings').insert({ id, user_id: currentUser.id, name, goal: parseFloat(goal), current_amount: 0, deadline: deadline || null })
+      const { error } = await supabase.from('savings').insert({ id, user_id: currentUser.id, name, goal: parseFloat(goal), current_amount: 0, deadline: deadline || null })
+      if (error) {
+        update(prev => ({ ...prev, savings: prev.savings.filter(s => s.id !== id) }))
+        showError('No se pudo guardar la meta. Verifica tu conexión.')
+      }
     }
-  }, [currentUser, subscription, appState, openModal, update])
+  }, [currentUser, subscription, appState, openModal, update, showError])
 
   const deleteSaving = useCallback(async (id) => {
-    update(prev => ({ ...prev, savings: prev.savings.filter(s => s.id !== id) }))
-    if (currentUser) supabase.from('savings').delete().eq('id', id)
-  }, [currentUser, update])
+    let removed = null
+    update(prev => {
+      removed = prev.savings.find(s => s.id === id)
+      return { ...prev, savings: prev.savings.filter(s => s.id !== id) }
+    })
+    if (currentUser) {
+      const { error } = await supabase.from('savings').delete().eq('id', id)
+      if (error && removed) {
+        update(prev => ({ ...prev, savings: [...prev.savings, removed] }))
+        showError('No se pudo eliminar la meta. Verifica tu conexión.')
+      }
+    }
+  }, [currentUser, update, showError])
 
   const openContribute = useCallback((id) => openModal('contribute', { savingId: id }), [openModal])
 
   const addContribution = useCallback(async (amount) => {
     const savingId = modalData?.savingId
     let newCurrent = 0
+    let prevCurrent = 0
     update(prev => ({
       ...prev,
       savings: prev.savings.map(s => {
         if (s.id !== savingId) return s
+        prevCurrent = s.current
         newCurrent = Math.min(s.goal, s.current + parseFloat(amount))
         return { ...s, current: newCurrent }
       }),
     }))
-    if (currentUser && savingId) {
-      supabase.from('savings').update({ current_amount: newCurrent }).eq('id', savingId)
-      supabase.from('saving_contributions').insert({ saving_id: savingId, user_id: currentUser.id, amount: parseFloat(amount) })
-    }
     closeModal()
-  }, [currentUser, modalData, update, closeModal])
+    if (currentUser && savingId) {
+      const [r1, r2] = await Promise.all([
+        supabase.from('savings').update({ current_amount: newCurrent }).eq('id', savingId),
+        supabase.from('saving_contributions').insert({ saving_id: savingId, user_id: currentUser.id, amount: parseFloat(amount) }),
+      ])
+      if (r1.error || r2.error) {
+        update(prev => ({
+          ...prev,
+          savings: prev.savings.map(s => s.id === savingId ? { ...s, current: prevCurrent } : s),
+        }))
+        showError('No se pudo registrar el aporte. Verifica tu conexión.')
+      }
+    }
+  }, [currentUser, modalData, update, closeModal, showError])
 
   // ═══════════════════════════════════════════════════════════════════════════
   // COMIDAS
@@ -214,9 +267,15 @@ export function AppProvider({ children }) {
     const id    = crypto.randomUUID()
     const color = COLORS[(appState?.workouts?.length ?? 0) % COLORS.length]
     update(prev => ({ ...prev, workouts: [...prev.workouts, { id, name, days, color, done: [] }] }))
-    if (currentUser) supabase.from('workouts').insert({ id, user_id: currentUser.id, name, days, color })
     closeModal()
-  }, [currentUser, appState, update, closeModal])
+    if (currentUser) {
+      const { error } = await supabase.from('workouts').insert({ id, user_id: currentUser.id, name, days, color })
+      if (error) {
+        update(prev => ({ ...prev, workouts: prev.workouts.filter(w => w.id !== id) }))
+        showError('No se pudo guardar el entrenamiento. Verifica tu conexión.')
+      }
+    }
+  }, [currentUser, appState, update, closeModal, showError])
 
   const toggleWorkoutDone = useCallback(async (id) => {
     let nowDone = false
@@ -232,20 +291,29 @@ export function AppProvider({ children }) {
       }),
     }))
     if (!currentUser) return
-    if (nowDone) {
-      supabase.from('workout_logs').upsert(
-        { workout_id: id, user_id: currentUser.id, log_date: todayKey },
-        { onConflict: 'workout_id,log_date' }
-      )
-    } else {
-      supabase.from('workout_logs').delete().eq('workout_id', id).eq('log_date', todayKey)
-    }
+    const writeLog = () => nowDone
+      ? supabase.from('workout_logs').upsert(
+          { workout_id: id, user_id: currentUser.id, log_date: todayKey },
+          { onConflict: 'workout_id,log_date' }
+        )
+      : supabase.from('workout_logs').delete().eq('workout_id', id).eq('log_date', todayKey)
+    writeLog().catch(() => setTimeout(writeLog, 3000))
   }, [currentUser, update])
 
   const deleteWorkout = useCallback(async (id) => {
-    update(prev => ({ ...prev, workouts: prev.workouts.filter(w => w.id !== id) }))
-    if (currentUser) supabase.from('workouts').delete().eq('id', id)
-  }, [currentUser, update])
+    let removed = null
+    update(prev => {
+      removed = prev.workouts.find(w => w.id === id)
+      return { ...prev, workouts: prev.workouts.filter(w => w.id !== id) }
+    })
+    if (currentUser) {
+      const { error } = await supabase.from('workouts').delete().eq('id', id)
+      if (error && removed) {
+        update(prev => ({ ...prev, workouts: [...prev.workouts, removed] }))
+        showError('No se pudo eliminar el entrenamiento. Verifica tu conexión.')
+      }
+    }
+  }, [currentUser, update, showError])
 
   // ═══════════════════════════════════════════════════════════════════════════
   // INVENTARIO
@@ -257,28 +325,55 @@ export function AppProvider({ children }) {
   const saveInvProduct = useCallback(async ({ name, cat, unit, qty, max }) => {
     const editId = modalData?.editId
     if (editId) {
-      update(prev => ({
-        ...prev,
-        inventory: prev.inventory.map(p =>
-          p.id === editId ? { ...p, name, cat, unit, qty: parseFloat(qty) || 0, max: parseFloat(max) || 100 } : p
-        ),
-      }))
-      if (currentUser) supabase.from('inventory').update({ name, cat, unit, qty: parseFloat(qty) || 0, max_qty: parseFloat(max) || 100 }).eq('id', editId)
+      let before = null
+      update(prev => {
+        before = prev.inventory.find(p => p.id === editId)
+        return {
+          ...prev,
+          inventory: prev.inventory.map(p =>
+            p.id === editId ? { ...p, name, cat, unit, qty: parseFloat(qty) || 0, max: parseFloat(max) || 100 } : p
+          ),
+        }
+      })
+      closeModal()
+      if (currentUser) {
+        const { error } = await supabase.from('inventory').update({ name, cat, unit, qty: parseFloat(qty) || 0, max_qty: parseFloat(max) || 100 }).eq('id', editId)
+        if (error && before) {
+          update(prev => ({ ...prev, inventory: prev.inventory.map(p => p.id === editId ? before : p) }))
+          showError('No se pudo guardar el producto. Verifica tu conexión.')
+        }
+      }
     } else {
       const id = crypto.randomUUID()
       update(prev => ({
         ...prev,
         inventory: [...prev.inventory, { id, name, cat, unit, qty: parseFloat(qty) || 0, max: parseFloat(max) || 100 }],
       }))
-      if (currentUser) supabase.from('inventory').insert({ id, user_id: currentUser.id, name, cat, unit, qty: parseFloat(qty) || 0, max_qty: parseFloat(max) || 100 })
+      closeModal()
+      if (currentUser) {
+        const { error } = await supabase.from('inventory').insert({ id, user_id: currentUser.id, name, cat, unit, qty: parseFloat(qty) || 0, max_qty: parseFloat(max) || 100 })
+        if (error) {
+          update(prev => ({ ...prev, inventory: prev.inventory.filter(p => p.id !== id) }))
+          showError('No se pudo guardar el producto. Verifica tu conexión.')
+        }
+      }
     }
-    closeModal()
-  }, [currentUser, modalData, update, closeModal])
+  }, [currentUser, modalData, update, closeModal, showError])
 
   const deleteInvItem = useCallback(async (id) => {
-    update(prev => ({ ...prev, inventory: prev.inventory.filter(p => p.id !== id) }))
-    if (currentUser) supabase.from('inventory').delete().eq('id', id)
-  }, [currentUser, update])
+    let removed = null
+    update(prev => {
+      removed = prev.inventory.find(p => p.id === id)
+      return { ...prev, inventory: prev.inventory.filter(p => p.id !== id) }
+    })
+    if (currentUser) {
+      const { error } = await supabase.from('inventory').delete().eq('id', id)
+      if (error && removed) {
+        update(prev => ({ ...prev, inventory: [...prev.inventory, removed] }))
+        showError('No se pudo eliminar el producto. Verifica tu conexión.')
+      }
+    }
+  }, [currentUser, update, showError])
 
   const saveInvMove = useCallback(async ({ qty, note, mvType }) => {
     const p = appState?.inventory.find(x => x.id === modalData?.moveId)
@@ -298,15 +393,25 @@ export function AppProvider({ children }) {
       invLog:    [logRow, ...prev.invLog],
     }))
 
-    if (currentUser) {
-      supabase.from('inventory').update({ qty: newQty }).eq('id', p.id)
-      supabase.from('inventory_logs').insert({
-        id: logId, user_id: currentUser.id, inventory_id: p.id,
-        item_name: p.name, move_type: mvType, qty, unit: p.unit, note: note || '', log_date: dateStr,
-      })
-    }
     closeModal()
-  }, [currentUser, appState, modalData, update, closeModal])
+    if (currentUser) {
+      const [r1, r2] = await Promise.all([
+        supabase.from('inventory').update({ qty: newQty }).eq('id', p.id),
+        supabase.from('inventory_logs').insert({
+          id: logId, user_id: currentUser.id, inventory_id: p.id,
+          item_name: p.name, move_type: mvType, qty, unit: p.unit, note: note || '', log_date: dateStr,
+        }),
+      ])
+      if (r1.error || r2.error) {
+        update(prev => ({
+          ...prev,
+          inventory: prev.inventory.map(x => x.id === p.id ? { ...x, qty: p.qty } : x),
+          invLog: prev.invLog.filter(l => l.id !== logId),
+        }))
+        showError('No se pudo registrar el movimiento. Verifica tu conexión.')
+      }
+    }
+  }, [currentUser, appState, modalData, update, closeModal, showError])
 
   const setInvFilter = useCallback((cat) => update(prev => ({ ...prev, invFilter: cat })), [update])
 
@@ -369,6 +474,7 @@ export function AppProvider({ children }) {
     currentUser, subscription, authLoading, appLoading,
     appState, authState,
     modal, openModal, closeModal, modalData,
+    saveError,
     // auth (delegado a AuthContext pero expuesto aquí para no romper componentes existentes)
     doLogin, doRegister, doLogout, upgradeToPro,
     // datos
