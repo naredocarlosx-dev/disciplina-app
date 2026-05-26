@@ -156,6 +156,37 @@ export function AuthProvider({ children }) {
     return () => authSub.unsubscribe()
   }, [loadProfile])
 
+  // Re-sync plan from Supabase when the subscriptions row changes (Realtime)
+  // or when the user tabs back to the app (visibility/focus fallback)
+  useEffect(() => {
+    if (!currentUser?.id) return
+
+    const refresh = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) loadProfile(user)
+    }
+
+    const channel = supabase
+      .channel(`sub-sync-${currentUser.id}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'subscriptions',
+        filter: `user_id=eq.${currentUser.id}`,
+      }, refresh)
+      .subscribe()
+
+    const handleVisibility = () => { if (document.visibilityState === 'visible') refresh() }
+    document.addEventListener('visibilitychange', handleVisibility)
+    window.addEventListener('focus', refresh)
+
+    return () => {
+      supabase.removeChannel(channel)
+      document.removeEventListener('visibilitychange', handleVisibility)
+      window.removeEventListener('focus', refresh)
+    }
+  }, [currentUser?.id, loadProfile])
+
   const doLogin = useCallback(async (email, pass) => {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass })
     if (error) {
