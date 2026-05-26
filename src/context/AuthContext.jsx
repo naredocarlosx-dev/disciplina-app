@@ -110,6 +110,17 @@ export function AuthProvider({ children }) {
     return user
   }, [])
 
+  // Safety net: si INITIAL_SESSION no llega en 8 s (red caída, JS error), desbloquear la app
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setAuthLoading(prev => {
+        if (prev) console.warn('[auth] timeout — forzando authLoading=false')
+        return false
+      })
+    }, 8000)
+    return () => clearTimeout(t)
+  }, [])
+
   // Revisar sesión activa al montar
   useEffect(() => {
     const { data: { subscription: authSub } } = supabase.auth.onAuthStateChange(async (event, session) => {

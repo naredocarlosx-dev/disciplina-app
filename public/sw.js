@@ -1,4 +1,4 @@
-const CACHE = 'episodio-v4'
+const CACHE = 'episodio-v5'
 
 // Recursos del app shell que se cachean al instalar
 const SHELL = [
@@ -55,6 +55,16 @@ self.addEventListener('notificationclick', event => {
   )
 })
 
+// ── Fetch con timeout ─────────────────────────────────────────
+function fetchWithTimeout(request, ms = 5000) {
+  return Promise.race([
+    fetch(request),
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('sw-timeout')), ms)
+    ),
+  ])
+}
+
 // ── Fetch: estrategia según el tipo de recurso ────────────────
 self.addEventListener('fetch', event => {
   const { request } = event
@@ -69,36 +79,42 @@ self.addEventListener('fetch', event => {
     request.method !== 'GET'
   ) return
 
-  // HTML → network-first: siempre busca la versión más nueva en el servidor.
+  // HTML → network-first con timeout de 5 s.
   // Evita que index.html cacheado apunte a bundles JS con hashes viejos ya borrados.
   if (request.destination === 'document' || request.headers.get('accept')?.includes('text/html')) {
     event.respondWith(
-      fetch(request).then(response => {
-        const clone = response.clone()
-        caches.open(CACHE).then(cache => cache.put(request, clone))
-        return response
-      }).catch(() => caches.match(request))
+      fetchWithTimeout(request, 5000)
+        .then(response => {
+          const clone = response.clone()
+          caches.open(CACHE).then(cache => cache.put(request, clone))
+          return response
+        })
+        .catch(() => caches.match(request).then(cached => cached || fetch(request)))
     )
     return
   }
 
-  // JS/CSS/imágenes (con hash en el nombre) → cache-first, fallback a red
+  // JS/CSS/imágenes (con hash en el nombre) → cache-first, fallback a red con timeout
   event.respondWith(
     caches.match(request).then(cached => {
       if (cached) return cached
 
-      return fetch(request).then(response => {
-        if (!response || response.status !== 200 || response.type === 'opaque') {
+      return fetchWithTimeout(request, 5000)
+        .then(response => {
+          if (!response || response.status !== 200 || response.type === 'opaque') {
+            return response
+          }
+          const clone = response.clone()
+          caches.open(CACHE).then(cache => cache.put(request, clone))
           return response
-        }
-        const clone = response.clone()
-        caches.open(CACHE).then(cache => cache.put(request, clone))
-        return response
-      }).catch(() => {
-        if (request.destination === 'document') {
-          return caches.match('/index.html')
-        }
-      })
+        })
+        .catch(() => {
+          if (request.destination === 'document') {
+            return caches.match('/index.html')
+          }
+          // Devuelve respuesta vacía válida en lugar de undefined para no romper el navegador
+          return new Response('', { status: 408, statusText: 'SW Timeout' })
+        })
     })
   )
 })

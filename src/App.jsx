@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, useState, useEffect } from 'react'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { AppProvider, AppContext } from './context/AppContext'
 import Landing              from './pages/Landing'
@@ -10,6 +10,27 @@ import OnboardingScreen     from './screens/OnboardingScreen'
 import TrialExpiredScreen   from './screens/TrialExpiredScreen'
 
 function LoadingScreen() {
+  const [timedOut, setTimedOut] = useState(false)
+
+  useEffect(() => {
+    const t = setTimeout(() => setTimedOut(true), 8000)
+    return () => clearTimeout(t)
+  }, [])
+
+  if (timedOut) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', flexDirection: 'column', gap: 16, padding: 24 }}>
+        <span style={{ fontSize: 14, color: 'var(--text3)', textAlign: 'center' }}>Algo salió mal</span>
+        <button
+          onClick={() => window.location.reload()}
+          style={{ padding: '12px 24px', background: 'var(--accent)', color: '#fff', border: 'none', borderRadius: 8, fontSize: 14, cursor: 'pointer' }}
+        >
+          Toca para recargar
+        </button>
+      </div>
+    )
+  }
+
   return (
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', flexDirection: 'column', gap: 16 }}>
       <div style={{ width: 40, height: 40, borderRadius: '50%', border: '3px solid var(--border)', borderTopColor: 'var(--accent)', animation: 'spin 0.8s linear infinite' }}></div>
