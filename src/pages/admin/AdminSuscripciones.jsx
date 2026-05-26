@@ -71,12 +71,21 @@ export default function AdminSuscripciones() {
   const [toast,     setToast]     = useState(null)  // { text, ok }
 
   const fetchRows = async () => {
-    const [{ data: profiles }, { data: subs }] = await Promise.all([
+    const { data: sessionData } = await supabase.auth.getSession()
+    const token = sessionData?.session?.access_token
+
+    const [{ data: profiles }, subsRes] = await Promise.all([
       supabase.from('profiles').select('id, name, email, role, created_at').order('created_at'),
-      supabase.from('subscriptions').select('*'),
+      token
+        ? fetch('/.netlify/functions/admin-get-subs', {
+            headers: { Authorization: `Bearer ${token}` },
+          }).then(r => r.ok ? r.json() : { subs: [] }).catch(() => ({ subs: [] }))
+        : Promise.resolve({ subs: [] }),
     ])
+
     const subMap = {}
-    for (const s of (subs || [])) subMap[s.user_id] = s
+    for (const s of (subsRes.subs || [])) subMap[s.user_id] = s
+
     return (profiles || [])
       .filter(p => p.role !== 'admin')
       .map(p => {
@@ -97,11 +106,6 @@ export default function AdminSuscripciones() {
     setLoading(true)
     setRows(await fetchRows())
     setLoading(false)
-  }
-
-  // Refresh data without hiding the table (used after actions)
-  const silentRefresh = async () => {
-    setRows(await fetchRows())
   }
 
   useEffect(() => { load() }, [])
@@ -148,15 +152,15 @@ export default function AdminSuscripciones() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || `Error ${res.status}`)
 
-      // 2 — Optimistic local update so the badge flips immediately
+      // 2 — Optimistic local update — badge flips immediately
       const now = new Date().toISOString()
       setRows(prev => prev.map(r => {
         if (r.user_id !== row.user_id) return r
-        if (action === 'activate') return { ...r, plan: 'pro', status: 'active', started_at: now, expires_at: null }
-        if (action === 'revoke')   return { ...r, plan: 'free', status: 'cancelled', expires_at: null }
+        if (action === 'activate') return { ...r, plan: 'pro', started_at: now, expires_at: null }
+        if (action === 'revoke')   return { ...r, plan: 'free', expires_at: null }
         if (action === 'promo') {
           const exp = new Date(); exp.setDate(exp.getDate() + (months || 1) * 30)
-          return { ...r, plan: 'pro', status: 'active', started_at: now, expires_at: exp.toISOString() }
+          return { ...r, plan: 'pro', started_at: now, expires_at: exp.toISOString() }
         }
         return r
       }))
@@ -341,14 +345,19 @@ export default function AdminSuscripciones() {
 
                       {/* Plan badge */}
                       <td>
-                        <span className="subs-plan-badge" style={{
-                          background: isPro ? 'rgba(0,212,255,.1)'  : 'var(--surface2)',
-                          color:      isPro ? '#00D4FF'              : 'var(--text3)',
-                          border:     isPro ? '1px solid rgba(0,212,255,.25)' : '1px solid var(--border)',
-                        }}>
-                          {isPro && <i className="ti ti-bolt" style={{ fontSize: 9 }}></i>}
-                          {isPro ? 'PRO' : 'FREE'}
-                        </span>
+                        {r.plan !== 'pro' ? (
+                          <span className="subs-plan-badge" style={{ background: 'var(--surface2)', color: 'var(--text3)', border: '1px solid var(--border)' }}>
+                            FREE
+                          </span>
+                        ) : r.expires_at ? (
+                          <span className="subs-plan-badge" style={{ background: 'rgba(212,145,30,.1)', color: 'var(--amber)', border: '1px solid rgba(212,145,30,.3)' }}>
+                            <i className="ti ti-gift" style={{ fontSize: 9 }}></i> PROMO
+                          </span>
+                        ) : (
+                          <span className="subs-plan-badge" style={{ background: 'rgba(0,212,255,.1)', color: '#00D4FF', border: '1px solid rgba(0,212,255,.25)' }}>
+                            <i className="ti ti-bolt" style={{ fontSize: 9 }}></i> PRO
+                          </span>
+                        )}
                       </td>
 
                       {/* Tipo */}
@@ -382,22 +391,25 @@ export default function AdminSuscripciones() {
                             <div className="subs-spinner"></div>
                             Procesando...
                           </div>
+                        ) : isPro ? (
+                          <button
+                            className="subs-btn subs-btn-rev"
+                            onClick={() => callAction('revoke', r)}
+                            title="Suspender plan PRO"
+                          >
+                            <i className="ti ti-ban" style={{ fontSize: 11 }}></i>
+                            Suspender plan
+                          </button>
                         ) : (
                           <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'nowrap' }}>
-
-                            {/* Activar PRO */}
-                            {!isPro && (
-                              <button
-                                className="subs-btn subs-btn-pro"
-                                onClick={() => callAction('activate', r)}
-                                title="Activar PRO manualmente"
-                              >
-                                <i className="ti ti-bolt" style={{ fontSize: 11 }}></i>
-                                Activar PRO
-                              </button>
-                            )}
-
-                            {/* Dar promo */}
+                            <button
+                              className="subs-btn subs-btn-pro"
+                              onClick={() => callAction('activate', r)}
+                              title="Activar PRO manualmente"
+                            >
+                              <i className="ti ti-bolt" style={{ fontSize: 11 }}></i>
+                              Activar PRO
+                            </button>
                             <button
                               className="subs-btn subs-btn-promo"
                               onClick={e => openPromo(e, r)}
@@ -406,19 +418,6 @@ export default function AdminSuscripciones() {
                               <i className="ti ti-gift" style={{ fontSize: 11 }}></i>
                               Promo
                             </button>
-
-                            {/* Revocar */}
-                            {isPro && (
-                              <button
-                                className="subs-btn subs-btn-rev"
-                                onClick={() => callAction('revoke', r)}
-                                title="Revocar PRO"
-                              >
-                                <i className="ti ti-ban" style={{ fontSize: 11 }}></i>
-                                Revocar
-                              </button>
-                            )}
-
                           </div>
                         )}
                       </td>
