@@ -75,7 +75,7 @@ export function AuthProvider({ children }) {
     if (effectiveSub.plan === 'pro' && effectiveSub.expires_at && !effectiveSub.stripe_customer_id) {
       if (new Date(effectiveSub.expires_at) < new Date()) {
         await supabase.from('subscriptions')
-          .update({ plan: 'free', status: 'cancelled' })
+          .update({ plan: 'free' })
           .eq('user_id', authUser.id)
         effectiveSub = { plan: 'free' }
       }

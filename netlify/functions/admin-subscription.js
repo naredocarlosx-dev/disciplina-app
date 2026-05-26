@@ -61,16 +61,16 @@ exports.handler = async (event) => {
     }
 
     if (action === 'activate') {
-      await upsert({ plan: 'pro', status: 'active', started_at: now, expires_at: null })
+      await upsert({ plan: 'pro', started_at: now, expires_at: null })
 
     } else if (action === 'revoke') {
-      await upsert({ plan: 'free', status: 'cancelled', expires_at: null })
+      await upsert({ plan: 'free', expires_at: null })
 
     } else if (action === 'promo') {
       const numMonths = Math.max(1, parseInt(months, 10) || 1)
       const expires = new Date()
       expires.setDate(expires.getDate() + numMonths * 30)
-      await upsert({ plan: 'pro', status: 'active', started_at: now, expires_at: expires.toISOString() })
+      await upsert({ plan: 'pro', started_at: now, expires_at: expires.toISOString() })
 
     } else {
       return { statusCode: 400, headers: HEADERS, body: JSON.stringify({ error: `Unknown action: ${action}` }) }
