@@ -103,38 +103,13 @@ function Step({ number, title, desc, svg }) {
 }
 
 // ── iOS tab ────────────────────────────────────────────────────────────────
-function IOSTab({ isSafari }) {
-  if (!isSafari) {
-    return (
-      <div style={{
-        padding: '24px', borderRadius: 12, textAlign: 'center',
-        background: 'rgba(255,184,0,.05)', border: '1px solid rgba(255,184,0,.25)',
-      }}>
-        <div style={{ fontSize: 32, marginBottom: 12 }}>🌐</div>
-        <div style={{ fontWeight: 600, fontSize: 15, color: '#FFB800', marginBottom: 8 }}>
-          Abre esta página en Safari
-        </div>
-        <div style={{ fontSize: 13, color: '#8a8a85', lineHeight: 1.7 }}>
-          Para instalar Episodio Uno en tu iPhone necesitas usar <strong style={{ color: '#efefed' }}>Safari</strong>.
-          Copia el enlace y ábrelo en Safari para continuar.
-        </div>
-        <div style={{
-          marginTop: 16, padding: '10px 16px', borderRadius: 8,
-          background: '#1a1a1a', border: '1px solid #2a2a2a',
-          fontSize: 13, color: '#00D4FF', fontFamily: 'monospace',
-        }}>
-          episodiouno.com
-        </div>
-      </div>
-    )
-  }
-
+function IOSTab() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <Step
         number="1"
-        title='Toca el botón "Compartir"'
-        desc='En la barra inferior de Safari, toca el ícono de compartir (cuadrado con flecha hacia arriba).'
+        title='Toca el botón "Compartir" ↑'
+        desc='En la barra inferior del navegador, toca el ícono de compartir (cuadrado con flecha hacia arriba).'
         svg={<PhoneShareSVG />}
       />
       <Step
@@ -378,7 +353,7 @@ export default function Instalar() {
 
       {/* Tab content */}
       <div className="card">
-        {tab === 'ios'     && <IOSTab isSafari={isSafari} />}
+        {tab === 'ios'     && <IOSTab />}
         {tab === 'android' && <AndroidTab canInstallNatively={canInstallNatively} triggerInstall={triggerInstall} onInstalled={() => setDone(true)} />}
         {tab === 'desktop' && <DesktopTab canInstallNatively={canInstallNatively} triggerInstall={triggerInstall} onInstalled={() => setDone(true)} />}
       </div>

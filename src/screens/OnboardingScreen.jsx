@@ -31,7 +31,7 @@ const OB_PARTICLES = Array.from({ length: 50 }, (_, i) => {
 
 export default function OnboardingScreen() {
   const { setScreen, addHabit } = useContext(AppContext)
-  const { isStandalone, isIOS, isAndroid, isSafari, canInstallNatively, triggerInstall } = usePWA()
+  const { isStandalone, isIOS, canInstallNatively, triggerInstall } = usePWA()
 
   const [step,         setStep]         = useState(1)
   const [habitName,    setHabitName]    = useState('')
@@ -232,27 +232,16 @@ export default function OnboardingScreen() {
                   </div>
                 </div>
 
-                {/* iOS non-Safari */}
-                {isIOS && !isAndroid && !isSafari && (
-                  <div style={{
-                    padding: '14px', borderRadius: 10, marginBottom: 16,
-                    background: 'rgba(255,184,0,.07)', border: '1px solid rgba(255,184,0,.25)',
-                    fontSize: 13, color: '#FFB800', lineHeight: 1.6,
-                  }}>
-                    <strong>iPhone:</strong> Abre episodiouno.com en <strong>Safari</strong> para poder instalar la app.
-                  </div>
-                )}
-
-                {/* iOS Safari instructions */}
-                {isIOS && isSafari && (
+                {/* iOS (Safari y Chrome) — mismas instrucciones: botón Compartir */}
+                {isIOS && (
                   <div style={{
                     background: 'rgba(0,212,255,.05)', border: '1px solid rgba(0,212,255,.15)',
                     borderRadius: 10, padding: '14px', marginBottom: 16,
                   }}>
                     {[
-                      { n: '1', t: 'Toca el botón Compartir (↑)', i: 'ti-share' },
-                      { n: '2', t: 'Toca "En la pantalla de inicio"', i: 'ti-plus' },
-                      { n: '3', t: 'Confirma tocando "Agregar"', i: 'ti-check' },
+                      { n: '1', t: 'Toca el botón Compartir ↑', i: 'ti-share' },
+                      { n: '2', t: 'Toca "Añadir a pantalla de inicio"', i: 'ti-plus' },
+                      { n: '3', t: 'Confirma tocando "Añadir"', i: 'ti-check' },
                     ].map(s => (
                       <div key={s.n} style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
                         <div style={{
