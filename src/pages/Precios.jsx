@@ -1,6 +1,7 @@
 import { useContext } from 'react'
 import { AppContext } from '../context/AppContext'
 import SubscribeButton from '../components/SubscribeButton'
+import ManageSubscriptionButton from '../components/ManageSubscriptionButton'
 
 const FEATURES_FREE = [
   'Hasta 3 hábitos',
@@ -24,7 +25,8 @@ const FEATURES_PRO = [
 
 export default function Precios() {
   const { subscription, upgradeToPro } = useContext(AppContext)
-  const isPro = subscription?.plan === 'pro'
+  const isPro       = subscription?.plan === 'pro'
+  const hasStripe   = Boolean(subscription?.stripe_customer_id)
 
   return (
     <div>
@@ -96,7 +98,14 @@ export default function Precios() {
             ))}
           </ul>
           {isPro ? (
-            <div style={{ fontSize: 12, color: 'var(--text3)', textAlign: 'center' }}>Tu plan actual</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div style={{ fontSize: 12, color: 'var(--text3)', textAlign: 'center' }}>
+                Plan activo ✓
+              </div>
+              {hasStripe && (
+                <ManageSubscriptionButton />
+              )}
+            </div>
           ) : (
             <div data-tour="precios-subscribe">
               <SubscribeButton style={{ width: '100%' }} />
@@ -110,8 +119,8 @@ export default function Precios() {
         <div className="section-title-sm" style={{ marginBottom: 16 }}>Preguntas frecuentes</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           {[
-            { q: '¿Puedo cancelar en cualquier momento?', a: 'Sí. Si cancelas, tu cuenta vuelve al plan FREE al término del periodo pagado.' },
-            { q: '¿Cómo se cobra el plan PRO?', a: 'El cobro es mensual. Actualmente el pago se procesa de forma manual — contáctanos al activarlo.' },
+            { q: '¿Puedo cancelar en cualquier momento?', a: 'Sí. Desde "Gestionar suscripción" puedes cancelar cuando quieras. Tu acceso PRO se mantiene hasta el fin del período pagado.' },
+            { q: '¿Cómo cambio mi tarjeta de crédito?', a: 'Usa el botón "Gestionar suscripción" en tu plan PRO. Te llevará al portal de Stripe donde puedes actualizar tu método de pago de forma segura.' },
             { q: '¿Mis datos están seguros en PRO?', a: 'Igual que en FREE: tus datos se guardan en Supabase con cifrado en tránsito y en reposo.' },
             { q: '¿Qué pasa con mis datos si bajo de plan?', a: 'Tus datos no se eliminan. Si tienes más de 3 hábitos o más de 1 meta de ahorro, simplemente no podrás agregar más hasta que borres los que sobren.' },
           ].map(({ q, a }) => (
