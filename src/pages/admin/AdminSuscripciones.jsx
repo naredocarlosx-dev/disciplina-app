@@ -70,34 +70,38 @@ export default function AdminSuscripciones() {
   const [promoPos,  setPromoPos]  = useState(null)  // { top, left, row }
   const [toast,     setToast]     = useState(null)  // { text, ok }
 
-  const load = async () => {
-    setLoading(true)
+  const fetchRows = async () => {
     const [{ data: profiles }, { data: subs }] = await Promise.all([
       supabase.from('profiles').select('id, name, email, role, created_at').order('created_at'),
       supabase.from('subscriptions').select('*'),
     ])
-
     const subMap = {}
     for (const s of (subs || [])) subMap[s.user_id] = s
+    return (profiles || [])
+      .filter(p => p.role !== 'admin')
+      .map(p => {
+        const s = subMap[p.id] || {}
+        return {
+          user_id:            p.id,
+          name:               p.name  || '—',
+          email:              p.email || '—',
+          plan:               s.plan        || 'free',
+          started_at:         s.started_at  || p.created_at,
+          expires_at:         s.expires_at  || null,
+          stripe_customer_id: s.stripe_customer_id || null,
+        }
+      })
+  }
 
-    setRows(
-      (profiles || [])
-        .filter(p => p.role !== 'admin')
-        .map(p => {
-          const s = subMap[p.id] || {}
-          return {
-            user_id:            p.id,
-            name:               p.name  || '—',
-            email:              p.email || '—',
-            plan:               s.plan       || 'free',
-            status:             s.status     || 'active',
-            started_at:         s.started_at || p.created_at,
-            expires_at:         s.expires_at || null,
-            stripe_customer_id: s.stripe_customer_id || null,
-          }
-        })
-    )
+  const load = async () => {
+    setLoading(true)
+    setRows(await fetchRows())
     setLoading(false)
+  }
+
+  // Refresh data without hiding the table (used after actions)
+  const silentRefresh = async () => {
+    setRows(await fetchRows())
   }
 
   useEffect(() => { load() }, [])
@@ -187,8 +191,8 @@ export default function AdminSuscripciones() {
       const suffix = emailOk ? `. Correo enviado a ${row.email}` : ` (correo no enviado)`
       setToast({ text: `✓ ${actionLabel[action] || 'Listo'}${suffix}`, ok: true })
 
-      // 5 — Re-sync from DB to confirm the change landed
-      await load()
+      // 5 — Re-sync from DB without hiding the table
+      await silentRefresh()
     } catch (err) {
       console.error('[admin] callAction error:', err)
       setToast({ text: err.message, ok: false })
