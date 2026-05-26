@@ -8,8 +8,9 @@ const TOUR_CSS = `
 .tour-tip { animation: tour-in 0.24s cubic-bezier(0.34,1.56,0.64,1) forwards; }
 `
 
-const GAP = 14
-const TW  = 272
+const GAP    = 14
+const MARGIN = 16   // minimum distance from every screen edge
+const TW_MAX = 272  // desired width — clamped to screen below
 
 // Which border pair to hide so the rotated square points the right way
 const ARROW_HIDE = {
@@ -27,15 +28,22 @@ function measure(target, placement) {
   const vw = window.innerWidth
   const vh = window.innerHeight
 
-  // Auto-flip bottom ↔ top when near screen edge
+  // Clamp tooltip width so it always fits within screen margins
+  const tw = Math.min(TW_MAX, vw - MARGIN * 2)
+
+  // Auto-flip vertically when near edge
   let p = placement
   if (p === 'bottom' && rect.bottom + GAP + 180 > vh) p = 'top'
   if (p === 'top'    && rect.top    - GAP - 180 < 0)  p = 'bottom'
+  // Auto-flip horizontally when near edge
+  if (p === 'right'  && rect.right  + GAP + tw  > vw - MARGIN) p = 'left'
+  if (p === 'left'   && rect.left   - GAP - tw  < MARGIN)      p = 'right'
 
-  const cx   = rect.left + rect.width  / 2
-  const SBAR = 230  // min-left: keep tooltip out of sidebar
-  const left = Math.max(SBAR, Math.min(cx - TW / 2, vw - TW - 10))
-  const ax   = Math.max(10, Math.min(cx - left - 6, TW - 22))
+  const cx = rect.left + rect.width / 2
+
+  // Horizontal position: center on element, clamp to stay within margins
+  const left = Math.max(MARGIN, Math.min(cx - tw / 2, vw - tw - MARGIN))
+  const ax   = Math.max(10, Math.min(cx - left - 6, tw - 22))
 
   let tipStyle, arrowStyle, arrowDir
 
@@ -48,18 +56,20 @@ function measure(target, placement) {
     arrowStyle = { bottom: -7, left: ax }
     arrowDir   = 'down'
   } else if (p === 'right') {
-    const top  = Math.max(60, Math.min(rect.top + rect.height / 2 - 70, vh - 200))
-    tipStyle   = { top, left: rect.right + GAP }
+    const tipLeft = Math.max(MARGIN, Math.min(rect.right + GAP, vw - tw - MARGIN))
+    const top     = Math.max(MARGIN, Math.min(rect.top + rect.height / 2 - 70, vh - 220))
+    tipStyle   = { top, left: tipLeft }
     arrowStyle = { top: Math.max(8, rect.top + rect.height / 2 - top - 6), left: -7 }
     arrowDir   = 'left'
   } else {
-    const top  = Math.max(60, Math.min(rect.top + rect.height / 2 - 70, vh - 200))
-    tipStyle   = { top, right: vw - rect.left + GAP }
+    const tipLeft = Math.max(MARGIN, Math.min(rect.left - GAP - tw, vw - tw - MARGIN))
+    const top     = Math.max(MARGIN, Math.min(rect.top + rect.height / 2 - 70, vh - 220))
+    tipStyle   = { top, left: tipLeft }
     arrowStyle = { top: Math.max(8, rect.top + rect.height / 2 - top - 6), right: -7 }
     arrowDir   = 'right'
   }
 
-  return { rect, tipStyle, arrowStyle, arrowDir }
+  return { rect, tipStyle, arrowStyle, arrowDir, tw }
 }
 
 export default function TourOverlay({ steps, tourKey, onDone }) {
@@ -147,7 +157,7 @@ export default function TourOverlay({ steps, tourKey, onDone }) {
           style={{
             position: 'fixed',
             zIndex: 9002,
-            width: TW,
+            width: pos.tw,
             background: 'rgba(8,8,10,.97)',
             border: '1px solid rgba(0,212,255,.32)',
             borderRadius: 12,
