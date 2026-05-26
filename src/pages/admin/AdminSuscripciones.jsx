@@ -73,13 +73,24 @@ export default function AdminSuscripciones() {
   const fetchRows = async () => {
     const { data: sessionData } = await supabase.auth.getSession()
     const token = sessionData?.session?.access_token
+    if (!token) console.warn('[admin-subs] no session token')
 
     const [{ data: profiles }, subsRes] = await Promise.all([
       supabase.from('profiles').select('id, name, email, role, created_at').order('created_at'),
       token
         ? fetch('/.netlify/functions/admin-get-subs', {
             headers: { Authorization: `Bearer ${token}` },
-          }).then(r => r.ok ? r.json() : { subs: [] }).catch(() => ({ subs: [] }))
+          }).then(async r => {
+            if (!r.ok) {
+              const err = await r.json().catch(() => ({}))
+              console.error('[admin-subs] admin-get-subs', r.status, err)
+              return { subs: [] }
+            }
+            return r.json()
+          }).catch(e => {
+            console.error('[admin-subs] fetch error:', e)
+            return { subs: [] }
+          })
         : Promise.resolve({ subs: [] }),
     ])
 
@@ -165,7 +176,10 @@ export default function AdminSuscripciones() {
         return r
       }))
 
-      // 3 — Email notification (best-effort — failure doesn't block the action)
+      // 3 — Re-sync from server (service role bypasses RLS → real plan)
+      fetchRows().then(fresh => setRows(fresh)).catch(() => {})
+
+      // 5 — Email notification (best-effort — failure doesn't block the action)
       let expiresAt = null
       if (action === 'promo' && months) {
         const d = new Date()
@@ -186,7 +200,7 @@ export default function AdminSuscripciones() {
         console.error('[admin] send-admin-email failed:', emailErr)
       }
 
-      // 4 — Toast
+      // 6 — Toast
       const actionLabel = {
         activate: 'PRO activado',
         revoke:   'PRO revocado',

@@ -31,7 +31,11 @@ exports.handler = async (event) => {
   }
 
   const { data: subs, error } = await supabase.from('subscriptions').select('*')
-  if (error) return { statusCode: 500, headers: HEADERS, body: JSON.stringify({ error: error.message }) }
+  if (error) {
+    console.error('admin-get-subs supabase error:', error.message)
+    return { statusCode: 500, headers: HEADERS, body: JSON.stringify({ error: error.message }) }
+  }
 
+  console.log(`admin-get-subs: returning ${(subs || []).length} subscriptions for ${user.email}`)
   return { statusCode: 200, headers: HEADERS, body: JSON.stringify({ ok: true, subs: subs || [] }) }
 }
