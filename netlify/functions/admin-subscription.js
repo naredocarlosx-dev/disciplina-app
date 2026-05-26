@@ -53,39 +53,24 @@ exports.handler = async (event) => {
       .eq('user_id', targetUserId)
       .maybeSingle()
 
+    const upsert = async (values) => {
+      const { error } = existing
+        ? await supabase.from('subscriptions').update(values).eq('user_id', targetUserId)
+        : await supabase.from('subscriptions').insert({ user_id: targetUserId, ...values })
+      if (error) throw new Error(`Supabase: ${error.message}`)
+    }
+
     if (action === 'activate') {
-      if (existing) {
-        await supabase.from('subscriptions')
-          .update({ plan: 'pro', status: 'active', started_at: now, expires_at: null })
-          .eq('user_id', targetUserId)
-      } else {
-        await supabase.from('subscriptions')
-          .insert({ user_id: targetUserId, plan: 'pro', status: 'active', started_at: now })
-      }
+      await upsert({ plan: 'pro', status: 'active', started_at: now, expires_at: null })
 
     } else if (action === 'revoke') {
-      if (existing) {
-        await supabase.from('subscriptions')
-          .update({ plan: 'free', status: 'cancelled', expires_at: null })
-          .eq('user_id', targetUserId)
-      } else {
-        await supabase.from('subscriptions')
-          .insert({ user_id: targetUserId, plan: 'free', status: 'cancelled' })
-      }
+      await upsert({ plan: 'free', status: 'cancelled', expires_at: null })
 
     } else if (action === 'promo') {
       const numMonths = Math.max(1, parseInt(months, 10) || 1)
       const expires = new Date()
       expires.setDate(expires.getDate() + numMonths * 30)
-
-      if (existing) {
-        await supabase.from('subscriptions')
-          .update({ plan: 'pro', status: 'active', started_at: now, expires_at: expires.toISOString() })
-          .eq('user_id', targetUserId)
-      } else {
-        await supabase.from('subscriptions')
-          .insert({ user_id: targetUserId, plan: 'pro', status: 'active', started_at: now, expires_at: expires.toISOString() })
-      }
+      await upsert({ plan: 'pro', status: 'active', started_at: now, expires_at: expires.toISOString() })
 
     } else {
       return { statusCode: 400, headers: HEADERS, body: JSON.stringify({ error: `Unknown action: ${action}` }) }

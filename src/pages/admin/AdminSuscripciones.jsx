@@ -123,10 +123,12 @@ export default function AdminSuscripciones() {
     setActioning(row.user_id)
     setPromoPos(null)
 
-    const { data: { session } } = await supabase.auth.getSession()
-    const token = session?.access_token
-
     try {
+      // getSession INSIDE try so any failure is caught and spinner is cleared
+      const { data: sessionData } = await supabase.auth.getSession()
+      const token = sessionData?.session?.access_token
+      if (!token) throw new Error('Sesión expirada. Recarga la página.')
+
       // 1 — DB action
       const res = await fetch('/.netlify/functions/admin-subscription', {
         method:  'POST',
@@ -140,9 +142,22 @@ export default function AdminSuscripciones() {
         }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Error desconocido')
+      if (!res.ok) throw new Error(data.error || `Error ${res.status}`)
 
-      // 2 — Email notification
+      // 2 — Optimistic local update so the badge flips immediately
+      const now = new Date().toISOString()
+      setRows(prev => prev.map(r => {
+        if (r.user_id !== row.user_id) return r
+        if (action === 'activate') return { ...r, plan: 'pro', status: 'active', started_at: now, expires_at: null }
+        if (action === 'revoke')   return { ...r, plan: 'free', status: 'cancelled', expires_at: null }
+        if (action === 'promo') {
+          const exp = new Date(); exp.setDate(exp.getDate() + (months || 1) * 30)
+          return { ...r, plan: 'pro', status: 'active', started_at: now, expires_at: exp.toISOString() }
+        }
+        return r
+      }))
+
+      // 3 — Email notification (best-effort — failure doesn't block the action)
       let expiresAt = null
       if (action === 'promo' && months) {
         const d = new Date()
@@ -150,36 +165,37 @@ export default function AdminSuscripciones() {
         expiresAt = d.toISOString()
       }
 
-      const emailRes = await fetch('/.netlify/functions/send-admin-email', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body:    JSON.stringify({
-          action,
-          targetEmail: row.email,
-          targetName:  row.name,
-          months,
-          expiresAt,
-        }),
-      })
-      const emailData = await emailRes.json()
-      const emailOk   = emailRes.ok && emailData.ok && !emailData.skipped
+      let emailOk = false
+      try {
+        const emailRes = await fetch('/.netlify/functions/send-admin-email', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body:    JSON.stringify({ action, targetEmail: row.email, targetName: row.name, months, expiresAt }),
+        })
+        const emailData = await emailRes.json().catch(() => ({}))
+        emailOk = emailRes.ok && emailData.ok && !emailData.skipped
+      } catch (emailErr) {
+        console.error('[admin] send-admin-email failed:', emailErr)
+      }
 
-      // 3 — Toast
+      // 4 — Toast
       const actionLabel = {
         activate: 'PRO activado',
         revoke:   'PRO revocado',
         promo:    `Promo de ${months} mes${months > 1 ? 'es' : ''} otorgada`,
       }
-      const suffix = emailOk
-        ? `. Correo enviado a ${row.email}`
-        : ` (correo no enviado)`
+      const suffix = emailOk ? `. Correo enviado a ${row.email}` : ` (correo no enviado)`
       setToast({ text: `✓ ${actionLabel[action] || 'Listo'}${suffix}`, ok: true })
 
+      // 5 — Re-sync from DB to confirm the change landed
       await load()
     } catch (err) {
+      console.error('[admin] callAction error:', err)
       setToast({ text: err.message, ok: false })
+    } finally {
+      // finally guarantees the spinner always clears regardless of what happened
+      setActioning(null)
     }
-    setActioning(null)
   }
 
   const openPromo = (e, row) => {
